@@ -1,0 +1,24 @@
+#set( $charsPerLine = 72 )
+$report.center("JC HARMONY SELLING INC.", $charsPerLine)
+
+$report.center("PURCHASE RETURN - BAD STOCK", $charsPerLine)
+
+B.S.R. # : $report.field($purchaseReturnBadStock.purchaseReturnBadStockNumber, 7)                                     Date : $report.field($currentDate)
+Customer : $report.field($purchaseReturnBadStock.supplier.name)
+
+      Product Code & Description         Unit  Qty    Price     Amount
+---------------------------------------- ---- ----- --------- ----------
+##QUATRO ARIEL COMPLETE 128gx144 #2061     CSE      1  1,522.50   1,522.50
+#foreach($item in $items)
+$report.field($item.product.description, 40) $report.field($item.unit, 4) $report.field($item.quantity, 5, "right") $report.field($item.unitCost, 9, "right") $report.field($item.amount, 10, "right")
+#end
+#if($isLastPage == true)
+
+                                                              ----------
+                                               Total Amount P $report.field($purchaseReturnBadStock.totalAmount, 10, "right")
+  Prepared by   : $report.field($purchaseReturnBadStock.postedBy.username, 15)                             ==========                    
+  Verified by   :
+  Total Items   : $report.field($purchaseReturnBadStock.items.size(), 5, "right")              Approved by :
+  
+  Remarks       : $remarks
+#end

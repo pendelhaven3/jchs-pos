@@ -1,0 +1,16 @@
+#set( $charsPerLine = 84 )
+$report.center("JC HARMONY SELLING", $charsPerLine)
+
+$report.center("${pricingScheme.name} PRICE LIST REPORT", $charsPerLine)
+$report.center("as of ${currentDate}", $charsPerLine)
+                                                                       Page: $currentPage x $totalPages
+
+             Product Description         PCS      DOZ      CTN      TIE       CSE
+-------------------------------------- -------- -------- -------- -------- ---------
+##DM P.APPLE 1/2GALx12 (56273) JUICE     1,110.00 1,110.00 1,110.00 1,110.00 11,110.00
+#foreach($product in $products)
+$report.field($product.description, 38) $report.price($product.getActiveUnitPrice("PCS"), 8) $report.price($product.getActiveUnitPrice("DOZ"), 8) $report.price($product.getActiveUnitPrice("CTN"), 8) $report.price($product.getActiveUnitPrice("TIE"), 8) $report.price($product.getUnitPrice("CSE"), 9)
+#end
+#if($isLastPage == true)
+------------------------------------------------------------------------------------
+#end

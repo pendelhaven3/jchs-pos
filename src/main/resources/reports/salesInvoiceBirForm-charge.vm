@@ -1,0 +1,32 @@
+
+
+     SI #: $report.field($salesInvoice.salesInvoiceNumber, 7)                                             Page: $currentPage x $totalPages
+
+
+
+
+                $report.field($salesInvoice.customer.name, 34)          $report.field($salesInvoice.transactionDate)
+
+
+
+                $report.multiline($salesInvoice.customer.businessAddress, 34, 1)
+                $report.multiline($salesInvoice.customer.businessAddress, 34, 2)
+
+
+
+
+
+$items
+#if($isLastPage == true)
+#foreach($fillerLine in $fillerLines)
+
+
+#end
+                                                                 $report.field($salesInvoice.vatableSales, 12, "right")
+
+                                                     Discount  :(  $report.field($salesInvoice.totalDiscounts, 10, "right"))
+
+                                                                 $report.field($salesInvoice.vatAmount, 12, "right")
+
+                                                                 $report.field($salesInvoice.totalNetAmount, 12, "right")
+#end

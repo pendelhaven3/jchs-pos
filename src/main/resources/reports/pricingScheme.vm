@@ -1,0 +1,19 @@
+$report.center("JC HARMONY SELLING")
+
+$report.center("PRODUCT PRICE ${pricingScheme.name}, COST & PROFIT")
+$report.center("as of ${currentDate}")
+                                                                Page: $currentPage x $totalPages
+
+Product
+Code       Description
+-------------------------------------
+           Unit   Price 1    Cost      Profit    % Profit
+           -----  ---------- --------- --------- ---------
+##555AFR155 - 555 TUNA 155gmx50 AFRITADA#0028
+##            CSE       994.70    964.25     30.45    3.16 %
+#foreach($product in $products)
+$report.field($product.code, 9) - $report.field($product.description, 46)
+#foreach($unit in $product.activeUnits)
+            $unit   $report.field($product.getUnitPrice($unit), 10, "right") $report.field($product.getFinalCost($unit), 9, "right") $report.field($product.getFlatProfit($unit), 9, "right") $report.field($product.getPercentProfit($unit), 7, "right") %
+#end
+#end

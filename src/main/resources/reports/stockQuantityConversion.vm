@@ -1,0 +1,19 @@
+                       JC HARMONY SELLING INC.
+	
+                  STOCK QUANTITY CONVERSION REPORT
+	
+SQC Ref. # : $report.field($stockQuantityConversion.stockQuantityConversionNumber, 6)                            Date Converted: $currentDate
+Remarks    : $report.field($stockQuantityConversion.remarks, 40)
+	
+                                        From  Qty To  To   To
+         Product Description            Unit  Convert Unit Qty
+--------------------------------------- ---- -------- ---- ----
+#foreach($item in $items)
+$report.field($item.product.description, 39) $report.field($item.fromUnit, 4)  $report.field($item.quantity, 6, "right")  $report.field($item.toUnit, 4) $report.field($item.convertedQuantity, 4, "right") 
+#end
+#if($isLastPage == true)
+	
+Prepared by   :
+Verified by   :
+Total Items   : $report.field($stockQuantityConversion.items.size(), 5, "right")              Approved by :
+#end

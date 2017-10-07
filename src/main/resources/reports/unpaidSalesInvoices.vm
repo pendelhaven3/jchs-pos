@@ -1,0 +1,17 @@
+$report.center("JC HARMONY SELLING INC.", $charsPerLine)
+
+$report.center("UNPAID SALES INVOICE REPORT", $charsPerLine)
+$report.center("As of ${currentDate}", $charsPerLine)
+                                                                             Page: $currentPage x $totalPages
+
+S.I. # Trans.Date         Customer Name          Net Amount    Adj. Amount   Amount Due
+------ ---------- ------------------------------ ------------- ------------- -------------
+##369282 11/26/2014 CAN-LIZA'S SARI-SARI STORE          5,351.90      5,351.90      5,351.90
+#foreach($salesInvoice in $salesInvoices)
+$report.field($salesInvoice.salesInvoice.salesInvoiceNumber, 6, "right") $report.field($salesInvoice.salesInvoice.transactionDate) $report.field($salesInvoice.salesInvoice.customer.name, 30) $report.field($salesInvoice.salesInvoice.totalNetAmount, 13, "right") $report.field($salesInvoice.adjustedAmount, 13, "right") $report.field($salesInvoice.amountDue, 13, "right")
+#end
+#if($isLastPage == true)
+                                                 ------------- ------------- -------------  
+                                    T O T A L => $report.field($salesInvoicesReport.totalNetAmount, 13, "right") $report.field($salesInvoicesReport.totalAdjustedAmount, 13, "right") $report.field($salesInvoicesReport.totalAmountDue, 13, "right")
+                                                 ============= ============= =============
+#end

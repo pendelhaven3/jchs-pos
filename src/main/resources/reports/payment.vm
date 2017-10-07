@@ -1,0 +1,60 @@
+#set( $charsPerLine = 70 )
+$report.center("JC HARMONY SELLING INC.", $charsPerLine)
+$report.center("251 GEN.P.ALVAREZ ST.CALOOCAN CITY", $charsPerLine)
+$report.center("TEL.NO.3621785 3195946", $charsPerLine)
+
+$report.center("PAYMENT SUMMARY", $charsPerLine)
+
+Payment # : $report.field($payment.paymentNumber, 7)                       Payment Date : $report.field($payment.createDate)
+Customer  : $report.field($payment.customer.name, 30)
+
+   Cash   : $report.field($payment.totalCashPayments, 13, "right")               Total Invoices : $report.field($payment.totalAmountDue, 13, "right")
+   Checks : $report.field($payment.totalCheckPayments, 13, "right")               Total Payments : $report.field($payment.totalPayments, 13, "right")
+                                     Total Adjustments : $report.field($payment.totalAdjustments, 13, "right")
+                                            Over/Short : $report.field($payment.overOrShort, 13, "right")
+
+   Tran. Date S.I. #  Net Amount   Adj.Amount   Amount Due  Due Date
+   ---------- ------ ------------  ----------  ------------ ----------
+##   11/28/2014 366237   146,906.86 ( 26,958.35)   119,948.51 11/28/2014
+#foreach($paymentSalesInvoice in $payment.salesInvoices)
+   $report.field($paymentSalesInvoice.salesInvoice.transactionDate) $report.field($paymentSalesInvoice.salesInvoice.salesInvoiceNumber, 6, "right") $report.field($paymentSalesInvoice.salesInvoice.totalNetAmount, 12, "right") ($report.adjustmentAmount($paymentSalesInvoice.adjustedAmount, 10)) $report.field($paymentSalesInvoice.amountDue, 12, "right") $report.field($paymentSalesInvoice.salesInvoice.dueDate)
+#end
+                     ------------  ----------  ------------
+           TOTALS => $report.field($payment.totalNetAmount, 12, "right") ($report.adjustmentAmount($payment.totalAdjustedAmount, 10)) $report.field($payment.totalAmountDue, 12, "right")
+                     ============  ==========  ============
+
+Cash Payments
+
+                Rec. Date  Rec. By      Amount   
+                ---------- ---------- ----------
+##                11/24/2014 IRENE       26,958.35 
+#foreach($cashPayment in $payment.cashPayments)
+                $report.field($cashPayment.receivedDate) $report.field($cashPayment.receivedBy.username, 10) $report.field($cashPayment.amount, 10, "right")
+#end
+                ---------- ---------- ----------
+                             TOTAL => $report.field($payment.totalCashPayments, 10, "right")   
+                                      ==========
+          
+Check Payments
+
+    Bank    Check Date  Check No.      Amount   
+ ---------- ---------- ------------ ------------
+## UnionBank  11/24/2014     51003734    26,958.35
+#foreach($checkPayment in $payment.checkPayments)
+ $report.field($checkPayment.bank, 10) $report.field($checkPayment.checkDate) $report.field($checkPayment.checkNumber, 12, "right") $report.field($checkPayment.amount, 12, "right")
+#end
+ ---------- ---------- ------------ ------------
+                           TOTAL => $report.field($payment.totalCheckPayments, 12, "right")   
+                                    ============
+
+Adjustments
+
+                    Type     Ref. No    Amount
+                ------------ -------- ----------
+##                SALES RETURN    12321  26,958.35
+#foreach($adjustment in $payment.adjustments)
+                $report.field($adjustment.adjustmentType.code, 12) $report.referenceNumber($adjustment, 8, "right") $report.field($adjustment.amount, 10, "right")
+#end
+                                      ----------
+                           TOTAL =>   $report.field($payment.totalAdjustments, 10, "right")   
+                                      ==========

@@ -1,0 +1,23 @@
+#foreach($itemGroup in $itemGroups)
+Effective Date: $report.field($itemGroup.date)
+
+  Time            Product Description           PCS      DOZ      CTN      TIE       CSE
+-------- -------------------------------------- -------- -------- -------- -------- ---------
+##11:45 PM DM P.APPLE 1/2GALx12 (56273) JUICE     1,110.00 1,110.00 1,110.00 1,110.00 11,110.00
+#foreach($item in $itemGroup.items)
+#set( $unitPricePieces = "" )
+#set( $unitPriceDozen = "" )
+#set( $unitPriceCarton = "" )
+#set( $unitPriceTie = "" )
+#set( $unitPriceCase = "" )
+#set( $unitPricePieces = $item.getActiveUnitPrice("PCS") )
+#set( $unitPriceDozen = $item.getActiveUnitPrice("DOZ") )
+#set( $unitPriceCarton = $item.getActiveUnitPrice("CTN") )
+#set( $unitPriceTie = $item.getActiveUnitPrice("TIE") )
+#set( $unitPriceCase = $item.getUnitPrice("CSE") )
+$report.time($item.updateDate) $report.field($item.product.description, 38) $report.field($unitPricePieces, 8, "right") $report.field($unitPriceDozen, 8, "right") $report.field($unitPriceCarton, 8, "right") $report.field($unitPriceTie, 8, "right") $report.field($unitPriceCase, 9, "right")
+#end
+-------- -------------------------------------- -------- -------- -------- -------- ---------
+
+
+#end

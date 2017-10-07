@@ -1,0 +1,22 @@
+$report.center("JC HARMONY SELLING INC.", $charsPerLine)
+
+$report.center("REMITTANCE REPORT", $charsPerLine)
+$report.center("As of ${report.field($remittanceReport.reportDate)}", $charsPerLine)
+
+                                                                             Page: $currentPage x $totalPages
+
+Terminal    : $paymentTerminal
+Time Period : $timePeriod
+
+Total Cash Payments  : $report.field($remittanceReport.totalCashPayments, 12, "right")
+Total Check Payments : $report.field($remittanceReport.totalCheckPayments, 12, "right")
+
+        Customer Name          Bank       Check No.       Check Date    Amount    Terminal
+------------------------------ ---------- --------------- ---------- ------------ --------
+##CAN-LIZA'S SARI-SARI STORE     UNIONBANK  abcdefghijabcde 12/18/2014   115,351.90 CASHIER
+#foreach($checkPayment in $remittanceReport.checkPayments)
+$report.field($checkPayment.parent.customer.name, 30) $report.field($checkPayment.bank, 10) $report.field($checkPayment.checkNumber, 15) $report.field($checkPayment.checkDate) $report.field($checkPayment.amount, 12, "right") $report.field($checkPayment.parent.paymentTerminal.name, 8)
+#end
+#if($isLastPage == true)
+------------------------------ ---------- --------------- ---------- ------------ --------
+#end

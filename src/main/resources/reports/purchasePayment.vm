@@ -1,0 +1,72 @@
+#set( $charsPerLine = 56 )
+#set( $space = " " )
+$report.center("JC HARMONY SELLING INC", $charsPerLine)
+$report.center("PAYMENT VOUCHER", $charsPerLine)
+
+PP #     : $report.field($payment.purchasePaymentNumber, 7)                     Date: $report.field($currentDate)
+SUPPLIER : $report.field($payment.supplier.name)
+
+CASH          : $report.field($payment.totalCashPayments, 12, "right")    TOTAL INV: $report.field($payment.totalAmount, 12, "right")
+CHECK         : $report.field($payment.totalCheckPayments, 12, "right")    TOTAL ADJ: $report.field($payment.totalAdjustments, 12, "right")
+BANK TRANSFER : $report.field($payment.totalBankTransfers, 12, "right")    TOTAL PAY: $report.field($payment.totalPayments, 12, "right")
+CREDIT CARD   : $report.field($payment.totalCreditCardPayments, 12, "right")   OVER/SHORT: $report.field($payment.overOrShort, 12, "right")
+
+   Date      RR#       Ref No.        Amount   
+---------- ------- --------------- ------------
+#foreach($paymentReceivingReceipt in $payment.receivingReceipts)
+#set( $receivingReceipt = $paymentReceivingReceipt.receivingReceipt )
+##10/22/2014 1234567 XXXXXXXXXXXXXXX 1,100,000.00
+$report.field($receivingReceipt.receivedDate) $report.field($receivingReceipt.receivingReceiptNumber, 7, "right") $report.field($receivingReceipt.referenceNumber, 15) $report.field($receivingReceipt.totalNetAmountWithVat, 12, "right")
+#end
+                                   ------------
+                         SUB TOTAL $report.field($payment.totalAmount, 12, "right")
+                                   ------------
+
+#if (!$payment.paymentAdjustments.isEmpty())
+Less: Purchase Adj
+----------- -------     ----------
+#foreach($adjustment in $payment.paymentAdjustments)
+##RETURN - GS      34          74.50
+##CC REBATE         3       2,000.00     2,074.50
+$report.field($adjustment.adjustmentType.code, 11) $report.field($adjustment.referenceNumber, 7, "right")     $report.field($adjustment.amount, 10, "right") #if($velocityCount == $payment.paymentAdjustments.size())$report.field($payment.totalAdjustments, 12, "right")#end$space
+##Workaround: Without the $space reference, this line will not have line break
+#end
+----------- -------     ---------- ------------
+
+#end                                
+TOTAL AMOUNT DUE                   $report.field($payment.totalAmountDue, 12, "right")
+                                   ============
+
+--------------------------------------------------------
+$report.center("PAYMENT", $charsPerLine)
+
+#if (!$payment.checkPayments.isEmpty())
+CHECK:
+---------- ---------------- ------------ ---------------
+#foreach($checkPayment in $payment.checkPayments)
+##1/30/2015 JCHS BDO SAVINGS 1,000,000.00 123123192873182
+$report.field($checkPayment.checkDate) $report.field($checkPayment.bank, 16) $report.field($checkPayment.amount, 12, "right") $report.field($checkPayment.checkNumber, 15)
+#end
+
+#end
+#if (!$payment.creditCardPayments.isEmpty())
+CREDIT CARD:
+---------- ---------------- ------------ ---------------
+#foreach($creditCardPayment in $payment.creditCardPayments)
+##1/30/2015 JCHS BDO SAVINGS 1,000,000.00 123123192873182
+$report.field($creditCardPayment.transactionDate) $report.field($creditCardPayment.creditCard.toString(), 16) $report.field($creditCardPayment.amount, 12, "right") $report.field($creditCardPayment.approvalCode, 15)
+#end
+
+#end
+#if (!$payment.bankTransfers.isEmpty())
+BANK TRANSFER:
+---------- ---------------- ------------ ---------------
+#foreach($bankTransfer in $payment.bankTransfers)
+##1/30/2015 JCHS BDO SAVINGS 1,000,000.00 123123192873182
+$report.field($bankTransfer.transferDate) $report.field($bankTransfer.bank, 16) $report.field($bankTransfer.amount, 12, "right") $report.field($bankTransfer.referenceNumber, 15)
+#end
+
+#end
+--------------------------------------------------------
+
+PREPARED BY:   JOY

@@ -1,0 +1,25 @@
+#set( $charsPerLine = 72 )
+$report.center("JC HARMONY SELLING INC.", $charsPerLine)
+
+$report.center("NO MORE STOCK ADJUSTMENT", $charsPerLine)
+
+NMS. #   : $report.field($noMoreStockAdjustment.noMoreStockAdjustmentNumber, 7)                                     Date : $report.field($currentDate)
+S.I. #   : $report.field($noMoreStockAdjustment.salesInvoice.salesInvoiceNumber, 7)
+Customer : $report.field($noMoreStockAdjustment.salesInvoice.customer.name)
+
+      Product Code & Description         Unit  Qty    Price     Amount
+---------------------------------------- ---- ----- --------- ----------
+##QUATRO ARIEL COMPLETE 128gx144 #2061     CSE      1  1,522.50   1,522.50
+#foreach($item in $items)
+$report.field($item.salesInvoiceItem.product.description, 40) $report.field($item.salesInvoiceItem.unit, 4) $report.field($item.quantity, 5, "right") $report.field($item.salesInvoiceItem.unitPrice, 9, "right") $report.field($item.amount, 10, "right")
+#end
+#if($isLastPage == true)
+
+                                                              ----------
+                                               Total Amount P $report.field($noMoreStockAdjustment.totalAmount, 10, "right")
+  Prepared by   : $report.field($noMoreStockAdjustment.postedBy.username, 15)                             ==========                    
+  Verified by   :
+  Total Items   : $report.field($noMoreStockAdjustment.items.size(), 5, "right")              Approved by :
+  
+  Remarks       : $remarks
+#end

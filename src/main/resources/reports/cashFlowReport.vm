@@ -1,0 +1,23 @@
+$report.center("JC HARMONY SELLING INC.", $charsPerLine)
+
+$report.center("CASH FLOW REPORT REPORT", $charsPerLine)
+$report.center("As of ${report.field($cashFlowReport.paymentDate)}", $charsPerLine)
+
+                                                                                 Page: $currentPage x $totalPages
+
+Terminal    : $paymentTerminal
+Time Period : $timePeriod
+
+  Time    Tran. Type   Ref. #         Customer Name          Tran. Date    Amount     Terminal
+-------- ------------- ------ ------------------------------ ---------- ------------- --------
+## 7:32 PM SALES INVOICE 369282 CAN-LIZA'S SARI-SARI STORE     12/18/2014      5,351.90 CASHIER
+## 7:32 PM SALES RETURN  369282 CAN-LIZA'S SARI-SARI STORE     12/18/2014      5,351.90 CASHIER
+## 7:32 PM B.O. RETURN   369282 CAN-LIZA'S SARI-SARI STORE     12/18/2014      5,351.90 CASHIER
+#foreach($item in $items)
+$report.time($item.time) $report.field($item.transactionType, 13) $report.field($item.referenceNumber, 6, "right") $report.field($item.customer.name, 30) $report.field($item.transactionDate) $report.field($item.amount, 13, "right") $report.field($item.paymentTerminal.name, 8)
+#end
+#if($isLastPage == true)
+                                                                        -------------  
+                                                           T O T A L => $report.field($cashFlowReport.totalAmount, 13, "right")
+                                                                        =============
+#end
