@@ -1,3 +1,8 @@
+alter table PRODUCT add UNIT_CODE varchar(10) not null;
+alter table PRODUCT add UNIT_CODE1 varchar(10) null;
+alter table PRODUCT add UNIT_QUANTITY numeric(10) not null;
+alter table PRODUCT add UNIT_QUANTITY1 numeric(10) null;
+
 create table SEQUENCE (
   NAME varchar(50) not null,
   VALUE integer default 0 not null,
