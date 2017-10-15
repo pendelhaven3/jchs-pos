@@ -1,6 +1,7 @@
 package com.pj.magic.service.impl;
 
 import java.io.IOException;
+import java.math.RoundingMode;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -18,6 +19,8 @@ import com.pj.magic.model.PricingScheme;
 import com.pj.magic.model.Product;
 import com.pj.magic.model.PurchaseOrder;
 import com.pj.magic.model.PurchaseOrderItem;
+import com.pj.magic.model.ReceivingReceipt;
+import com.pj.magic.model.ReceivingReceiptItem;
 import com.pj.magic.model.SalesInvoice;
 import com.pj.magic.model.SalesInvoiceItem;
 import com.pj.magic.model.Unit;
@@ -510,5 +513,134 @@ public class ExcelServiceImpl implements ExcelService {
 		
 		return workbook;
 	}
+
+    @Override
+    public Workbook generateSpreadsheet(ReceivingReceipt receivingReceipt) {
+        receivingReceipt.setSupplier(supplierDao.get(receivingReceipt.getSupplier().getId()));
+        
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet();
+        int currentRow = 0;
+        CellStyle centered = CellStyleBuilder.createStyle(workbook)
+                .setAlignment(CellStyle.ALIGN_CENTER).build();
+        CellStyle amountFormat = CellStyleBuilder.createStyle(workbook)
+                .setAmountFormat(true).build();
+        
+        Row row = sheet.createRow(currentRow);
+        Cell cell = row.createCell(0);
+        cell.setCellValue("JOSELLE CHRISTIAN GENERAL MERCHANDISE");
+        sheet.addMergedRegion(new CellRangeAddress(currentRow, currentRow, 0, 8));
+        cell.setCellStyle(centered);
+        
+        currentRow++;
+        
+        row = sheet.createRow(currentRow);
+        cell = row.createCell(0);
+        cell.setCellValue("RECEIVING RECEIPT");
+        sheet.addMergedRegion(new CellRangeAddress(currentRow, currentRow, 0, 8));
+        cell.setCellStyle(centered);
+        
+        currentRow++;
+        currentRow++;
+        
+        row = sheet.createRow(currentRow);
+        row.createCell(0).setCellValue("SUPPLIER: " + receivingReceipt.getSupplier().getName());
+        row.createCell(7).setCellValue("RR#");
+        row.createCell(8).setCellValue(receivingReceipt.getReceivingReceiptNumber());
+        
+        currentRow++;
+        
+        row = sheet.createRow(currentRow);
+        row.createCell(0).setCellValue("ADDRESS: " + receivingReceipt.getSupplier().getAddress());
+        row.createCell(7).setCellValue("DATE:");
+        cell = row.createCell(8);
+        cell.setCellValue(FormatterUtil.formatDate(systemDao.getCurrentDateTime()));
+        cell.setCellStyle(CellStyleBuilder.createStyle(workbook)
+                .setAlignment(CellStyle.ALIGN_RIGHT).build());
+
+        currentRow++;
+        currentRow++;
+        
+        row = sheet.createRow(currentRow);
+        row.createCell(0).setCellValue("FAX: " + receivingReceipt.getSupplier().getFaxNumber());
+        
+        currentRow++;
+        
+        row = sheet.createRow(currentRow);
+        row.createCell(0).setCellValue("CONTACT: " + receivingReceipt.getSupplier().getContactNumber());
+
+        currentRow++;
+        currentRow++;
+        
+        row = sheet.createRow(currentRow);
+        cell = row.createCell(0);
+        cell.setCellValue("PRODUCT DETAILS");
+        sheet.addMergedRegion(new CellRangeAddress(currentRow, currentRow, 0, 4));
+        cell.setCellStyle(centered);
+        
+        cell = row.createCell(5);
+        cell.setCellValue("UNIT");
+        cell.setCellStyle(centered);
+        
+        cell = row.createCell(6);
+        cell.setCellValue("QTY");
+        cell.setCellStyle(centered);
+        
+        cell = row.createCell(7);
+        cell.setCellValue("NET COST");
+        cell.setCellStyle(centered);
+        
+        cell = row.createCell(8);
+        cell.setCellValue("WITH VAT");
+        cell.setCellStyle(centered);
+        
+        currentRow++;
+        
+        for (ReceivingReceiptItem item : receivingReceipt.getItems()) {
+            currentRow++;
+            row = sheet.createRow(currentRow);
+            row.createCell(0).setCellValue(item.getProduct().getCode());
+            row.createCell(1).setCellValue(item.getProduct().getDescription());
+            row.createCell(5).setCellValue(item.getUnit());
+            row.createCell(6).setCellValue(item.getQuantity());
+            cell = row.createCell(7);
+            cell.setCellValue(item.getFinalCost().doubleValue());
+            cell.setCellStyle(amountFormat);
+            cell = row.createCell(8);
+            if (receivingReceipt.isVatInclusive()) {
+                cell.setCellValue(item.getFinalCost().doubleValue());
+            } else {
+                cell.setCellValue(item.getFinalCostWithVat().setScale(2, RoundingMode.HALF_UP).doubleValue());
+            }
+            cell.setCellStyle(amountFormat);
+        }
+        
+        currentRow++;
+        currentRow++;
+        
+        row = sheet.createRow(currentRow);
+        row.createCell(0).setCellValue("TOTAL ITEMS: " + receivingReceipt.getTotalNumberOfItems());
+        row.createCell(2).setCellValue("TOTAL QTY: " + receivingReceipt.getTotalQuantity());
+
+        currentRow++;
+        currentRow++;
+        
+        row = sheet.createRow(currentRow);
+//      row.createCell(0).setCellValue("PREPARED BY: " + purchaseOrder.getCreatedBy().getUsername());
+        row.createCell(0).setCellValue("PREPARED BY: ");
+        
+        currentRow++;
+        currentRow++;
+
+        row = sheet.createRow(currentRow);
+        row.createCell(0).setCellValue("REMARKS: " + receivingReceipt.getRemarks());
+        
+        sheet.autoSizeColumn(0);
+        sheet.autoSizeColumn(5);
+        sheet.autoSizeColumn(7);
+        sheet.autoSizeColumn(8);
+        
+        return workbook;
+    }
 		
 }

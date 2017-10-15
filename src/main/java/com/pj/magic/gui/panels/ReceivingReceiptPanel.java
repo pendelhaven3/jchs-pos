@@ -12,17 +12,26 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import javax.swing.filechooser.FileFilter;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.time.DateUtils;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,9 +47,11 @@ import com.pj.magic.gui.dialog.SetDiscountsForAllItemsDialog;
 import com.pj.magic.gui.dialog.StatusDetailsDialog;
 import com.pj.magic.gui.tables.ReceivingReceiptItemsTable;
 import com.pj.magic.model.ReceivingReceipt;
+import com.pj.magic.service.ExcelService;
 import com.pj.magic.service.PrintService;
 import com.pj.magic.service.ReceivingReceiptService;
 import com.pj.magic.util.ComponentUtil;
+import com.pj.magic.util.FileUtil;
 import com.pj.magic.util.FormatterUtil;
 import com.pj.magic.util.HtmlUtil;
 
@@ -61,6 +72,7 @@ public class ReceivingReceiptPanel extends StandardMagicPanel {
 	@Autowired private PrintPreviewDialog printPreviewDialog;
 	@Autowired private StatusDetailsDialog statusDialog;
 	@Autowired private SetDiscountsForAllItemsDialog setDiscountsForAllItemsDialog;
+    @Autowired private ExcelService excelService;
 	
 	private ReceivingReceipt receivingReceipt;
 	private JLabel receivingReceiptNumberField;
@@ -80,6 +92,7 @@ public class ReceivingReceiptPanel extends StandardMagicPanel {
 	private MagicToolBarButton cancelButton;
 	private MagicToolBarButton setDiscountsForAllButton;
 	private JDatePickerImpl datePicker;
+    private JFileChooser excelFileChooser;
 	
 	@Override
 	protected void initializeComponents() {
@@ -103,6 +116,21 @@ public class ReceivingReceiptPanel extends StandardMagicPanel {
 				}
 			}
 		});
+		
+        excelFileChooser = new JFileChooser();
+        excelFileChooser.setCurrentDirectory(new File(FileUtil.getDesktopFolderPath()));
+        excelFileChooser.setFileFilter(new FileFilter() {
+            
+            @Override
+            public String getDescription() {
+                return "Excel workbook (*.xlsx)";
+            }
+            
+            @Override
+            public boolean accept(File f) {
+                return FilenameUtils.getExtension(f.getName()).equals("xlsx");
+            }
+        });
 		
 		focusOnItemsTableWhenThisPanelIsDisplayed();
 		updateTotalAmountFieldWhenItemsTableChanges();
@@ -517,9 +545,19 @@ public class ReceivingReceiptPanel extends StandardMagicPanel {
 			}
 		});
 //		toolBar.add(printButton);
+		
+        MagicToolBarButton toExcelButton = new MagicToolBarButton("excel", "Generate Excel spreadsheet");
+        toExcelButton.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                generateExcelSpreadsheet();
+            }
+        }); 
+        toolBar.add(toExcelButton);
 	}
 
-	protected void openSetDiscountsForAllItemsDialog() {
+    protected void openSetDiscountsForAllItemsDialog() {
 		setDiscountsForAllItemsDialog.updateDisplay(receivingReceipt);
 		setDiscountsForAllItemsDialog.setVisible(true);
 		
@@ -567,4 +605,33 @@ public class ReceivingReceiptPanel extends StandardMagicPanel {
 		}
 	}
 
+    private void generateExcelSpreadsheet() {
+        excelFileChooser.setSelectedFile(new File(generateDefaultSpreadsheetName() + ".xlsx"));
+        
+        int returnVal = excelFileChooser.showSaveDialog(this);
+        if (returnVal != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+        
+        try (
+            Workbook workbook = excelService.generateSpreadsheet(receivingReceipt);
+            FileOutputStream out = new FileOutputStream(excelFileChooser.getSelectedFile());
+        ) {
+            workbook.write(out);
+            showMessage("Excel spreadsheet generated successfully");
+        } catch (IOException e) {
+            showErrorMessage("Unexpected error during excel generation");
+        }
+    }
+	
+    private String generateDefaultSpreadsheetName() {
+        return new StringBuilder()
+            .append(receivingReceipt.getSupplier().getName())
+            .append(" - ")
+            .append(new SimpleDateFormat("MMM-dd-yyyy").format(new Date()))
+            .append(" - RR ")
+            .append(receivingReceipt.getReceivingReceiptNumber())
+            .toString();
+    }
+    
 }

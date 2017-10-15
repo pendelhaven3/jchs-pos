@@ -6,6 +6,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 
 import com.pj.magic.model.PricingScheme;
 import com.pj.magic.model.PurchaseOrder;
+import com.pj.magic.model.ReceivingReceipt;
 import com.pj.magic.model.SalesInvoice;
 import com.pj.magic.model.report.CustomerSalesSummaryReport;
 import com.pj.magic.model.report.StockOfftakeReport;
@@ -21,5 +22,7 @@ public interface ExcelService {
 	Workbook generateSpreadsheet(CustomerSalesSummaryReport report) throws IOException;
 
 	Workbook generateSpreadsheet(StockOfftakeReport report) throws IOException;
+
+    Workbook generateSpreadsheet(ReceivingReceipt receivingReceipt);
 	
 }
