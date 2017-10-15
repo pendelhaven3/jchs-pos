@@ -8,6 +8,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -28,6 +30,8 @@ import com.pj.magic.util.DbUtil;
 @Repository
 public class PaymentSalesInvoiceDaoImpl extends MagicDao implements PaymentSalesInvoiceDao {
 
+    private static final Logger logger = LoggerFactory.getLogger(PaymentSalesInvoiceDaoImpl.class);
+    
 	private static final String BASE_SELECT_SQL =
 			"   select a.ID, PAYMENT_ID, SALES_INVOICE_ID, b.SALES_INVOICE_NO, ADJUSTMENT_AMOUNT,"
 			+ " c.PAYMENT_NO, c.POST_DT,"
