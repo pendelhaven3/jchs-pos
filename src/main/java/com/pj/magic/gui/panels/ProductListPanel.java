@@ -260,10 +260,14 @@ public class ProductListPanel extends StandardMagicPanel {
                 StringJoiner sj = new StringJoiner(",");
                 for (String s : fields) {
                     String value = rec.getString(s);
+                    
                     if (value != null && value.contains("\"")) {
                         value = value.replaceAll("\"", "\"\"");
+                        value = "\"" + value + "\"";
                     }
-                    value = "\"" + value + "\"";
+                    if (value != null && value.contains(",")) {
+                        value = "\"" + value + "\"";
+                    }
                     sj.add(value);
                 }
 
