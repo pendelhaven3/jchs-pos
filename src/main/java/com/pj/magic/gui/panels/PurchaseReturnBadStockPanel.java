@@ -9,10 +9,16 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.swing.AbstractAction;
 import javax.swing.Box;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -20,8 +26,11 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import javax.swing.filechooser.FileFilter;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,21 +40,24 @@ import com.pj.magic.gui.component.EllipsisButton;
 import com.pj.magic.gui.component.MagicTextField;
 import com.pj.magic.gui.component.MagicToolBar;
 import com.pj.magic.gui.component.MagicToolBarButton;
-import com.pj.magic.gui.dialog.PrintPreviewDialog;
 import com.pj.magic.gui.dialog.SelectSupplierDialog;
 import com.pj.magic.gui.tables.PurchaseReturnBadStockItemsTable;
 import com.pj.magic.model.PurchaseReturnBadStock;
 import com.pj.magic.model.Supplier;
-import com.pj.magic.service.PrintService;
+import com.pj.magic.report.excel.PurchaseReturnBadStockExcelGenerator;
 import com.pj.magic.service.PurchaseReturnBadStockService;
 import com.pj.magic.service.SupplierService;
 import com.pj.magic.util.ComponentUtil;
+import com.pj.magic.util.ExcelUtil;
+import com.pj.magic.util.FileUtil;
 import com.pj.magic.util.FormatterUtil;
 
 @Component
 public class PurchaseReturnBadStockPanel extends StandardMagicPanel {
 
-	private static final Logger logger = LoggerFactory.getLogger(PurchaseReturnBadStockPanel.class);
+    private static final long serialVersionUID = -100177874408138993L;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(PurchaseReturnBadStockPanel.class);
 	
 	private static final String SAVE_SUPPLIER_ACTION_NAME = "SAVE_CUSTOMER_ACTION_NAME";
 	private static final String OPEN_SELECT_SUPPLIER_DIALOG_ACTION_NAME = 
@@ -55,8 +67,7 @@ public class PurchaseReturnBadStockPanel extends StandardMagicPanel {
 	@Autowired private PurchaseReturnBadStockService purchaseReturnBadStockService;
 	@Autowired private SupplierService supplierService;
 	@Autowired private SelectSupplierDialog selectSupplierDialog;
-	@Autowired private PrintService printService;
-	@Autowired private PrintPreviewDialog printPreviewDialog;
+	@Autowired private PurchaseReturnBadStockExcelGenerator excelGenerator;
 	
 	private PurchaseReturnBadStock purchaseReturnBadStock;
 	private JLabel purchaseReturnBadStockNumberField;
@@ -71,8 +82,7 @@ public class PurchaseReturnBadStockPanel extends StandardMagicPanel {
 	private JLabel totalAmountField;
 	private JButton addItemButton;
 	private JButton deleteItemButton;
-	private JButton printPreviewButton;
-	private JButton printButton;
+    private JFileChooser excelFileChooser;
 	
 	@Override
 	protected void initializeComponents() {
@@ -81,13 +91,7 @@ public class PurchaseReturnBadStockPanel extends StandardMagicPanel {
 		
 		selectSupplierButton = new EllipsisButton();
 		selectSupplierButton.setToolTipText("Select Supplier (F5)");
-		selectSupplierButton.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				selectSupplier();
-			}
-		});;
+		selectSupplierButton.addActionListener(e -> selectSupplier());
 		
 		remarksField = new MagicTextField();
 		remarksField.setMaximumLength(100);
@@ -98,6 +102,21 @@ public class PurchaseReturnBadStockPanel extends StandardMagicPanel {
 				saveRemarks();
 			}
 		});
+		
+        excelFileChooser = new JFileChooser();
+        excelFileChooser.setCurrentDirectory(new File(FileUtil.getDesktopFolderPath()));
+        excelFileChooser.setFileFilter(new FileFilter() {
+            
+            @Override
+            public String getDescription() {
+                return "Excel workbook (*.xlsx)";
+            }
+            
+            @Override
+            public boolean accept(File f) {
+                return FilenameUtils.getExtension(f.getName()).equals("xlsx");
+            }
+        });
 		
 		focusOnComponentWhenThisPanelIsDisplayed(supplierCodeField);
 		updateTotalAmountFieldWhenItemsTableChanges();
@@ -127,7 +146,7 @@ public class PurchaseReturnBadStockPanel extends StandardMagicPanel {
 					updateDisplay(purchaseReturnBadStock);
 					remarksField.requestFocusInWindow();
 				} catch (Exception e) {
-					logger.error(e.getMessage(), e);
+					LOGGER.error(e.getMessage(), e);
 					showMessageForUnexpectedError();
 				}
 			}
@@ -188,7 +207,7 @@ public class PurchaseReturnBadStockPanel extends StandardMagicPanel {
 				updateDisplay(purchaseReturnBadStock);
 				remarksField.requestFocusInWindow();
 			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
+				LOGGER.error(e.getMessage(), e);
 				showMessageForUnexpectedError();
 			}
 		}
@@ -244,8 +263,6 @@ public class PurchaseReturnBadStockPanel extends StandardMagicPanel {
 		totalAmountField.setText(purchaseReturnBadStock.getTotalAmount().toString());
 		addItemButton.setEnabled(!purchaseReturnBadStock.isPosted());
 		deleteItemButton.setEnabled(!purchaseReturnBadStock.isPosted());
-		printPreviewButton.setEnabled(true);
-		printButton.setEnabled(true);
 		
 		itemsTable.setPurchaseReturnBadStock(purchaseReturnBadStock);
 	}
@@ -266,8 +283,6 @@ public class PurchaseReturnBadStockPanel extends StandardMagicPanel {
 		itemsTable.setPurchaseReturnBadStock(purchaseReturnBadStock);
 		addItemButton.setEnabled(false);
 		deleteItemButton.setEnabled(false);
-		printPreviewButton.setEnabled(false);
-		printButton.setEnabled(false);
 	}
 
 	@Override
@@ -518,26 +533,48 @@ public class PurchaseReturnBadStockPanel extends StandardMagicPanel {
 
 	@Override
 	protected void addToolBarButtons(MagicToolBar toolBar) {
-		printPreviewButton = new MagicToolBarButton("print_preview", "Print Preview");
-		printPreviewButton.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				printPreviewDialog.updateDisplay(printService.generateReportAsString(purchaseReturnBadStock));
-				printPreviewDialog.setVisible(true);
-			}
-		});
-		toolBar.add(printPreviewButton);
-		
-		printButton = new MagicToolBarButton("print", "Print");
-		printButton.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				printService.print(purchaseReturnBadStock);
-			}
-		});
-		toolBar.add(printButton);
+        MagicToolBarButton toExcelButton = new MagicToolBarButton("excel", "Generate Excel spreadsheet");
+        toExcelButton.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                generateExcelSpreadsheet();
+            }
+        }); 
+        toolBar.add(toExcelButton);
 	}
 
+    private void generateExcelSpreadsheet() {
+        excelFileChooser.setSelectedFile(new File(generateDefaultSpreadsheetName() + ".xlsx"));
+        
+        int returnVal = excelFileChooser.showSaveDialog(this);
+        if (returnVal != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+        
+        try (
+            Workbook workbook = excelGenerator.generate(purchaseReturnBadStock);
+            FileOutputStream out = new FileOutputStream(excelFileChooser.getSelectedFile());
+        ) {
+            workbook.write(out);
+            if (confirm("Excel file generated.\nDo you wish to open the file?")) {
+                ExcelUtil.openExcelFile(excelFileChooser.getSelectedFile());
+            }
+        } catch (IOException e) {
+            LOGGER.error(e.getMessage(), e);
+            showErrorMessage("Unexpected error during excel generation");
+            return;
+        }
+    }
+    
+    private String generateDefaultSpreadsheetName() {
+        return new StringBuilder()
+            .append(purchaseReturnBadStock.getSupplier().getName())
+            .append(" - ")
+            .append(new SimpleDateFormat("MMM-dd-yyyy").format(new Date()))
+            .append(" - BSR ")
+            .append(purchaseReturnBadStock.getPurchaseReturnBadStockNumber())
+            .toString();
+    }
+	
 }

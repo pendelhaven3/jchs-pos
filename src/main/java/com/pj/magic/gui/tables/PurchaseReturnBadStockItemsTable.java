@@ -38,7 +38,9 @@ import com.pj.magic.util.NumberUtil;
 @Component
 public class PurchaseReturnBadStockItemsTable extends MagicTable {
 	
-	public static final int PRODUCT_CODE_COLUMN_INDEX = 0;
+    private static final long serialVersionUID = -6494177235358975401L;
+    
+    public static final int PRODUCT_CODE_COLUMN_INDEX = 0;
 	public static final int PRODUCT_DESCRIPTION_COLUMN_INDEX = 1;
 	public static final int UNIT_COLUMN_INDEX = 2;
 	public static final int QUANTITY_COLUMN_INDEX = 3;
@@ -76,36 +78,10 @@ public class PurchaseReturnBadStockItemsTable extends MagicTable {
 		columnModel.getColumn(AMOUNT_COLUMN_INDEX).setPreferredWidth(100);
 		
 		MagicTextField productCodeTextField = new MagicTextField();
-		productCodeTextField.setMaximumLength(Constants.PRODUCT_CODE_MAXIMUM_LENGTH);
-		productCodeTextField.addKeyListener(new KeyAdapter() {
-			
-			@Override
-			public void keyReleased(KeyEvent event) {
-				if (KeyUtil.isAlphaNumericKeyCode(event.getKeyCode())) {
-					JTextField textField = (JTextField)event.getComponent();
-					if (textField.getText().length() == Constants.PRODUCT_CODE_MAXIMUM_LENGTH) {
-						getCellEditor().stopCellEditing();
-					};
-				}
-			}
-		});
 		columnModel.getColumn(PRODUCT_CODE_COLUMN_INDEX).setCellEditor(
 				new ProductCodeCellEditor(productCodeTextField));
 		
 		MagicTextField unitTextField = new MagicTextField();
-		unitTextField.setMaximumLength(Constants.UNIT_MAXIMUM_LENGTH);
-		unitTextField.addKeyListener(new KeyAdapter() {
-			
-			@Override
-			public void keyReleased(KeyEvent event) {
-				if (KeyUtil.isAlphaNumericKeyCode(event.getKeyCode())) {
-					JTextField textField = (JTextField)event.getComponent();
-					if (textField.getText().length() == Constants.UNIT_MAXIMUM_LENGTH) {
-						getCellEditor().stopCellEditing();
-					}
-				}
-			}
-		});
 		columnModel.getColumn(UNIT_COLUMN_INDEX).setCellEditor(new UnitCellEditor(unitTextField));
 		
 		MagicTextField quantityTextField = new MagicTextField();
@@ -165,7 +141,6 @@ public class PurchaseReturnBadStockItemsTable extends MagicTable {
 		
 		addMode = false;
 		List<PurchaseReturnBadStockItem> items = purchaseReturnBadStock.getItems();
-//		items.addAll(tableModel.getItems());
 		tableModel.setItems(items);
 		
 		if (items.size() > 0) {

@@ -375,15 +375,7 @@ public class Product implements Comparable<Product>, Serializable {
 	}
 
 	public String getMaxUnit() {
-		Collections.sort(units, new Comparator<String>() {
-
-			@Override
-			public int compare(String unit1, String unit2) {
-				return Unit.compare(unit1, unit2) * -1;
-			}
-		});
-		
-		return units.get(0);
+	    return units.get(units.size() - 1);
 	}
 	
 	public void autoCalculateCostsOfSmallerUnits() {
@@ -391,23 +383,13 @@ public class Product implements Comparable<Product>, Serializable {
 	}
 	
 	public void autoCalculateCostsOfSmallerUnits(String referenceUnit) {
-//		Collections.sort(units, new Comparator<String>() {
-//
-//			@Override
-//			public int compare(String unit1, String unit2) {
-//				return Unit.compare(unit1, unit2) * -1;
-//			}
-//		});
-		
 		String maxUnit = referenceUnit;
 		BigDecimal grossCostOfMaxUnit = getGrossCost(maxUnit);
 		BigDecimal finalCostOfMaxUnit = getFinalCost(maxUnit);
-		int conversionOfMaxUnit = getUnitConversion(maxUnit);
-		for (int i = (units.indexOf(referenceUnit) + 1); i < units.size(); i++) {
-			String unit = units.get(i);
-			BigDecimal grossCost = grossCostOfMaxUnit.divide(new BigDecimal(conversionOfMaxUnit / getUnitConversion(unit)), 
+		for (String unit : units) {
+			BigDecimal grossCost = grossCostOfMaxUnit.divide(new BigDecimal(getUnitConversion(unit)), 
 					2, RoundingMode.HALF_UP);
-			BigDecimal finalCost = finalCostOfMaxUnit.divide(new BigDecimal(conversionOfMaxUnit / getUnitConversion(unit)), 
+			BigDecimal finalCost = finalCostOfMaxUnit.divide(new BigDecimal(getUnitConversion(unit)), 
 					2, RoundingMode.HALF_UP);
 			setGrossCost(unit, grossCost);
 			setFinalCost(unit, finalCost);

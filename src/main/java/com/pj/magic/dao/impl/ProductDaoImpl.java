@@ -24,6 +24,7 @@ import com.pj.magic.model.Product;
 import com.pj.magic.model.Supplier;
 import com.pj.magic.model.Unit;
 import com.pj.magic.model.UnitConversion;
+import com.pj.magic.model.UnitCost;
 import com.pj.magic.model.search.ProductSearchCriteria;
 
 @Repository
@@ -31,7 +32,8 @@ public class ProductDaoImpl extends MagicDao implements ProductDao {
 	
 	private static final String BASE_SELECT_SQL =
 			"select a.ID, a.CODE, a.DESCRIPTION,"
-			+ " a.UOM_CODE, a.UOM_CODE1, a.UOM_QTY, a.UOM_QTY1"
+			+ " a.UOM_CODE, a.UOM_CODE1, a.UOM_QTY, a.UOM_QTY1,"
+			+ " a.GROSS_COST, a.GROSS_COST1, a.FINAL_COST, a.FINAL_COST1"
 			+ " from PRODUCT a"
 			+ " where 1 = 1";
 	
@@ -76,10 +78,12 @@ public class ProductDaoImpl extends MagicDao implements ProductDao {
 			
 			product.getUnits().add(unit1);
             product.getUnitConversions().add(new UnitConversion(unit1, rs.getInt("UOM_QTY")));
+            product.getUnitCosts().add(new UnitCost(unit1, rs.getBigDecimal("GROSS_COST"), rs.getBigDecimal("FINAL_COST")));
             
             if (!StringUtils.isEmpty(unit2)) {
                 product.getUnits().add(unit2);
                 product.getUnitConversions().add(new UnitConversion(unit2, rs.getInt("UOM_QTY1")));
+                product.getUnitCosts().add(new UnitCost(unit2, rs.getBigDecimal("GROSS_COST1"), rs.getBigDecimal("FINAL_COST1")));
             }
 			
 			return product;
@@ -222,26 +226,18 @@ public class ProductDaoImpl extends MagicDao implements ProductDao {
 	}
 
 	private static final String UPDATE_COSTS_SQL =
-			"update PRODUCT"
-			+ " set GROSS_COST_CSE = ?, GROSS_COST_TIE = ?, GROSS_COST_CTN = ?, "
-			+ " GROSS_COST_DOZ = ?, GROSS_COST_PCS = ?, FINAL_COST_CSE = ?, "
-			+ " FINAL_COST_TIE = ?, FINAL_COST_CTN = ?, FINAL_COST_DOZ = ?, "
-			+ " FINAL_COST_PCS = ?"
-			+ " where ID = ?"; 
+			"update PRODUCT set GROSS_COST = ?, GROSS_COST1 = ?, FINAL_COST = ?, FINAL_COST1 = ? where ID = ?"; 
 	
 	@Override
 	public void updateCosts(Product product) {
+	    UnitCost unitCost1 = product.getUnitCosts().get(0);
+        UnitCost unitCost2 = product.getUnitCosts().size() > 1 ? product.getUnitCosts().get(1) : null;
+	    
 		getJdbcTemplate().update(UPDATE_COSTS_SQL,
-				product.getGrossCost(Unit.CASE),
-				product.getGrossCost(Unit.TIE),
-				product.getGrossCost(Unit.CARTON),
-				product.getGrossCost(Unit.DOZEN),
-				product.getGrossCost(Unit.PIECES),
-				product.getFinalCost(Unit.CASE),
-				product.getFinalCost(Unit.TIE),
-				product.getFinalCost(Unit.CARTON),
-				product.getFinalCost(Unit.DOZEN),
-				product.getFinalCost(Unit.PIECES),
+				unitCost1.getGrossCost(),
+				(unitCost2 != null) ? unitCost2.getGrossCost() : null,
+                unitCost1.getFinalCost(),
+                (unitCost2 != null) ? unitCost2.getFinalCost() : null,
 				product.getId());
 	}
 

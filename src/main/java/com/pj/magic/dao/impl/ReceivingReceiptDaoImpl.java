@@ -124,14 +124,14 @@ public class ReceivingReceiptDaoImpl extends MagicDao implements ReceivingReceip
 				receivingReceipt.getSupplier().getId(),
 				receivingReceipt.isPosted() ? "Y" : "N",
 				receivingReceipt.isPosted() ? receivingReceipt.getPostDate() : null,
-				receivingReceipt.isPosted() ? receivingReceipt.getPostedBy().getId() : null,
+				null,
 				receivingReceipt.getPaymentTerm().getId(),
 				receivingReceipt.getRemarks(),
 				receivingReceipt.getReferenceNumber(),
 				receivingReceipt.getReceivedDate(),
 				receivingReceipt.isCancelled() ? "Y" : "N",
 				receivingReceipt.isCancelled() ? receivingReceipt.getCancelDate() : null,
-				receivingReceipt.isCancelled() ? receivingReceipt.getCancelledBy().getId() : null,
+				null,
 				receivingReceipt.getId());
 	}
 	

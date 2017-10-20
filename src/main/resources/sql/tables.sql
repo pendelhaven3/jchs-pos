@@ -18,6 +18,10 @@ create table PRODUCT (
   UNIT_CODE1 varchar(10) null,
   UNIT_QUANTITY numeric(10) not null,
   UNIT_QUANTITY1 numeric(10) null,
+  GROSS_COST numeric(9,2) null,
+  GROSS_COST1 numeric(9,2) null,
+  FINAL_COST numeric(9,2) null,
+  FINAL_COST1 numeric(9,2) null,
   constraint PRODUCT$PK primary key (ID),
   constraint PRODUCT$CODE$UK unique (CODE)
 );
@@ -130,4 +134,29 @@ create table RECEIVING_RECEIPT_ITEM (
   constraint RECEIVING_RECEIPT_ITEM$PK primary key (ID),
   constraint RECEIVING_RECEIPT_ITEM$FK foreign key (RECEIVING_RECEIPT_ID) references RECEIVING_RECEIPT (ID),
   constraint RECEIVING_RECEIPT_ITEM$FK2 foreign key (PRODUCT_ID) references PRODUCT (ID)
+);
+
+create table PURCHASE_RETURN_BAD_STOCK (
+  ID integer auto_increment,
+  PURCHASE_RETURN_BAD_STOCK_NO integer not null,
+  SUPPLIER_ID integer not null,
+  POST_IND char(1) default 'N' not null,
+  POST_DT date null,
+  POST_BY integer null,
+  REMARKS varchar(100) null,
+  constraint PURCHASE_RETURN_BAD_STOCK$PK primary key (ID),
+  constraint PURCHASE_RETURN_BAD_STOCK$UK unique (PURCHASE_RETURN_BAD_STOCK_NO),
+  constraint PURCHASE_RETURN_BAD_STOCK$FK foreign key (SUPPLIER_ID) references SUPPLIER (ID)
+);
+
+create table PURCHASE_RETURN_BAD_STOCK_ITEM (
+  ID integer auto_increment,
+  PURCHASE_RETURN_BAD_STOCK_ID integer not null,
+  PRODUCT_ID integer not null,
+  UNIT char(3) not null,
+  QUANTITY integer not null,
+  UNIT_COST numeric(10, 2) not null,
+  constraint PURCHASE_RETURN_BAD_STOCK_ITEM$PK primary key (ID),
+  constraint PURCHASE_RETURN_BAD_STOCK_ITEM$FK foreign key (PURCHASE_RETURN_BAD_STOCK_ID) references PURCHASE_RETURN_BAD_STOCK (ID),
+  constraint PURCHASE_RETURN_BAD_STOCK_ITEM$FK2 foreign key (PRODUCT_ID) references PRODUCT (ID)
 );

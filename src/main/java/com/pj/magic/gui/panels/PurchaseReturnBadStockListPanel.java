@@ -30,7 +30,9 @@ import com.pj.magic.util.FormatterUtil;
 @Component
 public class PurchaseReturnBadStockListPanel extends StandardMagicPanel {
 	
-	private static final int PURCHASE_RETURN_BAD_STOCK_NUMBER_COLUMN_INDEX = 0;
+    private static final long serialVersionUID = -3092669048307048975L;
+    
+    private static final int PURCHASE_RETURN_BAD_STOCK_NUMBER_COLUMN_INDEX = 0;
 	private static final int SUPPLIER_COLUMN_INDEX = 1;
 	private static final int TOTAL_AMOUNT_COLUMN_INDEX = 2;
 	private static final int STATUS_COLUMN_INDEX = 3;

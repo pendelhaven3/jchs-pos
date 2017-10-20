@@ -111,16 +111,12 @@ public class ReceivingReceiptServiceImpl implements ReceivingReceiptService {
 			}
 			productDao.updateCosts(product);
 			
-			product.addUnitQuantity(item.getUnit(), item.getQuantity());
-			productDao.updateAvailableQuantities(product);
-			
 			item.setCurrentCost(currentCost);
 			receivingReceiptItemDao.save(item);
 		}
 		
 		updated.setPosted(true);
 		updated.setPostDate(systemDao.getCurrentDateTime());
-		updated.setPostedBy(loginService.getLoggedInUser());
 		receivingReceiptDao.save(updated);
 	}
 

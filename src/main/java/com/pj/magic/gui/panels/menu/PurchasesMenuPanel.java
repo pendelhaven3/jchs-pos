@@ -114,12 +114,14 @@ public class PurchasesMenuPanel extends MenuPanel {
 
 	private class MainMenuTableModel extends AbstractTableModel {
 
-		private final List<String> menuItems = Arrays.asList(
+        private static final long serialVersionUID = 2994571598043738315L;
+        
+        private final List<String> menuItems = Arrays.asList(
 				PURCHASE_ORDER,
-				RECEIVING_RECEIPT
-//				PRODUCT_CANVASS
+				RECEIVING_RECEIPT,
+				PRODUCT_CANVASS,
 //				PURCHASE_RETURN,
-//				BAD_PURCHASE_RETURN
+				BAD_PURCHASE_RETURN
 		);
 		
 		@Override

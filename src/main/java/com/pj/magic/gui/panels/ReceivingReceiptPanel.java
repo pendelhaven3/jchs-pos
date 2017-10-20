@@ -524,27 +524,7 @@ public class ReceivingReceiptPanel extends StandardMagicPanel {
 				postReceivingReceipt();
 			}
 		});
-//		toolBar.add(postButton);
-		
-		JButton printPreviewButton = new MagicToolBarButton("print_preview", "Print Preview");
-		printPreviewButton.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				printPreview();
-			}
-		});
-//		toolBar.add(printPreviewButton);
-		
-		MagicToolBarButton printButton = new MagicToolBarButton("print", "Print");
-		printButton.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				printReceivingReceipt();
-			}
-		});
-//		toolBar.add(printButton);
+		toolBar.add(postButton);
 		
         MagicToolBarButton toExcelButton = new MagicToolBarButton("excel", "Generate Excel spreadsheet");
         toExcelButton.addActionListener(new ActionListener() {
