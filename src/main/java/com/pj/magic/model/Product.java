@@ -378,24 +378,29 @@ public class Product implements Comparable<Product>, Serializable {
 	    return units.get(units.size() - 1);
 	}
 	
-	public void autoCalculateCostsOfSmallerUnits() {
-		autoCalculateCostsOfSmallerUnits(getMaxUnit());
+    public void autoCalculateCostsOfSmallerUnits() {
+        autoCalculateCostsOfSmallerUnits(getMaxUnit());
+    }
+    
+	public void autoCalculateCostsOfSmallerUnits(String referenceUnit) {
+	    if (units.size() == 2) {
+            BigDecimal grossCost = getGrossCost(referenceUnit);
+            BigDecimal finalCost = getFinalCost(referenceUnit);
+            
+	        if (referenceUnit.equals(units.get(1))) {
+	            setGrossCost(units.get(0), grossCost.divide(new BigDecimal(getUnitConversion(referenceUnit)), 
+	                    2, RoundingMode.HALF_UP));
+	            setFinalCost(units.get(0), finalCost.divide(new BigDecimal(getUnitConversion(referenceUnit)), 
+                        2, RoundingMode.HALF_UP));
+	        } else {
+                setGrossCost(units.get(1), grossCost.multiply(new BigDecimal(getUnitConversion(units.get(1))))
+                        .setScale(2, RoundingMode.HALF_UP));
+                setFinalCost(units.get(1), finalCost.multiply(new BigDecimal(getUnitConversion(units.get(1))))
+                        .setScale(2, RoundingMode.HALF_UP));
+	        }
+	    }
 	}
 	
-	public void autoCalculateCostsOfSmallerUnits(String referenceUnit) {
-		String maxUnit = referenceUnit;
-		BigDecimal grossCostOfMaxUnit = getGrossCost(maxUnit);
-		BigDecimal finalCostOfMaxUnit = getFinalCost(maxUnit);
-		for (String unit : units) {
-			BigDecimal grossCost = grossCostOfMaxUnit.divide(new BigDecimal(getUnitConversion(unit)), 
-					2, RoundingMode.HALF_UP);
-			BigDecimal finalCost = finalCostOfMaxUnit.divide(new BigDecimal(getUnitConversion(unit)), 
-					2, RoundingMode.HALF_UP);
-			setGrossCost(unit, grossCost);
-			setFinalCost(unit, finalCost);
-		}
-	}
-
 	public boolean hasNoSellingPrice(String unit) {
 		return getUnitPrice(unit).equals(Constants.ZERO);
 	}
