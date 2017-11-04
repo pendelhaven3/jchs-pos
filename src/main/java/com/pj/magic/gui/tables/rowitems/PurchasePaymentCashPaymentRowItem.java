@@ -4,20 +4,17 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 import com.pj.magic.model.PurchasePaymentCashPayment;
-import com.pj.magic.model.User;
 
 public class PurchasePaymentCashPaymentRowItem {
 
 	private PurchasePaymentCashPayment cashPayment;
 	private BigDecimal amount;
 	private Date paidDate;
-	private User paidBy;
 
 	public PurchasePaymentCashPaymentRowItem(PurchasePaymentCashPayment cashPayment) {
 		this.cashPayment = cashPayment;
 		amount = cashPayment.getAmount();
 		paidDate = cashPayment.getPaidDate();
-		paidBy = cashPayment.getPaidBy();
 	}
 	
 	
@@ -51,24 +48,13 @@ public class PurchasePaymentCashPaymentRowItem {
 	}
 
 
-	public User getPaidBy() {
-		return paidBy;
-	}
-
-
-	public void setPaidBy(User paidBy) {
-		this.paidBy = paidBy;
-	}
-
-
 	public void reset() {
 		amount = cashPayment.getAmount();
 		paidDate = cashPayment.getPaidDate();
-		paidBy = cashPayment.getPaidBy();
 	}
 
 	public boolean isValid() {
-		return amount != null && paidDate != null && paidBy != null;
+		return amount != null && paidDate != null;
 	}
 
 	public boolean isUpdating() {

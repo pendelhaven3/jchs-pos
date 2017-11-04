@@ -3,14 +3,10 @@ package com.pj.magic.gui.tables;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.Date;
-import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
-import javax.swing.DefaultCellEditor;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.InputMap;
-import javax.swing.JComboBox;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
@@ -23,23 +19,21 @@ import org.springframework.stereotype.Component;
 
 import com.pj.magic.gui.component.AmountCellEditor;
 import com.pj.magic.gui.component.DateCellEditor;
-import com.pj.magic.gui.component.MagicComboBox;
 import com.pj.magic.gui.component.MagicTextField;
 import com.pj.magic.gui.dialog.SelectDateDialog;
 import com.pj.magic.gui.tables.models.PurchasePaymentCashPaymentsTableModel;
 import com.pj.magic.gui.tables.rowitems.PurchasePaymentCashPaymentRowItem;
 import com.pj.magic.model.PurchasePayment;
 import com.pj.magic.model.PurchasePaymentCashPayment;
-import com.pj.magic.model.User;
-import com.pj.magic.service.UserService;
 import com.pj.magic.util.FormatterUtil;
 
 @Component
 public class PurchasePaymentCashPaymentsTable extends MagicTable {
 	
-	public static final int AMOUNT_COLUMN_INDEX = 0;
+    private static final long serialVersionUID = -1062660095045207443L;
+    
+    public static final int AMOUNT_COLUMN_INDEX = 0;
 	public static final int PAID_DATE_COLUMN_INDEX = 1;
-	public static final int PAID_BY_COLUMN_INDEX = 2;
 	private static final String CANCEL_ACTION_NAME = "cancelAddMode";
 	private static final String DELETE_ITEM_ACTION_NAME = "deleteItem";
 	private static final String F10_ACTION_NAME = "F10";
@@ -47,10 +41,8 @@ public class PurchasePaymentCashPaymentsTable extends MagicTable {
 
 	@Autowired private PurchasePaymentCashPaymentsTableModel tableModel;
 	@Autowired private SelectDateDialog selectDateDialog;
-	@Autowired private UserService userService;
 	
 	private PurchasePayment purchasePayment;
-	private JComboBox<User> paidByComboBox;
 	
 	@Autowired
 	public PurchasePaymentCashPaymentsTable(PurchasePaymentCashPaymentsTableModel tableModel) {
@@ -69,9 +61,6 @@ public class PurchasePaymentCashPaymentsTable extends MagicTable {
 		receivedDateField.setMaximumLength(10);
 		columnModel.getColumn(PAID_DATE_COLUMN_INDEX).setCellEditor(
 				new DateCellEditor(receivedDateField, "Paid Date"));
-		
-		paidByComboBox = new MagicComboBox<>();
-		columnModel.getColumn(PAID_BY_COLUMN_INDEX).setCellEditor(new DefaultCellEditor(paidByComboBox));
 	}
 	
 	public void addNewRow() {
@@ -109,9 +98,6 @@ public class PurchasePaymentCashPaymentsTable extends MagicTable {
 		clearSelection();
 		this.purchasePayment = purchasePayment;
 		tableModel.setPurchasePayment(purchasePayment);
-		
-		List<User> users = userService.getAllUsers();
-		paidByComboBox.setModel(new DefaultComboBoxModel<>(users.toArray(new User[users.size()])));
 	}
 	
 	protected void registerKeyBindings() {
@@ -205,15 +191,6 @@ public class PurchasePaymentCashPaymentsTable extends MagicTable {
 		}
 	}
 
-	public void highlight() {
-//		if (!adjustmentIn.hasItems()) {
-//			switchToAddMode();
-//		} else {
-//			changeSelection(0, 0, false, false);
-//			requestFocusInWindow();
-//		}
-	}
-	
 	private void initializeModelListener() {
 		getModel().addTableModelListener(new TableModelListener() {
 			
@@ -231,9 +208,6 @@ public class PurchasePaymentCashPaymentsTable extends MagicTable {
 							selectAndEditCellAt(row, PAID_DATE_COLUMN_INDEX);
 							break;
 						case PAID_DATE_COLUMN_INDEX:
-							selectAndEditCellAt(row, PAID_BY_COLUMN_INDEX);
-							break;
-						case PAID_BY_COLUMN_INDEX:
 							if (isLastRowSelected()) {
 								addNewRow();
 							}

@@ -18,7 +18,6 @@ import org.springframework.stereotype.Repository;
 import com.pj.magic.dao.PurchasePaymentCashPaymentDao;
 import com.pj.magic.model.PurchasePayment;
 import com.pj.magic.model.PurchasePaymentCashPayment;
-import com.pj.magic.model.User;
 import com.pj.magic.model.search.PurchasePaymentCashPaymentSearchCriteria;
 import com.pj.magic.util.DbUtil;
 
@@ -26,11 +25,8 @@ import com.pj.magic.util.DbUtil;
 public class PurchasePaymentCashPaymentDaoImpl extends MagicDao implements PurchasePaymentCashPaymentDao {
 
 	private static final String BASE_SELECT_SQL = 
-			"select a.ID, PURCHASE_PAYMENT_ID, a.AMOUNT, PAID_DT, PAID_BY,"
-			+ " b.USERNAME as PAID_BY_USERNAME"
+			"select a.ID, PURCHASE_PAYMENT_ID, a.AMOUNT, PAID_DT, PAID_BY"
 			+ " from PURCHASE_PAYMENT_CASH_PAYMENT a"
-			+ " join USER b"
-			+ "   on b.ID = a.PAID_BY"
 			+ " join PURCHASE_PAYMENT c"
 			+ "   on c.ID = a.PURCHASE_PAYMENT_ID";
 	
@@ -48,7 +44,7 @@ public class PurchasePaymentCashPaymentDaoImpl extends MagicDao implements Purch
 
 	private static final String INSERT_SQL = 
 			"insert into PURCHASE_PAYMENT_CASH_PAYMENT"
-			+ " (PURCHASE_PAYMENT_ID, AMOUNT, PAID_DT, PAID_BY) values (?, ?, ?, ?)";
+			+ " (PURCHASE_PAYMENT_ID, AMOUNT, PAID_DT) values (?, ?, ?)";
 	
 	private void insert(final PurchasePaymentCashPayment cashPayment) {
 		KeyHolder holder = new GeneratedKeyHolder();
@@ -61,7 +57,6 @@ public class PurchasePaymentCashPaymentDaoImpl extends MagicDao implements Purch
 				ps.setLong(1, cashPayment.getParent().getId());
 				ps.setBigDecimal(2, cashPayment.getAmount());
 				ps.setDate(3, new Date(cashPayment.getPaidDate().getTime()));
-				ps.setLong(4, cashPayment.getPaidBy().getId());
 				return ps;
 			}
 		}, holder);
@@ -71,14 +66,13 @@ public class PurchasePaymentCashPaymentDaoImpl extends MagicDao implements Purch
 
 	private static final String UPDATE_SQL = 
 			"update PURCHASE_PAYMENT_CASH_PAYMENT"
-			+ " set AMOUNT = ?, PAID_DT = ?, PAID_BY = ?"
+			+ " set AMOUNT = ?, PAID_DT = ?"
 			+ " where ID = ?";
 	
 	private void update(PurchasePaymentCashPayment cashPayment) {
 		getJdbcTemplate().update(UPDATE_SQL, 
 				cashPayment.getAmount(), 
 				cashPayment.getPaidDate(),
-				cashPayment.getPaidBy().getId(),
 				cashPayment.getId());
 	}
 
@@ -100,8 +94,6 @@ public class PurchasePaymentCashPaymentDaoImpl extends MagicDao implements Purch
 			cashPayment.setParent(new PurchasePayment(rs.getLong("PURCHASE_PAYMENT_ID")));
 			cashPayment.setAmount(rs.getBigDecimal("AMOUNT"));
 			cashPayment.setPaidDate(rs.getDate("PAID_DT"));
-			cashPayment.setPaidBy(
-					new User(rs.getLong("PAID_BY"), rs.getString("PAID_BY_USERNAME")));
 			return cashPayment;
 		}
 		

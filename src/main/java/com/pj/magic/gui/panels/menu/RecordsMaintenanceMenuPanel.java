@@ -28,7 +28,8 @@ import com.pj.magic.util.ListUtil;
 @Component
 public class RecordsMaintenanceMenuPanel extends MenuPanel {
 
-	private static final String AREA_LIST = "Area List";
+    private static final long serialVersionUID = 6070286737713137704L;
+    private static final String AREA_LIST = "Area List";
 	private static final String ADJUSTMENT_TYPE_LIST = "Adjustment Type List";
 	private static final String PRODUCT_CATEGORY_LIST = "Product Category List";
 	private static final String PAYMENT_TERM_LIST = "Payment Term List";
@@ -136,16 +137,18 @@ public class RecordsMaintenanceMenuPanel extends MenuPanel {
 
 	private class MainMenuTableModel extends AbstractTableModel {
 
-		private final List<String> allMenuItems = ListUtil.asSortedList(Arrays.asList(
+        private static final long serialVersionUID = -8243372847458489940L;
+
+        private final List<String> allMenuItems = ListUtil.asSortedList(Arrays.asList(
 //				CUSTOMER_LIST,
 				SUPPLIER_LIST,
 //				MANUFACTURER_LIST,
-				PAYMENT_TERM_LIST
+				PAYMENT_TERM_LIST,
 //				PRODUCT_CATEGORY_LIST,
 //				ADJUSTMENT_TYPE_LIST,
 //				AREA_LIST,
-//				CREDIT_CARD_LIST,
-//				PURCHASE_PAYMENT_ADJUSTMENT_TYPE_LIST
+				CREDIT_CARD_LIST,
+				PURCHASE_PAYMENT_ADJUSTMENT_TYPE_LIST
 		));
 		
 		private List<String> menuItems = new ArrayList<>();
@@ -168,9 +171,6 @@ public class RecordsMaintenanceMenuPanel extends MenuPanel {
 		public void setUser(User user) {
 			menuItems.clear();
 			menuItems.addAll(allMenuItems);
-			if (!user.isSupervisor()) {
-				menuItems.remove(CREDIT_CARD_LIST);
-			}
 			fireTableDataChanged();
 		}
 		

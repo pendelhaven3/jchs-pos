@@ -193,11 +193,7 @@ public class MainMenuPanel extends StandardMagicPanel {
 			getMagicFrame().switchToSalesPaymentsMenuPanel();
 			break;
 		case PURCHASE_PAYMENT:
-			if (loginService.getLoggedInUser().isSupervisor()) {
-				getMagicFrame().switchToPurchasePaymentsMenuPanel();
-			} else {
-				getMagicFrame().switchToPurchasePaymentListPanel();
-			}
+            getMagicFrame().switchToPurchasePaymentsMenuPanel();
 			break;
 		case STOCK_MOVEMENT:
 			getMagicFrame().switchToStockMovementMenuPanel();
@@ -239,13 +235,15 @@ public class MainMenuPanel extends StandardMagicPanel {
 
 	private class MainMenuTableModel extends AbstractTableModel {
 
-		private final List<String> allMenuItems = Arrays.asList(
+        private static final long serialVersionUID = -8941683427387469626L;
+
+        private final List<String> allMenuItems = Arrays.asList(
 //				SALES,
                 PRODUCTS,
 				PURCHASES,
 //                PRODUCT_MAINTENANCE_AND_PRICING_SCHEMES,
 //				SALES_PAYMENT,
-//				PURCHASE_PAYMENT,
+				PURCHASE_PAYMENT,
 //				PROMO,
 //				PROMO_REDEMPTION,
 //				STOCK_MOVEMENT,

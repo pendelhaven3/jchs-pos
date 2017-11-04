@@ -28,7 +28,7 @@ public class CreditCardStatementPaymentRowItem {
 	}
 
 	public boolean isValid() {
-		return paymentDate != null && amount != null && !StringUtils.isEmpty(paymentType);
+		return paymentDate != null && amount != null && !StringUtils.isEmpty(paymentType) && !StringUtils.isEmpty(remarks);
 	}
 
 	public boolean isUpdating() {

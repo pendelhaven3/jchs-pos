@@ -23,7 +23,9 @@ import com.pj.magic.gui.tables.MagicSubmenuTable;
 @Component
 public class PurchasePaymentsMenuPanel extends MenuPanel {
 
-	private static final String PURCHASE_PAYMENT = "Purchase Payment";
+    private static final long serialVersionUID = -3357932767596071935L;
+    
+    private static final String PURCHASE_PAYMENT = "Purchase Payment";
 	private static final String PURCHASE_PAYMENT_ADJUSTMENT = "Purchase Payment Adjustment";
 	private static final String UNPAID_CREDIT_CARD_PAYMENTS_LIST = "Unpaid Credit Card Payments List";
 	private static final String CREDIT_CARD_STATEMENT = "Credit Card Statements";

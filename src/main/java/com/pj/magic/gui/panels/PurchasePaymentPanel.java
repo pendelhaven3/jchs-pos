@@ -57,7 +57,9 @@ import com.pj.magic.util.FormatterUtil;
 @Component
 public class PurchasePaymentPanel extends StandardMagicPanel {
 
-	private static final Logger logger = LoggerFactory.getLogger(PurchasePaymentPanel.class);
+    private static final long serialVersionUID = -3780835355579100447L;
+
+    private static final Logger logger = LoggerFactory.getLogger(PurchasePaymentPanel.class);
 	
 	private static final String SAVE_SUPPLIER_ACTION_NAME = "saveSupplier";
 	private static final String OPEN_SELECT_SUPPLIER_DIALOG_ACTION_NAME = "openSelectSupplierDialog";
@@ -527,7 +529,7 @@ public class PurchasePaymentPanel extends StandardMagicPanel {
 				unpostPayment();
 			}
 		});
-		toolBar.add(unpostButton);
+//		toolBar.add(unpostButton);
 		
 		printPreviewButton = new MagicToolBarButton("print_preview", "Print Preview");
 		printPreviewButton.addActionListener(new ActionListener() {
@@ -537,7 +539,7 @@ public class PurchasePaymentPanel extends StandardMagicPanel {
 				printPreview();
 			}
 		});
-		toolBar.add(printPreviewButton);
+//		toolBar.add(printPreviewButton);
 		
 		printButton = new MagicToolBarButton("print", "Print");
 		printButton.addActionListener(new ActionListener() {
@@ -547,11 +549,11 @@ public class PurchasePaymentPanel extends StandardMagicPanel {
 				printPaymentSummary();
 			}
 		});	
-		toolBar.add(printButton);
+//		toolBar.add(printButton);
 		
 		MagicToolBarButton printChequeButton = new MagicToolBarButton("cheque", "Print Cheque");
 		printChequeButton.addActionListener(e -> printCheque());
-		toolBar.add(printChequeButton);
+//		toolBar.add(printChequeButton);
 	}
 
 	private void printPaymentSummary() {

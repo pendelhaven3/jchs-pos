@@ -14,7 +14,6 @@ import com.pj.magic.gui.tables.PurchasePaymentCashPaymentsTable;
 import com.pj.magic.gui.tables.rowitems.PurchasePaymentCashPaymentRowItem;
 import com.pj.magic.model.PurchasePayment;
 import com.pj.magic.model.PurchasePaymentCashPayment;
-import com.pj.magic.model.User;
 import com.pj.magic.service.PurchasePaymentService;
 import com.pj.magic.util.DateUtil;
 import com.pj.magic.util.FormatterUtil;
@@ -23,7 +22,9 @@ import com.pj.magic.util.NumberUtil;
 @Component
 public class PurchasePaymentCashPaymentsTableModel extends AbstractTableModel {
 	
-	private static final String[] columnNames = {"Amount", "Paid Date", "Paid By"};
+    private static final long serialVersionUID = -4568551261115410069L;
+
+    private static final String[] columnNames = {"Amount", "Paid Date"};
 	
 	@Autowired private PurchasePaymentService purchasePaymentService;
 	
@@ -50,8 +51,6 @@ public class PurchasePaymentCashPaymentsTableModel extends AbstractTableModel {
 		case PurchasePaymentCashPaymentsTable.PAID_DATE_COLUMN_INDEX:
 			Date paidDate = rowItem.getPaidDate();
 			return (paidDate != null) ? FormatterUtil.formatDate(paidDate) : null;
-		case PurchasePaymentCashPaymentsTable.PAID_BY_COLUMN_INDEX:
-			return rowItem.getPaidBy();
 		default:
 			throw new RuntimeException("Fetching invalid column index: " + columnIndex);
 		}
@@ -91,20 +90,12 @@ public class PurchasePaymentCashPaymentsTableModel extends AbstractTableModel {
 			}
 			rowItem.setPaidDate(DateUtil.toDate(dateString));
 			break;
-		case PurchasePaymentCashPaymentsTable.PAID_BY_COLUMN_INDEX:
-			User paidBy = (User)value;
-			if (paidBy == null || paidBy.equals(rowItem.getPaidBy())) {
-				return;
-			}
-			rowItem.setPaidBy(paidBy);
-			break;
 		}
 		
 		if (rowItem.isValid()) {
 			PurchasePaymentCashPayment cashPayment = rowItem.getCashPayment();
 			cashPayment.setAmount(rowItem.getAmount());
 			cashPayment.setPaidDate(rowItem.getPaidDate());
-			cashPayment.setPaidBy(rowItem.getPaidBy());
 			
 			boolean newCashPayment = (cashPayment.getId() == null);
 			purchasePaymentService.save(cashPayment);
@@ -124,8 +115,6 @@ public class PurchasePaymentCashPaymentsTableModel extends AbstractTableModel {
 		PurchasePaymentCashPaymentRowItem rowItem = rowItems.get(rowIndex);
 		boolean editable = true;
 		switch (columnIndex) {
-		case PurchasePaymentCashPaymentsTable.PAID_BY_COLUMN_INDEX:
-			editable = (rowItem.getPaidDate() != null);
 		case PurchasePaymentCashPaymentsTable.PAID_DATE_COLUMN_INDEX:
 			editable = (rowItem.getAmount() != null);
 		case PurchasePaymentCashPaymentsTable.AMOUNT_COLUMN_INDEX:

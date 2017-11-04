@@ -42,7 +42,9 @@ import com.pj.magic.util.NumberUtil;
 @Component
 public class MaintainPurchasePaymentAdjustmentPanel extends StandardMagicPanel {
 
-	private static final Logger logger = LoggerFactory.getLogger(MaintainPurchasePaymentAdjustmentPanel.class);
+    private static final long serialVersionUID = -8392441627145704133L;
+    
+    private static final Logger logger = LoggerFactory.getLogger(MaintainPurchasePaymentAdjustmentPanel.class);
 	private static final String NEXT_FIELD_ACTION_NAME = "nextField";
 	private static final String SAVE_ACTION_NAME = "save";
 	

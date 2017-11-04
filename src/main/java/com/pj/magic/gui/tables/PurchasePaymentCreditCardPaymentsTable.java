@@ -185,7 +185,7 @@ public class PurchasePaymentCreditCardPaymentsTable extends MagicTable {
 			if (getCurrentlySelectedRowItem().isUpdating()) {
 				tableModel.reset(getSelectedRow());
 			}
-		} else if (isLastRowSelected() && !getCurrentlySelectedRowItem().isUpdating()) {
+		} else if (isLastRowSelected() && (tableModel.getRowCount() > 0 && !getCurrentlySelectedRowItem().isUpdating())) {
 			int selectedRow = getSelectedRow();
 			clearSelection();
 			tableModel.removeItem(selectedRow);

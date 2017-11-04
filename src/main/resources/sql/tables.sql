@@ -18,9 +18,9 @@ create table PRODUCT (
   UNIT_CODE1 varchar(10) null,
   UNIT_QUANTITY numeric(10) not null,
   UNIT_QUANTITY1 numeric(10) null,
-  GROSS_COST numeric(9,2) null,
+  GROSS_COST numeric(9,2) default 0 not null,
   GROSS_COST1 numeric(9,2) null,
-  FINAL_COST numeric(9,2) null,
+  FINAL_COST numeric(9,2) default 0 not null,
   FINAL_COST1 numeric(9,2) null,
   constraint PRODUCT$PK primary key (ID),
   constraint PRODUCT$CODE$UK unique (CODE)
@@ -153,10 +153,46 @@ create table PURCHASE_RETURN_BAD_STOCK_ITEM (
   ID integer auto_increment,
   PURCHASE_RETURN_BAD_STOCK_ID integer not null,
   PRODUCT_ID integer not null,
-  UNIT char(3) not null,
+  UNIT char(4) not null,
   QUANTITY integer not null,
   UNIT_COST numeric(10, 2) not null,
   constraint PURCHASE_RETURN_BAD_STOCK_ITEM$PK primary key (ID),
   constraint PURCHASE_RETURN_BAD_STOCK_ITEM$FK foreign key (PURCHASE_RETURN_BAD_STOCK_ID) references PURCHASE_RETURN_BAD_STOCK (ID),
   constraint PURCHASE_RETURN_BAD_STOCK_ITEM$FK2 foreign key (PRODUCT_ID) references PRODUCT (ID)
+);
+
+create table CREDIT_CARD_STATEMENT (
+  ID integer auto_increment,
+  CUSTOMER_NUMBER varchar(30) not null,
+  CREDIT_CARD_ID integer null,
+  STATEMENT_DT date not null,
+  POST_IND varchar(1) default 'N' not null,
+  primary key (ID)
+);
+
+create table CREDIT_CARD_STATEMENT_ITEM (
+  ID integer auto_increment,
+  CREDIT_CARD_STATEMENT_ID integer not null,
+  PURCHASE_PAYMENT_CREDIT_CARD_PAYMENT_ID integer not null,
+  primary key (ID),
+  constraint CREDIT_CARD_STATEMENT_ITEM$FK foreign key (CREDIT_CARD_STATEMENT_ID) references CREDIT_CARD_STATEMENT (ID),
+  constraint CREDIT_CARD_STATEMENT_ITEM$FK2 foreign key (PURCHASE_PAYMENT_CREDIT_CARD_PAYMENT_ID) references PURCHASE_PAYMENT_CREDIT_CARD_PAYMENT (ID)
+);
+
+create table CREDIT_CARD_PAYMENT (
+  ID integer auto_increment,
+  CREDIT_CARD_ID integer not null,
+  primary key (ID),
+  constraint CREDIT_CARD_PAYMENT$FK foreign key (CREDIT_CARD_ID) references CREDIT_CARD (ID)
+);
+
+create table CREDIT_CARD_STATEMENT_PAYMENT (
+  ID integer auto_increment,
+  CREDIT_CARD_STATEMENT_ID integer not null,
+  AMOUNT numeric(10, 2) not null,
+  PAYMENT_DT date not null,
+  PAYMENT_TYPE varchar(20) not null,
+  REMARKS varchar(100) not null,
+  primary key (ID),
+  constraint CREDIT_CARD_STATEMENT_PAYMENT$FK foreign key (CREDIT_CARD_STATEMENT_ID) references CREDIT_CARD_STATEMENT (ID)
 );

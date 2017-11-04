@@ -19,7 +19,6 @@ import com.pj.magic.dao.PurchasePaymentAdjustmentDao;
 import com.pj.magic.model.PurchasePaymentAdjustmentType;
 import com.pj.magic.model.Supplier;
 import com.pj.magic.model.PurchasePaymentAdjustment;
-import com.pj.magic.model.User;
 import com.pj.magic.model.search.PurchasePaymentAdjustmentSearchCriteria;
 import com.pj.magic.util.DbUtil;
 
@@ -33,13 +32,10 @@ public class PurchasePaymentAdjustmentDaoImpl extends MagicDao implements Purcha
 			"select a.ID, PURCHASE_PAYMENT_ADJUSTMENT_NO, SUPPLIER_ID, PURCHASE_PAYMENT_ADJ_TYPE_ID, AMOUNT,"
 			+ " POST_IND, POST_DT, POST_BY, a.REMARKS,"
 			+ " b.CODE as SUPPLIER_CODE, b.NAME as SUPPLIER_NAME,"
-			+ " c.USERNAME as POST_BY_USERNAME,"
 			+ " d.CODE as ADJUSTMENT_TYPE_CODE"
 			+ " from PURCHASE_PAYMENT_ADJUSTMENT a"
 			+ " join SUPPLIER b"
 			+ "   on b.ID = a.SUPPLIER_ID"
-			+ " left join USER c"
-			+ "   on c.ID = a.POST_BY"
 			+ " join PURCHASE_PAYMENT_ADJ_TYPE d"
 			+ "   on d.ID = a.PURCHASE_PAYMENT_ADJ_TYPE_ID";
 
@@ -135,10 +131,7 @@ public class PurchasePaymentAdjustmentDaoImpl extends MagicDao implements Purcha
 			paymentAdjustment.setAdjustmentType(adjustmentType);
 			
 			paymentAdjustment.setPosted("Y".equals(rs.getString("POST_IND")));
-			if (paymentAdjustment.isPosted()) {
-				paymentAdjustment.setPostDate(rs.getDate("POST_DT"));
-				paymentAdjustment.setPostedBy(new User(rs.getLong("POST_BY"), rs.getString("POST_BY_USERNAME")));
-			}
+            paymentAdjustment.setPostDate(rs.getDate("POST_DT"));
 			
 			paymentAdjustment.setRemarks(rs.getString("REMARKS"));
 			

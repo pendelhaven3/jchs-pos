@@ -30,7 +30,9 @@ import com.pj.magic.util.FormatterUtil;
 @Component
 public class AddReceivingReceiptsToPurchasePaymentDialog extends MagicDialog {
 
-	private static final int SELECTION_CHECKBOX_COLUMN_INDEX = 0;
+    private static final long serialVersionUID = -4035429938223647439L;
+    
+    private static final int SELECTION_CHECKBOX_COLUMN_INDEX = 0;
 	private static final int RECEIVING_RECEIPT_NUMBER_COLUMN_INDEX = 1;
 	private static final int RECEIVED_DATE_COLUMN_INDEX = 2;
 	private static final int AMOUNT_COLUMN_INDEX = 3;
@@ -126,7 +128,7 @@ public class AddReceivingReceiptsToPurchasePaymentDialog extends MagicDialog {
 		c.gridy = currentRow;
 		c.anchor = GridBagConstraints.CENTER;
 		add(ComponentUtil.createGenericPanel(
-				addButton, addAllButton), c);
+				addButton, Box.createHorizontalStrut(10), addAllButton), c);
 		
 		currentRow++;
 		
@@ -145,7 +147,9 @@ public class AddReceivingReceiptsToPurchasePaymentDialog extends MagicDialog {
 
 	private class ReceivingReceiptsTableModel extends AbstractTableModel {
 
-		private final String[] columnNames = {"", "RR No.", "Received Date", "Total Amount"};
+        private static final long serialVersionUID = 3095622462874049530L;
+
+        private final String[] columnNames = {"", "RR No.", "Received Date", "Total Amount"};
 		
 		private List<ReceivingReceipt> receivingReceipts = new ArrayList<>();
 		private List<Integer> selected = new ArrayList<>();

@@ -29,7 +29,8 @@ import com.pj.magic.util.ListUtil;
 @Component
 public class CreditCardStatementPaymentsTable extends MagicTable {
 	
-	public static final int PAYMENT_DATE_COLUMN_INDEX = 0;
+    private static final long serialVersionUID = -6152576930617866843L;
+    public static final int PAYMENT_DATE_COLUMN_INDEX = 0;
 	public static final int AMOUNT_COLUMN_INDEX = 1;
 	public static final int PAYMENT_TYPE_COLUMN_INDEX = 2;
 	public static final int REMARKS_COLUMN_INDEX = 3;
@@ -163,7 +164,7 @@ public class CreditCardStatementPaymentsTable extends MagicTable {
 			if (getCurrentlySelectedRowItem().isUpdating()) {
 				tableModel.reset(getSelectedRow());
 			}
-		} else if (isLastRowSelected() && !getCurrentlySelectedRowItem().isUpdating()) {
+		} else if (isLastRowSelected() && tableModel.getRowCount() > 0 && !getCurrentlySelectedRowItem().isUpdating()) {
 			int selectedRow = getSelectedRow();
 			clearSelection();
 			tableModel.removeItem(selectedRow);
