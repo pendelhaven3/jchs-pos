@@ -470,13 +470,21 @@ public class Product implements Comparable<Product>, Serializable {
             return false;
         }
         
-        return new EqualsBuilder()
-                .append(description, other.getDescription())
-                .append(units.get(0), other.getUnits().get(0))
-                .append(units.get(1), other.getUnits().get(1))
-                .append(unitConversions.get(0), other.getUnitConversions().get(0))
-                .append(unitConversions.get(1), other.getUnitConversions().get(1))
-                .isEquals();
+        if (units.size() == 2) {
+            return new EqualsBuilder()
+                    .append(description, other.getDescription())
+                    .append(units.get(0), other.getUnits().get(0))
+                    .append(units.get(1), other.getUnits().get(1))
+                    .append(unitConversions.get(0), other.getUnitConversions().get(0))
+                    .append(unitConversions.get(1), other.getUnitConversions().get(1))
+                    .isEquals();
+        } else {
+            return new EqualsBuilder()
+                    .append(description, other.getDescription())
+                    .append(units.get(0), other.getUnits().get(0))
+                    .append(unitConversions.get(0), other.getUnitConversions().get(0))
+                    .isEquals();
+        }
     }
 	
 }

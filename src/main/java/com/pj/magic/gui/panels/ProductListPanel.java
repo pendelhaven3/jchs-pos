@@ -212,6 +212,10 @@ public class ProductListPanel extends StandardMagicPanel {
             while ((nextLine = reader.readNext()) != null) {
                 String unit1 = nextLine[8];
                 String unit2 = nextLine[9];
+                if ("null".equals(unit2)) {
+                    unit2 = null;
+                }
+                
                 int unitConversion1 = (int)Float.parseFloat(nextLine[13]);
                 int unitConversion2 = 0;
                 if (!StringUtils.isEmpty(nextLine[14]) && !"null".equals(nextLine[14])) {
