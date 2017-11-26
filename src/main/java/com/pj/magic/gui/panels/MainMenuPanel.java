@@ -247,7 +247,7 @@ public class MainMenuPanel extends StandardMagicPanel {
 //				PROMO,
 //				PROMO_REDEMPTION,
 //				STOCK_MOVEMENT,
-//				REPORTS,
+				REPORTS,
 //				INVENTORY_CHECK,
 				RECORDS_MAINTENANCE
 //				BACKUP_RESTORE_DATA,

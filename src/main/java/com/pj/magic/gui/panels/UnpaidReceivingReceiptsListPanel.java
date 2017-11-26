@@ -40,7 +40,9 @@ import com.pj.magic.util.FormatterUtil;
 @Component
 public class UnpaidReceivingReceiptsListPanel extends StandardMagicPanel {
 
-	private static final int RECEIVING_RECEIPT_NUMBER_COLUMN_INDEX = 0;
+    private static final long serialVersionUID = -8758578626764868250L;
+    
+    private static final int RECEIVING_RECEIPT_NUMBER_COLUMN_INDEX = 0;
 	private static final int RECEIVED_DATE_COLUMN_INDEX = 1;
 	private static final int SUPPLIER_COLUMN_INDEX = 2;
 	private static final int NET_AMOUNT_COLUMN_INDEX = 3;
@@ -232,36 +234,6 @@ public class UnpaidReceivingReceiptsListPanel extends StandardMagicPanel {
 
 	@Override
 	protected void addToolBarButtons(MagicToolBar toolBar) {
-		JButton printPreviewButton = new MagicToolBarButton("print_preview", "Print Preview");
-		printPreviewButton.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				printPreview();
-			}
-		});
-//		toolBar.add(printPreviewButton);
-		
-		JButton printButton = new MagicToolBarButton("print", "Print");
-		printButton.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				print();
-			}
-		});
-//		toolBar.add(printButton);
-	}
-
-	private void print() {
-//		UnpaidSalesInvoicesReport report = createUnpaidSalesInvoicesReport();
-//		printService.print(report);
-	}
-
-	private void printPreview() {
-//		UnpaidReceivingReceiptsReport report = createUnpaidSalesInvoicesReport();
-//		printPreviewDialog.updateDisplay(printService.generateReportAsString(report));
-//		printPreviewDialog.setVisible(true);
 	}
 
 	private UnpaidReceivingReceiptsReport createReport() {

@@ -27,7 +27,9 @@ import com.pj.magic.service.LoginService;
 @Component
 public class ReportsMenuPanel extends MenuPanel {
 
-	private static final String POSTED_SALES_AND_PROFIT_REPORT = "Posted Sales and Profit Report";
+    private static final long serialVersionUID = -1041462307872718651L;
+    
+    private static final String POSTED_SALES_AND_PROFIT_REPORT = "Posted Sales and Profit Report";
 	private static final String UNPAID_SALES_INVOICES_LIST = "Unpaid Sales Invoices List";
 	private static final String CUSTOMER_SALES_SUMMARY_REPORT = "Customer Sales Summary Report";
 	private static final String UNPAID_RECEIVING_RECEIPTS_LIST = "Unpaid Receiving Receipts List";
@@ -155,19 +157,19 @@ public class ReportsMenuPanel extends MenuPanel {
 	private class MainMenuTableModel extends AbstractTableModel {
 
 		private final List<String> allMenuItems = Arrays.asList(
-				UNPAID_SALES_INVOICES_LIST,
-				POSTED_SALES_AND_PROFIT_REPORT,
-				CUSTOMER_SALES_SUMMARY_REPORT,
-				CUSTOMER_CHECK_PAYMENTS_REPORT,
-				UNPAID_RECEIVING_RECEIPTS_LIST,
-				DISBURSEMENT_REPORT,
-				PURCHASE_PAYMENT_BANK_TRANSFERS_REPORT,
-				PURCHASE_PAYMENT_CHECK_PAYMENTS_REPORT,
-				PURCHASE_PAYMENT_CREDIT_CARD_PAYMENTS_REPORT,
-				SALES_BY_MANUFACTURER_REPORT,
-				STOCK_OFFTAKE_REPORT,
-				DAILY_PRODUCT_QUANTITY_DISCREPANCY_REPORT,
-				PILFERAGE_REPORT
+//				UNPAID_SALES_INVOICES_LIST,
+//				POSTED_SALES_AND_PROFIT_REPORT,
+//				CUSTOMER_SALES_SUMMARY_REPORT,
+//				CUSTOMER_CHECK_PAYMENTS_REPORT,
+				UNPAID_RECEIVING_RECEIPTS_LIST
+//				DISBURSEMENT_REPORT,
+//				PURCHASE_PAYMENT_BANK_TRANSFERS_REPORT,
+//				PURCHASE_PAYMENT_CHECK_PAYMENTS_REPORT,
+//				PURCHASE_PAYMENT_CREDIT_CARD_PAYMENTS_REPORT,
+//				SALES_BY_MANUFACTURER_REPORT,
+//				STOCK_OFFTAKE_REPORT,
+//				DAILY_PRODUCT_QUANTITY_DISCREPANCY_REPORT,
+//				PILFERAGE_REPORT
 		);
 		
 		private List<String> menuItems = new ArrayList<>();
