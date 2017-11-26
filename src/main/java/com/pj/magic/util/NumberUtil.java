@@ -40,4 +40,8 @@ public class NumberUtil {
 		}
 	}
 	
+	public static BigDecimal nvl(BigDecimal amount) {
+	    return amount != null ? amount : BigDecimal.ZERO.setScale(2);
+	}
+	
 }

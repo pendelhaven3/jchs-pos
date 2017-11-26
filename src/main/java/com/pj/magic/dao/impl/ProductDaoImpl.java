@@ -26,6 +26,7 @@ import com.pj.magic.model.Unit;
 import com.pj.magic.model.UnitConversion;
 import com.pj.magic.model.UnitCost;
 import com.pj.magic.model.search.ProductSearchCriteria;
+import com.pj.magic.util.NumberUtil;
 
 @Repository
 public class ProductDaoImpl extends MagicDao implements ProductDao {
@@ -78,12 +79,14 @@ public class ProductDaoImpl extends MagicDao implements ProductDao {
 			
 			product.getUnits().add(unit1);
             product.getUnitConversions().add(new UnitConversion(unit1, rs.getInt("UOM_QTY")));
-            product.getUnitCosts().add(new UnitCost(unit1, rs.getBigDecimal("GROSS_COST"), rs.getBigDecimal("FINAL_COST")));
+            product.getUnitCosts().add(new UnitCost(unit1, NumberUtil.nvl(rs.getBigDecimal("GROSS_COST")), 
+                    NumberUtil.nvl(rs.getBigDecimal("FINAL_COST"))));
             
             if (!StringUtils.isEmpty(unit2)) {
                 product.getUnits().add(unit2);
                 product.getUnitConversions().add(new UnitConversion(unit2, rs.getInt("UOM_QTY1")));
-                product.getUnitCosts().add(new UnitCost(unit2, rs.getBigDecimal("GROSS_COST1"), rs.getBigDecimal("FINAL_COST1")));
+                product.getUnitCosts().add(new UnitCost(unit2, NumberUtil.nvl(rs.getBigDecimal("GROSS_COST1")), 
+                        NumberUtil.nvl(rs.getBigDecimal("FINAL_COST1"))));
             }
 			
 			return product;
