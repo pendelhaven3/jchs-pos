@@ -553,7 +553,7 @@ public class PurchasePaymentPanel extends StandardMagicPanel {
 		
 		MagicToolBarButton printChequeButton = new MagicToolBarButton("cheque", "Print Cheque");
 		printChequeButton.addActionListener(e -> printCheque());
-//		toolBar.add(printChequeButton);
+		toolBar.add(printChequeButton);
 	}
 
 	private void printPaymentSummary() {
