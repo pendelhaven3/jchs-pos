@@ -11,7 +11,6 @@ import com.pj.magic.dao.ProductDao;
 import com.pj.magic.dao.PurchaseReturnDao;
 import com.pj.magic.dao.PurchaseReturnItemDao;
 import com.pj.magic.dao.SystemDao;
-import com.pj.magic.model.Product;
 import com.pj.magic.model.PurchaseReturn;
 import com.pj.magic.model.PurchaseReturnItem;
 import com.pj.magic.model.search.PurchaseReturnSearchCriteria;
@@ -68,14 +67,14 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
 		PurchaseReturn updated = purchaseReturnDao.get(purchaseReturn.getId());
 		updated.setItems(purchaseReturnItemDao.findAllByPurchaseReturn(purchaseReturn));
 		
-		for (PurchaseReturnItem item : updated.getItems()) {
-			Product product = productDao.get(item.getReceivingReceiptItem().getProduct().getId());
-			product.addUnitQuantity(item.getReceivingReceiptItem().getUnit(), -1 * item.getQuantity());
-			productDao.updateAvailableQuantities(product);
-		}
+//		for (PurchaseReturnItem item : updated.getItems()) {
+//			Product product = productDao.get(item.getReceivingReceiptItem().getProduct().getId());
+//			product.addUnitQuantity(item.getReceivingReceiptItem().getUnit(), -1 * item.getQuantity());
+//			productDao.updateAvailableQuantities(product);
+//		}
 		updated.setPosted(true);
 		updated.setPostDate(systemDao.getCurrentDateTime());
-		updated.setPostedBy(loginService.getLoggedInUser());
+//		updated.setPostedBy(loginService.getLoggedInUser());
 		purchaseReturnDao.save(updated);
 	}
 

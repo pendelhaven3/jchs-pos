@@ -196,7 +196,6 @@ public class PurchaseReturnPanel extends StandardMagicPanel {
 		supplierField.setText(supplier.getCode() + " - " + supplier.getName());
 		
 		postDateField.setText(purchaseReturn.isPosted() ? FormatterUtil.formatDate(purchaseReturn.getPostDate()) : null);
-		postedByField.setText(purchaseReturn.isPosted() ? purchaseReturn.getPostedBy().getUsername() : null);
 		remarksField.setText(purchaseReturn.getRemarks());
 		remarksField.setEnabled(!purchaseReturn.isPosted());
 		
@@ -317,7 +316,7 @@ public class PurchaseReturnPanel extends StandardMagicPanel {
 		c.gridx = 4;
 		c.gridy = currentRow;
 		c.anchor = GridBagConstraints.WEST;
-		mainPanel.add(ComponentUtil.createLabel(120, "Posted By:"), c);
+		mainPanel.add(ComponentUtil.createLabel(120, ""), c);
 		
 		c = new GridBagConstraints();
 		c.gridx = 5;

@@ -120,7 +120,7 @@ public class PurchasesMenuPanel extends MenuPanel {
 				PURCHASE_ORDER,
 				RECEIVING_RECEIPT,
 				PRODUCT_CANVASS,
-//				PURCHASE_RETURN,
+				PURCHASE_RETURN,
 				BAD_PURCHASE_RETURN
 		);
 		

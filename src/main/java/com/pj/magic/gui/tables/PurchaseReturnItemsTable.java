@@ -1,7 +1,6 @@
 package com.pj.magic.gui.tables;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.List;
 
@@ -37,7 +36,6 @@ import com.pj.magic.model.PurchaseReturn;
 import com.pj.magic.model.PurchaseReturnItem;
 import com.pj.magic.model.ReceivingReceiptItem;
 import com.pj.magic.service.ProductService;
-import com.pj.magic.util.KeyUtil;
 
 /*
  * [PJ 7/10/2014] 
@@ -48,7 +46,9 @@ import com.pj.magic.util.KeyUtil;
 @Component
 public class PurchaseReturnItemsTable extends MagicTable {
 	
-	public static final int PRODUCT_CODE_COLUMN_INDEX = 0;
+    private static final long serialVersionUID = 5478414075790045848L;
+    
+    public static final int PRODUCT_CODE_COLUMN_INDEX = 0;
 	public static final int PRODUCT_DESCRIPTION_COLUMN_INDEX = 1;
 	public static final int UNIT_COLUMN_INDEX = 2;
 	public static final int QUANTITY_COLUMN_INDEX = 3;
@@ -59,7 +59,7 @@ public class PurchaseReturnItemsTable extends MagicTable {
 	private static final String CANCEL_ACTION_NAME = "cancelAddMode";
 	private static final String DELETE_ITEM_ACTION_NAME = "deleteItem";
 	private static final String F4_ACTION_NAME = "F4";
-
+	
 	@Autowired private SelectProductDialog selectProductDialog;
 	@Autowired private SelectUnitDialog selectUnitDialog;
 	@Autowired private ProductService productService;
@@ -91,35 +91,9 @@ public class PurchaseReturnItemsTable extends MagicTable {
 		columnModel.getColumn(AMOUNT_COLUMN_INDEX).setPreferredWidth(100);
 		
 		MagicTextField productCodeTextField = new MagicTextField();
-		productCodeTextField.setMaximumLength(Constants.PRODUCT_CODE_MAXIMUM_LENGTH);
-		productCodeTextField.addKeyListener(new KeyAdapter() {
-			
-			@Override
-			public void keyReleased(KeyEvent event) {
-				if (KeyUtil.isAlphaNumericKeyCode(event.getKeyCode())) {
-					JTextField textField = (JTextField)event.getComponent();
-					if (textField.getText().length() == Constants.PRODUCT_CODE_MAXIMUM_LENGTH) {
-						getCellEditor().stopCellEditing();
-					};
-				}
-			}
-		});
 		columnModel.getColumn(PRODUCT_CODE_COLUMN_INDEX).setCellEditor(new ProductCodeCellEditor(productCodeTextField));
 		
 		MagicTextField unitTextField = new MagicTextField();
-		unitTextField.setMaximumLength(Constants.UNIT_MAXIMUM_LENGTH);
-		unitTextField.addKeyListener(new KeyAdapter() {
-			
-			@Override
-			public void keyReleased(KeyEvent event) {
-				if (KeyUtil.isAlphaNumericKeyCode(event.getKeyCode())) {
-					JTextField textField = (JTextField)event.getComponent();
-					if (textField.getText().length() == Constants.UNIT_MAXIMUM_LENGTH) {
-						getCellEditor().stopCellEditing();
-					}
-				}
-			}
-		});
 		columnModel.getColumn(UNIT_COLUMN_INDEX).setCellEditor(new UnitCellEditor(unitTextField));
 		
 		MagicTextField quantityTextField = new MagicTextField();
