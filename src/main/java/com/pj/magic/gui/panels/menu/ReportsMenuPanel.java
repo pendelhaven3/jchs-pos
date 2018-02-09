@@ -156,15 +156,17 @@ public class ReportsMenuPanel extends MenuPanel {
 
 	private class MainMenuTableModel extends AbstractTableModel {
 
-		private final List<String> allMenuItems = Arrays.asList(
+        private static final long serialVersionUID = 8368258984397052646L;
+
+        private final List<String> allMenuItems = Arrays.asList(
 //				UNPAID_SALES_INVOICES_LIST,
 //				POSTED_SALES_AND_PROFIT_REPORT,
 //				CUSTOMER_SALES_SUMMARY_REPORT,
 //				CUSTOMER_CHECK_PAYMENTS_REPORT,
-				UNPAID_RECEIVING_RECEIPTS_LIST
+				UNPAID_RECEIVING_RECEIPTS_LIST,
 //				DISBURSEMENT_REPORT,
 //				PURCHASE_PAYMENT_BANK_TRANSFERS_REPORT,
-//				PURCHASE_PAYMENT_CHECK_PAYMENTS_REPORT,
+				PURCHASE_PAYMENT_CHECK_PAYMENTS_REPORT
 //				PURCHASE_PAYMENT_CREDIT_CARD_PAYMENTS_REPORT,
 //				SALES_BY_MANUFACTURER_REPORT,
 //				STOCK_OFFTAKE_REPORT,
