@@ -111,6 +111,11 @@ public class PurchaseReturnBadStockExcelGenerator {
         
         row = sheet.createRow(currentRow);
         row.createCell(0).setCellValue("TOTAL ITEMS: " + purchaseReturnBadStock.getTotalItems());
+        row.createCell(7).setCellValue("TOTAL: ");
+        
+        cell = row.createCell(8);
+        cell.setCellValue(purchaseReturnBadStock.getTotalAmount().doubleValue());
+        cell.setCellStyle(amountFormat);
 
         currentRow++;
         currentRow++;

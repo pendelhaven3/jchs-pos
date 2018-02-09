@@ -129,6 +129,10 @@ public class ReceivingReceiptItem implements Comparable<ReceivingReceiptItem> {
 		return getNetAmount().divide(new BigDecimal(quantity), 2, RoundingMode.HALF_UP);
 	}
 
+    public BigDecimal getGrossCost() {
+        return getAmount().divide(new BigDecimal(quantity), 2, RoundingMode.HALF_UP);
+    }
+
 	@Override
 	public int compareTo(ReceivingReceiptItem o) {
 		int result = product.compareTo(o.getProduct());
@@ -150,5 +154,9 @@ public class ReceivingReceiptItem implements Comparable<ReceivingReceiptItem> {
 	public BigDecimal getFinalCostWithVat() {
 		return getFinalCost().multiply(parent.getVatMultiplier());
 	}
+	
+    public BigDecimal getGrossCostWithVat() {
+        return getGrossCost().multiply(parent.getVatMultiplier());
+    }
 	
 }
