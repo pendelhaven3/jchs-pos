@@ -3,9 +3,6 @@ package com.pj.magic;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import com.pj.magic.gui.MagicFrame;
 
@@ -23,11 +20,6 @@ public class JchsPos {
                 frame.setVisible(true);
             }
         });
-	}
-	
-	@Bean
-	public TransactionTemplate transactionTemplate(PlatformTransactionManager transactionManager) {
-	    return new TransactionTemplate(transactionManager);
 	}
 	
 }
