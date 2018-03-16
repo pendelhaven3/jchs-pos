@@ -4,20 +4,17 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
 
 import org.slf4j.Logger;
@@ -29,7 +26,8 @@ import com.pj.magic.exception.ValidationException;
 import com.pj.magic.gui.component.MagicTextField;
 import com.pj.magic.gui.component.MagicToolBar;
 import com.pj.magic.gui.dialog.SelectSupplierDialog;
-import com.pj.magic.gui.tables.ProductSuppliersTable;
+import com.pj.magic.gui.tables.MagicListTable;
+import com.pj.magic.gui.tables.models.ListBackedTableModel;
 import com.pj.magic.model.Product;
 import com.pj.magic.model.Supplier;
 import com.pj.magic.service.ProductService;
@@ -44,7 +42,6 @@ public class MaintainProductPanel extends StandardMagicPanel {
 	private static final String SAVE_ACTION_NAME = "save";
 	
 	@Autowired private ProductService productService;
-	@Autowired private ProductSuppliersTable productSuppliersTable;
 	@Autowired private SelectSupplierDialog selectSupplierDialog;
 	
 	private Product product;
@@ -54,6 +51,9 @@ public class MaintainProductPanel extends StandardMagicPanel {
 	private MagicTextField minimumStockLevelField;
 	private JButton saveButton;
 	private JButton addSupplierButton;
+    private JButton deleteSupplierButton;
+    private MagicListTable productSuppliersTable;
+    private ProductSuppliersTableModel tableModel = new ProductSuppliersTableModel();
 	
 	@Override
 	protected void initializeComponents() {
@@ -75,35 +75,29 @@ public class MaintainProductPanel extends StandardMagicPanel {
 		saveButton.addActionListener(e -> saveProduct());
 		
 		addSupplierButton = new JButton("Add Supplier");
-		addSupplierButton.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				addProductSupplier();
-			}
-		});
+		addSupplierButton.addActionListener(e -> addProductSupplier());
 		
-		productSuppliersTable.addMouseListener(new MouseAdapter() {
-			
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				if (productSuppliersTable.getSelectedColumn() == ProductSuppliersTable.BUTTON_COLUMN_INDEX) {
-					deleteProductSupplier();
-				}
-			}
-			
-		});
+        deleteSupplierButton = new JButton("Delete Supplier");
+        deleteSupplierButton.addActionListener(e -> deleteProductSupplier());
 		
 		focusOnComponentWhenThisPanelIsDisplayed(maximumStockLevelField);
+		
+		productSuppliersTable = new MagicListTable(tableModel);
+		productSuppliersTable.setTableHeader(null);
 	}
 
 	protected void deleteProductSupplier() {
+	    int selectedRow = productSuppliersTable.getSelectedRow();
+	    if (selectedRow == -1) {
+	        showErrorMessage("No record selected");
+	        return;
+	    }
+	    
 		int confirm = showConfirmMessage("Delete?");
 		if (confirm == JOptionPane.OK_OPTION) {
-			int selectedRow = productSuppliersTable.getSelectedRow();
-			Supplier supplier = productSuppliersTable.getSupplier(selectedRow);
+			Supplier supplier = tableModel.getItem(selectedRow);
 			productService.deleteProductSupplier(product, supplier);
-			productSuppliersTable.updateDisplay(product);
+	        tableModel.setItems(productService.getProductSuppliers(product));
 		}
 	}
 
@@ -114,7 +108,7 @@ public class MaintainProductPanel extends StandardMagicPanel {
 		Supplier supplier = selectSupplierDialog.getSelectedSupplier();
 		if (supplier != null) {
 			productService.addProductSupplier(product, supplier);
-			productSuppliersTable.updateDisplay(product);
+            tableModel.setItems(productService.getProductSuppliers(product));
 		}
 	}
 
@@ -202,16 +196,6 @@ public class MaintainProductPanel extends StandardMagicPanel {
 		descriptionField.setPreferredSize(new Dimension(300, 25));
 		mainPanel.add(descriptionField, c);
 
-//		c = new GridBagConstraints();
-//		c.gridx = 3;
-//		c.gridy = currentRow;
-//		c.gridwidth = 2;
-//		c.gridheight = 4;
-//		c.anchor = GridBagConstraints.NORTHWEST;
-//		JScrollPane scrollPane = new JScrollPane(productSuppliersTable);
-//		scrollPane.setPreferredSize(new Dimension(400, 110));
-//		mainPanel.add(scrollPane, c);
-		
 		currentRow++;
 		
         c = new GridBagConstraints();
@@ -250,15 +234,44 @@ public class MaintainProductPanel extends StandardMagicPanel {
         c.gridy = currentRow;
         c.gridwidth = 2;
         mainPanel.add(saveButton, c);
+        
+        currentRow++;
+        
+        c = new GridBagConstraints();
+        c.insets.top = 20;
+        c.gridx = 0;
+        c.gridy = currentRow;
+        c.anchor = GridBagConstraints.WEST;
+        mainPanel.add(ComponentUtil.createLabel(175, "Suppliers: "), c);
+        
+        currentRow++;
+        
+        c = new GridBagConstraints();
+        c.insets.top = 10;
+        c.gridx = 0;
+        c.gridy = currentRow;
+        c.gridwidth = 2;
+        JScrollPane scrollPane = new JScrollPane(productSuppliersTable);
+        scrollPane.setPreferredSize(new Dimension(400, 110));
+        mainPanel.add(scrollPane, c);
 		
+        currentRow++;
+        
+        c = new GridBagConstraints();
+        c.insets.top = 10;
+        c.gridx = 0;
+        c.gridy = currentRow;
+        c.gridwidth = 2;
+        mainPanel.add(ComponentUtil.createGenericPanel(addSupplierButton, Box.createHorizontalStrut(20), deleteSupplierButton), c);
+        
         currentRow++;
 		
         c = new GridBagConstraints();
 		c.fill = GridBagConstraints.BOTH;
-		c.weighty = 1.0; // bottom space filler
+		c.weighty = 1.0;
 		c.gridx = 0;
 		c.gridy = currentRow;
-		mainPanel.add(ComponentUtil.createFiller(1, 1), c);
+		mainPanel.add(Box.createGlue(), c);
 	}
 
 	@Override
@@ -297,8 +310,9 @@ public class MaintainProductPanel extends StandardMagicPanel {
 		maximumStockLevelField.setText(String.valueOf(product.getMaximumStockLevel()));
 		minimumStockLevelField.setText(String.valueOf(product.getMinimumStockLevel()));
 		
-//		productSuppliersTable.updateDisplay(product);
+        tableModel.setItems(productService.getProductSuppliers(product));
 		addSupplierButton.setEnabled(true);
+        deleteSupplierButton.setEnabled(true);
 	}
 
 	private void clearDisplay() {
@@ -307,7 +321,8 @@ public class MaintainProductPanel extends StandardMagicPanel {
 		maximumStockLevelField.setText(null);
 		minimumStockLevelField.setText(null);
 		addSupplierButton.setEnabled(false);
-		productSuppliersTable.clearDisplay();
+        deleteSupplierButton.setEnabled(true);
+		tableModel.clear();
 	}
 
 	@Override
@@ -319,4 +334,28 @@ public class MaintainProductPanel extends StandardMagicPanel {
 	protected void addToolBarButtons(MagicToolBar toolBar) {
 	}
 
+	private class ProductSuppliersTableModel extends ListBackedTableModel<Supplier> {
+
+        @Override
+        public Object getValueAt(int rowIndex, int columnIndex) {
+            return getItem(rowIndex).getName();
+        }
+
+        @Override
+        public int getColumnCount() {
+            return 1;
+        }
+
+        @Override
+        protected String[] getColumnNames() {
+            return null;
+        }
+	    
+        @Override
+        public String getColumnName(int column) {
+            return null;
+        }
+        
+	}
+	
 }

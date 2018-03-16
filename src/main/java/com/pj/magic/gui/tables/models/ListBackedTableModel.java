@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
+@SuppressWarnings("serial")
 public abstract class ListBackedTableModel<T> extends AbstractTableModel {
 
 	private List<T> items = new ArrayList<>();
