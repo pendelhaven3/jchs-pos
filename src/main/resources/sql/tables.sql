@@ -22,6 +22,8 @@ create table PRODUCT (
   GROSS_COST1 numeric(9,2) null,
   FINAL_COST numeric(9,2) default 0 not null,
   FINAL_COST1 numeric(9,2) null,
+  MAX_STOCK_LEVEL integer(4) default 0,
+  MIN_STOCK_LEVEL integer(4) default 0,
   constraint PRODUCT$PK primary key (ID),
   constraint PRODUCT$CODE$UK unique (CODE)
 );

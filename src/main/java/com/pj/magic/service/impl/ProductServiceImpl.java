@@ -1,7 +1,6 @@
 package com.pj.magic.service.impl;
 
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.pj.magic.dao.AdjustmentInItemDao;
 import com.pj.magic.dao.AdjustmentOutItemDao;
 import com.pj.magic.dao.AreaInventoryReportItemDao;
-import com.pj.magic.dao.PricingSchemeDao;
 import com.pj.magic.dao.ProductDao;
 import com.pj.magic.dao.ProductPriceDao;
 import com.pj.magic.dao.ProductPriceHistoryDao;
@@ -35,7 +33,6 @@ public class ProductServiceImpl implements ProductService {
 	@Autowired private ProductDao productDao;
 	@Autowired private ProductPriceDao productPriceDao;
 	@Autowired private SupplierDao supplierDao;
-	@Autowired private PricingSchemeDao pricingSchemeDao;
 	@Autowired private SalesRequisitionItemDao salesRequisitionItemDao;
 	@Autowired private PurchaseOrderItemDao purchaseOrderItemDao;
 	@Autowired private StockQuantityConversionItemDao stockQuantityConversionItemDao;
@@ -70,30 +67,7 @@ public class ProductServiceImpl implements ProductService {
 	@Transactional
 	@Override
 	public void save(Product product) {
-		boolean inserting = (product.getId() == null);
-		if (inserting) {
-			productDao.save(product);
-			productPriceDao.createUnitPrices(product);
-		} else {
-			boolean updateCostAndPrice = hasUnitConversionChange(product);
-			productDao.save(product);
-			if (updateCostAndPrice) {
-				product.autoCalculateCostsOfSmallerUnits();
-				productDao.updateCosts(product);
-			}
-			if (updateCostAndPrice) {
-				for (PricingScheme pricingScheme : pricingSchemeDao.getAll()) {
-					Product p = productDao.findByIdAndPricingScheme(product.getId(), pricingScheme);
-					p.autoCalculatePricesOfSmallerUnits();
-					productPriceDao.updateUnitPrices(p, pricingScheme);
-				}
-			}
-		}
-	}
-
-	private boolean hasUnitConversionChange(Product product) {
-		Product fromDb = productDao.get(product.getId());
-		return !new HashSet<>(product.getUnitConversions()).equals(new HashSet<>(fromDb.getUnitConversions()));
+	    productDao.save(product);
 	}
 
 	@Override
@@ -219,6 +193,8 @@ public class ProductServiceImpl implements ProductService {
 	        productDao.save(product);
 	    } else if (!existing.areFieldsEqual(product)) {
             product.setId(existing.getId());
+            product.setMinimumStockLevel(existing.getMinimumStockLevel());
+            product.setMaximumStockLevel(existing.getMaximumStockLevel());
             productDao.save(product);
 	    }
     }

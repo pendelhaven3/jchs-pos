@@ -34,6 +34,7 @@ public class ProductDaoImpl extends MagicDao implements ProductDao {
 	private static final String BASE_SELECT_SQL =
 			"select a.ID, a.CODE, a.DESCRIPTION,"
 			+ " a.UOM_CODE, a.UOM_CODE1, a.UOM_QTY, a.UOM_QTY1,"
+			+ " MAX_STOCK_LEVEL, MIN_STOCK_LEVEL,"
 			+ " a.GROSS_COST, a.GROSS_COST1, a.FINAL_COST, a.FINAL_COST1"
 			+ " from PRODUCT a"
 			+ " where 1 = 1";
@@ -73,6 +74,8 @@ public class ProductDaoImpl extends MagicDao implements ProductDao {
 			product.setId(rs.getLong("ID"));
             product.setCode(rs.getString("CODE"));
 			product.setDescription(rs.getString("DESCRIPTION"));
+			product.setMaximumStockLevel(rs.getInt("MAX_STOCK_LEVEL"));
+			product.setMinimumStockLevel(rs.getInt("MIN_STOCK_LEVEL"));
 			
 			String unit1 = rs.getString("UOM_CODE");
 			String unit2 = rs.getString("UOM_CODE1");
@@ -121,7 +124,7 @@ public class ProductDaoImpl extends MagicDao implements ProductDao {
 
 	private static final String UPDATE_SQL =
 			"update PRODUCT set CODE = ?, DESCRIPTION = ?,"
-			+ " UOM_CODE = ?, UOM_CODE1 = ?, UOM_QTY = ?, UOM_QTY1 = ?"
+			+ " UOM_CODE = ?, UOM_CODE1 = ?, UOM_QTY = ?, UOM_QTY1 = ?, MAX_STOCK_LEVEL = ?, MIN_STOCK_LEVEL = ?"
 			+ " where ID = ?";
 	
 	private void update(Product product) {
@@ -132,6 +135,8 @@ public class ProductDaoImpl extends MagicDao implements ProductDao {
 				product.getUnits().size() > 1 ? product.getUnits().get(1) : null,
                 product.getUnitConversions().get(0).getQuantity(),
                 product.getUnitConversions().size() > 1 ? product.getUnitConversions().get(1).getQuantity() : null,
+                product.getMaximumStockLevel(),
+                product.getMinimumStockLevel(),
 				product.getId());
 	}
 

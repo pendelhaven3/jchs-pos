@@ -17,8 +17,6 @@ import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileFilter;
 
 import org.apache.commons.lang3.StringUtils;
@@ -46,10 +44,9 @@ import net.iryndin.jdbf.core.DbfRecord;
 import net.iryndin.jdbf.reader.DbfReader;
 
 @Component
+@SuppressWarnings("serial")
 public class ProductListPanel extends StandardMagicPanel {
 
-    private static final long serialVersionUID = 1492209324052508967L;
-    
     private static final Logger LOGGER = LoggerFactory.getLogger(ProductListPanel.class);
     
     private static final int PRODUCT_CODE_COLUMN_INDEX = 0;
@@ -59,12 +56,10 @@ public class ProductListPanel extends StandardMagicPanel {
     private static final int UOM_1_QUANTITY_COLUMN_INDEX = 4;
     private static final int UOM_2_QUANTITY_COLUMN_INDEX = 5;
     
-	private static final String EDIT_PRODUCT_ACTION_NAME = "editProduct";
-	
 	@Autowired private ProductService productService;
 	@Autowired private SearchProductsDialog searchProductsDialog;
 	
-	private JTable table;
+	private MagicListTable table;
 	private ProductsTableModel tableModel = new ProductsTableModel();
 	private MagicFileChooser fileChooser = new MagicFileChooser();
 	
@@ -128,23 +123,17 @@ public class ProductListPanel extends StandardMagicPanel {
 		}
 	}
 
-	@Override
+    @Override
 	protected void registerKeyBindings() {
-		table.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), EDIT_PRODUCT_ACTION_NAME);
-		table.getActionMap().put(EDIT_PRODUCT_ACTION_NAME, new AbstractAction() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				selectProduct();
-			}
-		});
-//		table.addMouseListener(new DoubleClickMouseAdapter() {
-//			
-//			@Override
-//			protected void onDoubleClick() {
-//				selectProduct();
-//			}
-//		});
+	    table.setKeyEvent(KeyEvent.VK_ENTER, new AbstractAction() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                selectProduct();
+            }
+        });
+	    
+	    table.addDoubleClickMouseListener(() -> selectProduct());
 	}
 
 	protected void selectProduct() {

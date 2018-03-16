@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.math.BigDecimal;
 import java.util.EventObject;
+import java.util.UUID;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -20,6 +21,7 @@ import javax.swing.table.TableModel;
 import com.pj.magic.Constants;
 import com.pj.magic.gui.component.CustomAction;
 import com.pj.magic.gui.component.DoubleClickMouseAdapter;
+import com.pj.magic.gui.component.DoubleClickMouseListener;
 import com.pj.magic.util.KeyUtil;
 
 // TODO: This is not really ItemsTable
@@ -30,7 +32,9 @@ import com.pj.magic.util.KeyUtil;
  */
 public class MagicTable extends JTable {
 
-	private static final String SCROLL_TO_TOP_ACTION_NAME = "scrollToTop";
+    private static final long serialVersionUID = 3705229707474795416L;
+    
+    private static final String SCROLL_TO_TOP_ACTION_NAME = "scrollToTop";
 	private static final String SCROLL_TO_BOTTOM_ACTION_NAME = "scrollToBottom";
 	
 	protected boolean addMode; // TODO: Return back to PO panel / items table class
@@ -201,6 +205,17 @@ public class MagicTable extends JTable {
 	
 	public boolean hasNoSelectedRow() {
 		return getSelectedRow() == -1;
+	}
+	
+	public void setKeyEvent(int keyEvent, Action action) {
+	    String actionName = UUID.randomUUID().toString();
+	    
+        getInputMap().put(KeyStroke.getKeyStroke(keyEvent, 0), actionName);
+        getActionMap().put(actionName, action);
+	}
+	
+	public void addDoubleClickMouseListener(DoubleClickMouseListener listener) {
+	    addMouseListener(listener);
 	}
 	
 }
