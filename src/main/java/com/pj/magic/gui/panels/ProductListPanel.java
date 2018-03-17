@@ -158,13 +158,34 @@ public class ProductListPanel extends StandardMagicPanel {
 
         });
         toolBar.add(addButton);
+        
+        JButton showAllButton = new MagicToolBarButton("all", "Show All");
+        showAllButton.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showAllProducts();
+            }
+        });
+        toolBar.add(showAllButton);
+        
+        JButton searchButton = new MagicToolBarButton("search", "Search");
+        searchButton.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                searchProducts();
+            }
+        });
+        
+        toolBar.add(searchButton);
 	}
 
 	private void showAllProducts() {
 		tableModel.setItems(productService.getAllProducts());
 		table.changeSelection(0, 0, false, false);
 		table.requestFocusInWindow();
-//		searchProductsDialog.updateDisplay();
+		searchProductsDialog.updateDisplay();
 	}
 	
     private void updateProductsFromDbf() {
