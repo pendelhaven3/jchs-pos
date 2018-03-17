@@ -203,10 +203,10 @@ public class ProductDaoImpl extends MagicDao implements ProductDao {
 			params.add(criteria.getSubcategory().getId());
 		}
 		
-//		if (criteria.getSupplier() != null) {
-//			sql.append(" and exists(select 1 from SUPPLIER_PRODUCT sp where sp.PRODUCT_ID = a.ID and sp.SUPPLIER_ID = ?)");
-//			params.add(criteria.getSupplier().getId());
-//		}
+		if (criteria.getSupplier() != null) {
+			sql.append(" and exists(select 1 from SUPPLIER_PRODUCT sp where sp.PRODUCT_ID = a.ID and sp.SUPPLIER_ID = ?)");
+			params.add(criteria.getSupplier().getId());
+		}
 		
 		sql.append(" order by a.DESCRIPTION");
 		
