@@ -9,15 +9,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.pj.magic.dao.InventoryCheckDao;
+import com.pj.magic.dao.ReceivingReceiptItemDao;
 import com.pj.magic.dao.ReportDao;
 import com.pj.magic.model.InventoryCheck;
 import com.pj.magic.model.StockCardInventoryReportItem;
 import com.pj.magic.model.report.CustomerSalesSummaryReport;
+import com.pj.magic.model.report.EwtReport;
+import com.pj.magic.model.report.EwtReportItem;
 import com.pj.magic.model.report.InventoryReport;
 import com.pj.magic.model.report.PilferageReport;
 import com.pj.magic.model.report.ProductQuantityDiscrepancyReport;
 import com.pj.magic.model.report.SalesByManufacturerReport;
 import com.pj.magic.model.report.StockOfftakeReport;
+import com.pj.magic.model.search.EwtReportCriteria;
 import com.pj.magic.model.search.InventoryReportCriteria;
 import com.pj.magic.model.search.PilferageReportCriteria;
 import com.pj.magic.model.search.SalesByManufacturerReportCriteria;
@@ -30,6 +34,7 @@ public class ReportServiceImpl implements ReportService {
 
 	@Autowired private ReportDao reportDao;
 	@Autowired private InventoryCheckDao inventoryCheckDao;
+	@Autowired private ReceivingReceiptItemDao receivingReceiptItemDao;
 	
 	@Override
 	public List<StockCardInventoryReportItem> getStockCardInventoryReport(StockCardInventoryReportCriteria criteria) {
@@ -118,4 +123,20 @@ public class ReportServiceImpl implements ReportService {
 		return report;
 	}
 
+    @Override
+    public EwtReport generateEwtReport(EwtReportCriteria criteria) {
+        EwtReport report = new EwtReport();
+        report.setSupplier(criteria.getSupplier());
+        report.setItems(getEwtReportItems(criteria));
+        return report;
+    }
+
+    private List<EwtReportItem> getEwtReportItems(EwtReportCriteria criteria) {
+        List<EwtReportItem> items = reportDao.searchEwtReportItems(criteria);
+        for (EwtReportItem item : items) {
+            item.getReceivingReceipt().setItems(receivingReceiptItemDao.findAllByReceivingReceipt(item.getReceivingReceipt()));
+        }
+        return items;
+    }
+	
 }

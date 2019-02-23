@@ -4,11 +4,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.time.DateUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
@@ -19,16 +21,20 @@ import com.pj.magic.dao.ReportDao;
 import com.pj.magic.model.Customer;
 import com.pj.magic.model.Manufacturer;
 import com.pj.magic.model.Product;
+import com.pj.magic.model.PurchasePayment;
+import com.pj.magic.model.ReceivingReceipt;
 import com.pj.magic.model.ReceivingReceiptItem;
 import com.pj.magic.model.SalesInvoiceItem;
 import com.pj.magic.model.StockCardInventoryReportItem;
 import com.pj.magic.model.report.CustomerSalesSummaryReportItem;
+import com.pj.magic.model.report.EwtReportItem;
 import com.pj.magic.model.report.InventoryReportItem;
 import com.pj.magic.model.report.PilferageReportItem;
 import com.pj.magic.model.report.ProductQuantityDiscrepancyReport;
 import com.pj.magic.model.report.ProductQuantityDiscrepancyReportItem;
 import com.pj.magic.model.report.SalesByManufacturerReportItem;
 import com.pj.magic.model.report.StockOfftakeReportItem;
+import com.pj.magic.model.search.EwtReportCriteria;
 import com.pj.magic.model.search.InventoryReportCriteria;
 import com.pj.magic.model.search.PilferageReportCriteria;
 import com.pj.magic.model.search.SalesByManufacturerReportCriteria;
@@ -487,4 +493,37 @@ public class ReportDaoImpl extends MagicDao implements ReportDao {
 		});
 	}
 
+    @Override
+    public List<EwtReportItem> searchEwtReportItems(EwtReportCriteria criteria) {
+        getJdbcTemplate().update("set @rank := 0, @paymentId := 0");
+        
+        String sql = QueriesUtil.getSql("ewtReportItems");
+        
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("supplierId", criteria.getSupplier().getId());
+        paramMap.put("receivedDateFrom", DateUtils.truncate(criteria.getFromDate(), Calendar.DATE));
+        paramMap.put("receivedDateTo", DateUtils.truncate(criteria.getToDate(), Calendar.DATE));
+        
+        return getNamedParameterJdbcTemplate().query(sql.toString(), paramMap, (rs, rowNum) -> {
+            EwtReportItem item = new EwtReportItem();
+            
+            ReceivingReceipt receivingReceipt = new ReceivingReceipt(rs.getLong("RECEIVING_RECEIPT_ID"));
+            receivingReceipt.setReceivingReceiptNumber(rs.getLong("RECEIVING_RECEIPT_NO"));
+            receivingReceipt.setReceivedDate(rs.getDate("RECEIVED_DT"));
+            receivingReceipt.setReferenceNumber(rs.getString("REFERENCE_NO"));
+            receivingReceipt.setVatRate(rs.getBigDecimal("VAT_RATE"));
+            receivingReceipt.setVatInclusive("Y".equals(rs.getString("VAT_INCLUSIVE")));
+            item.setReceivingReceipt(receivingReceipt);
+            
+            PurchasePayment purchasePayment = new PurchasePayment(rs.getLong("PURCHASE_PAYMENT_ID"));
+            purchasePayment.setPurchasePaymentNumber(rs.getLong("PURCHASE_PAYMENT_NO"));
+            item.setPurchasePayment(purchasePayment);
+            
+            item.setBadStockAndDiscountTotalAmount(rs.getBigDecimal("BAD_STOCK_ADJ_TOTAL"));
+            item.setCancelledItemsTotalAmount(rs.getBigDecimal("CANCEL_ITEM_ADJ_TOTAL"));
+            
+            return item;
+        });
+    }
+	
 }

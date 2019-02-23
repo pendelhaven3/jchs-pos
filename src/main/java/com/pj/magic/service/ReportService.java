@@ -5,11 +5,13 @@ import java.util.List;
 
 import com.pj.magic.model.StockCardInventoryReportItem;
 import com.pj.magic.model.report.CustomerSalesSummaryReport;
+import com.pj.magic.model.report.EwtReport;
 import com.pj.magic.model.report.InventoryReport;
 import com.pj.magic.model.report.PilferageReport;
 import com.pj.magic.model.report.ProductQuantityDiscrepancyReport;
 import com.pj.magic.model.report.SalesByManufacturerReport;
 import com.pj.magic.model.report.StockOfftakeReport;
+import com.pj.magic.model.search.EwtReportCriteria;
 import com.pj.magic.model.search.InventoryReportCriteria;
 import com.pj.magic.model.search.PilferageReportCriteria;
 import com.pj.magic.model.search.SalesByManufacturerReportCriteria;
@@ -36,5 +38,7 @@ public interface ReportService {
 	ProductQuantityDiscrepancyReport getProductQuantityDiscrepancyReport(Date date);
 
 	PilferageReport getPilferageReport(PilferageReportCriteria criteria);
+
+    EwtReport generateEwtReport(EwtReportCriteria criteria);
 	
 }

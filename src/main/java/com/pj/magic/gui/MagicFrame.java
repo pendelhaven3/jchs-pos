@@ -38,6 +38,7 @@ import com.pj.magic.gui.panels.CustomerListPanel;
 import com.pj.magic.gui.panels.CustomerSalesSummaryReportPanel;
 import com.pj.magic.gui.panels.DailyProductQuantityDiscrepancyReportListPanel;
 import com.pj.magic.gui.panels.DisbursementReportPanel;
+import com.pj.magic.gui.panels.EwtReportPanel;
 import com.pj.magic.gui.panels.InventoryCheckListPanel;
 import com.pj.magic.gui.panels.InventoryCheckPanel;
 import com.pj.magic.gui.panels.InventoryCorrectionListPanel;
@@ -306,6 +307,7 @@ public class MagicFrame extends JFrame {
 	public static final String PRODUCT_QUANTITY_DISCREPANCY_REPORT_PANEL = 
 			"DAILY_PRODUCT_QUANTITY_DISCREPANCY_REPORT_PANEL";
 	public static final String PILFERAGE_REPORT_PANEL = "PILFERAGE_REPORT_PANEL";
+    public static final String EWT_REPORT_PANEL = "EWT_REPORT_LIST_PANEL";
 	
 	@Value("${application.title}")
 	private String baseTitle;
@@ -420,6 +422,7 @@ public class MagicFrame extends JFrame {
 	@Autowired private DailyProductQuantityDiscrepancyReportListPanel dailyProductQuantityDiscrepancyReportListPanel;
 	@Autowired private ProductQuantityDiscrepancyReportPanel productQuantityDiscrepancyReportPanel;
 	@Autowired private PilferageReportPanel pilferageReportPanel;
+    @Autowired private EwtReportPanel ewtReportPanel;
 	
 	@Autowired private SystemService systemParameterService;
 	@Autowired private DataSource dataSource;
@@ -592,6 +595,7 @@ public class MagicFrame extends JFrame {
 				DAILY_PRODUCT_QUANTITY_DISCREPANCY_REPORT_LIST_PANEL);
 		panelHolder.add(productQuantityDiscrepancyReportPanel, PRODUCT_QUANTITY_DISCREPANCY_REPORT_PANEL);
 		panelHolder.add(pilferageReportPanel, PILFERAGE_REPORT_PANEL);
+        panelHolder.add(ewtReportPanel, EWT_REPORT_PANEL);
         getContentPane().add(panelHolder);
 
         switchToMainMenuPanel();
@@ -1410,4 +1414,11 @@ public class MagicFrame extends JFrame {
 		((CardLayout)panelHolder.getLayout()).show(panelHolder, PILFERAGE_REPORT_PANEL);
 	}
 	
+    public void switchPanel(String panelName) {
+        StandardMagicPanel panel = panelHolder.getCardPanel(panelName);
+        addPanelNameToTitle(panel.getTitle());
+        panel.updateDisplay();
+        ((CardLayout)panelHolder.getLayout()).show(panelHolder, panelName);
+    }
+
 }

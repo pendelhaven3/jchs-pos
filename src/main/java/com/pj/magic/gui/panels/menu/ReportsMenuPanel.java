@@ -17,6 +17,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.pj.magic.gui.MagicFrame;
 import com.pj.magic.gui.component.DoubleClickMouseAdapter;
 import com.pj.magic.gui.component.MagicToolBar;
 import com.pj.magic.gui.tables.MagicListTable;
@@ -45,6 +46,7 @@ public class ReportsMenuPanel extends MenuPanel {
 	private static final String STOCK_OFFTAKE_REPORT = "Stock Offtake Report";
 	private static final String DAILY_PRODUCT_QUANTITY_DISCREPANCY_REPORT = "Daily Product Quantity Discrepancy Report";
 	private static final String PILFERAGE_REPORT = "Pilferage Report";
+    private static final String EWT_REPORT = "BIR EWT Report";
 
 	@Autowired private LoginService loginService;
 	
@@ -146,6 +148,9 @@ public class ReportsMenuPanel extends MenuPanel {
 		case PILFERAGE_REPORT:
 			getMagicFrame().switchToPilferageReportPanel();
 			break;
+        case EWT_REPORT:
+            getMagicFrame().switchPanel(MagicFrame.EWT_REPORT_PANEL);
+            break;
 		}
 	}
 
@@ -166,12 +171,13 @@ public class ReportsMenuPanel extends MenuPanel {
 				UNPAID_RECEIVING_RECEIPTS_LIST,
 //				DISBURSEMENT_REPORT,
 //				PURCHASE_PAYMENT_BANK_TRANSFERS_REPORT,
-				PURCHASE_PAYMENT_CHECK_PAYMENTS_REPORT
+				PURCHASE_PAYMENT_CHECK_PAYMENTS_REPORT,
 //				PURCHASE_PAYMENT_CREDIT_CARD_PAYMENTS_REPORT,
 //				SALES_BY_MANUFACTURER_REPORT,
 //				STOCK_OFFTAKE_REPORT,
 //				DAILY_PRODUCT_QUANTITY_DISCREPANCY_REPORT,
 //				PILFERAGE_REPORT
+				EWT_REPORT				
 		);
 		
 		private List<String> menuItems = new ArrayList<>();

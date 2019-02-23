@@ -641,4 +641,59 @@ from (
 where 1 = 1
 	]]>
 	</entry>
+	<entry name="ewtReportItems">
+<![CDATA[
+select 
+	PURCHASE_PAYMENT_ID, RECEIVING_RECEIPT_ID, RECEIVING_RECEIPT_NO, REFERENCE_NO, RECEIVED_DT, VAT_RATE, VAT_INCLUSIVE, PURCHASE_PAYMENT_NO, 
+	(case RANK when 1 then BAD_STOCK_ADJ_TOTAL else 0 end) as BAD_STOCK_ADJ_TOTAL,
+	CANCEL_ITEM_ADJ_TOTAL,
+	RANK,
+	@rank := 0,
+	@paymentId := 0
+from (
+	select
+		@rank := case when @paymentId <> a.ID then 1 else @rank + 1 end as RANK,
+		@paymentId := cast((case when @paymentId is null then a.ID else (case when @paymentId <> a.ID then a.ID else @paymentId end) end) as unsigned) as PURCHASE_PAYMENT_ID,
+		c.ID as RECEIVING_RECEIPT_ID,
+		c.REFERENCE_NO,
+		c.RECEIVING_RECEIPT_NO,
+		c.RECEIVED_DT,
+		c.VAT_RATE,
+		c.VAT_INCLUSIVE,
+		a.PURCHASE_PAYMENT_NO,
+		(
+			select ifnull(sum(AMOUNT), 0)
+			from PURCHASE_PAYMENT_PAYMENT_ADJUSTMENT pppa
+			join PURCHASE_PAYMENT_ADJ_TYPE ppat
+				on ppat.ID = pppa.PURCHASE_PAYMENT_ADJ_TYPE_ID
+			where ppat.CODE in ('RETURN - BS', 'DISC')
+			and pppa.PURCHASE_PAYMENT_ID = a.ID
+		) as BAD_STOCK_ADJ_TOTAL,
+		(
+			select ifnull(sum(AMOUNT), 0)
+			from PURCHASE_PAYMENT_PAYMENT_ADJUSTMENT pppa
+			join PURCHASE_PAYMENT_ADJ_TYPE ppat
+				on ppat.ID = pppa.PURCHASE_PAYMENT_ADJ_TYPE_ID
+			join PURCHASE_RETURN pr
+				on pr.PURCHASE_RETURN_NO = pppa.REFERENCE_NO
+			join RECEIVING_RECEIPT rr
+				on rr.ID = pr.RECEIVING_RECEIPT_ID
+			where ppat.CODE = 'RETURN - GS'
+			and pppa.PURCHASE_PAYMENT_ID = a.ID
+			and rr.ID = c.ID
+		) as CANCEL_ITEM_ADJ_TOTAL
+	from PURCHASE_PAYMENT a
+	join PURCHASE_PAYMENT_RECEIVING_RECEIPT b
+		on b.PURCHASE_PAYMENT_ID = a.ID
+	join RECEIVING_RECEIPT c
+		on c.ID = b.RECEIVING_RECEIPT_ID
+	where a.SUPPLIER_ID = :supplierId
+	and a.CANCEL_IND = 'N'
+	and c.RECEIVED_DT >= :receivedDateFrom
+	and c.RECEIVED_DT <= :receivedDateTo
+	and c.CANCEL_IND = 'N'
+	order by c.RECEIVED_DT
+) x
+	]]>
+	</entry>
 </root>
