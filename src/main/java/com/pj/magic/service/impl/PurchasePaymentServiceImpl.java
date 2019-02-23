@@ -1,6 +1,11 @@
 package com.pj.magic.service.impl;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.MessageFormat;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -8,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.pj.magic.dao.PurchasePaymentAdjustmentDao;
+import com.pj.magic.dao.PurchasePaymentAdjustmentTypeDao;
 import com.pj.magic.dao.PurchasePaymentBankTransferDao;
 import com.pj.magic.dao.PurchasePaymentCashPaymentDao;
 import com.pj.magic.dao.PurchasePaymentCheckPaymentDao;
@@ -20,6 +26,7 @@ import com.pj.magic.dao.PurchaseReturnDao;
 import com.pj.magic.dao.ReceivingReceiptItemDao;
 import com.pj.magic.dao.SystemDao;
 import com.pj.magic.model.PurchasePayment;
+import com.pj.magic.model.PurchasePaymentAdjustment;
 import com.pj.magic.model.PurchasePaymentAdjustmentType;
 import com.pj.magic.model.PurchasePaymentBankTransfer;
 import com.pj.magic.model.PurchasePaymentCashPayment;
@@ -27,6 +34,8 @@ import com.pj.magic.model.PurchasePaymentCheckPayment;
 import com.pj.magic.model.PurchasePaymentCreditCardPayment;
 import com.pj.magic.model.PurchasePaymentPaymentAdjustment;
 import com.pj.magic.model.PurchasePaymentReceivingReceipt;
+import com.pj.magic.model.PurchaseReturn;
+import com.pj.magic.model.ReceivingReceipt;
 import com.pj.magic.model.search.PurchasePaymentBankTransferSearchCriteria;
 import com.pj.magic.model.search.PurchasePaymentCashPaymentSearchCriteria;
 import com.pj.magic.model.search.PurchasePaymentCheckPaymentSearchCriteria;
@@ -57,6 +66,7 @@ public class PurchasePaymentServiceImpl implements PurchasePaymentService {
 	@Autowired private PurchaseReturnBadStockService purchaseReturnBadStockService;
 	@Autowired private PurchaseReturnBadStockDao purchaseReturnBadStockDao;
 	@Autowired private SystemDao systemDao;
+	@Autowired private PurchasePaymentAdjustmentTypeDao purchasePaymentAdjustmentTypeDao;
 	
 	@Transactional
 	@Override
@@ -250,5 +260,57 @@ public class PurchasePaymentServiceImpl implements PurchasePaymentService {
 		updated.setPostedBy(null);
 		purchasePaymentDao.save(updated);
 	}
+	
+    @Transactional
+    @Override
+    public void generateEwtAdjustment(PurchasePayment purchasePayment) {
+        purchasePayment = getPurchasePayment(purchasePayment.getId());
+        Map<ReceivingReceipt, BigDecimal> cancelledItemsAmountMap = generateCancelledItemsAmountMap(purchasePayment);
+        
+        for (int i = 0; i < purchasePayment.getReceivingReceipts().size(); i++) {
+            ReceivingReceipt receivingReceipt = purchasePayment.getReceivingReceipts().get(i).getReceivingReceipt();
+            BigDecimal invoiceAmount = receivingReceipt.getTotalNetAmountWithVat();
+            BigDecimal grossAmount = invoiceAmount.subtract(cancelledItemsAmountMap.get(receivingReceipt));
+            if (i == 0) {
+                grossAmount = grossAmount.subtract(purchasePayment.getBadStockAdjustmentsTotalAmount())
+                        .subtract(purchasePayment.getDiscountAdjustmentsTotalAmount());
+            }
+            BigDecimal netOfVatAmount = grossAmount.divide(new BigDecimal("1.12"), RoundingMode.HALF_UP);
+            BigDecimal ewt = netOfVatAmount.multiply(new BigDecimal("0.01")).setScale(2, RoundingMode.HALF_UP);
+            
+            PurchasePaymentAdjustment ewtAdjustment = new PurchasePaymentAdjustment();
+            ewtAdjustment.setSupplier(purchasePayment.getSupplier());
+            ewtAdjustment.setAdjustmentType(purchasePaymentAdjustmentTypeDao.findByCode(PurchasePaymentAdjustmentType.EWT_CODE));
+            ewtAdjustment.setAmount(ewt);
+            ewtAdjustment.setRemarks(MessageFormat.format("PP: {0}, RR: {1}", 
+                    purchasePayment.getPurchasePaymentNumber().toString(), receivingReceipt.getReceivingReceiptNumber().toString()));
+            purchasePaymentAdjustmentDao.save(ewtAdjustment);
+            
+            if (!purchasePayment.isPosted()) {
+                PurchasePaymentPaymentAdjustment paymentAdjustment = new PurchasePaymentPaymentAdjustment();
+                paymentAdjustment.setParent(purchasePayment);
+                paymentAdjustment.setAdjustmentType(ewtAdjustment.getAdjustmentType());
+                paymentAdjustment.setReferenceNumber(ewtAdjustment.getPurchasePaymentAdjustmentNumber().toString());
+                paymentAdjustment.setAmount(ewtAdjustment.getAmount());
+                purchasePaymentPaymentAdjustmentDao.save(paymentAdjustment);
+            }
+        }
+    }
+
+    private Map<ReceivingReceipt, BigDecimal> generateCancelledItemsAmountMap(PurchasePayment purchasePayment) {
+        Map<ReceivingReceipt, BigDecimal> map = purchasePayment.getReceivingReceipts().stream()
+                .map(r -> r.getReceivingReceipt())
+                .collect(Collectors.toMap(r -> r, r -> BigDecimal.ZERO));
+        
+        for (PurchasePaymentPaymentAdjustment paymentAdjustment : purchasePayment.getPaymentAdjustments()) {
+            if (paymentAdjustment.isCancelledItemsAdjustment()) {
+                PurchaseReturn purchaseReturn = purchaseReturnDao.findByPurchaseReturnNumber(Long.valueOf(paymentAdjustment.getReferenceNumber()));
+                ReceivingReceipt receivingReceipt = purchaseReturn.getReceivingReceipt();
+                map.put(receivingReceipt, purchaseReturn.getTotalAmount());
+            }
+        }
+        
+        return map;
+    }
 
 }

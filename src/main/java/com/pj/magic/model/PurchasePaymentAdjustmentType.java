@@ -14,6 +14,8 @@ public class PurchasePaymentAdjustmentType {
 
 	public static final String PURCHASE_RETURN_GOOD_STOCK_CODE = "RETURN - GS";
 	public static final String PURCHASE_RETURN_BAD_STOCK_CODE = "RETURN - BS";
+    public static final String EWT_CODE = "EWT";
+    public static final String DISCOUNT_CODE = "DISC";
 	
 	@Id
 	@GeneratedValue

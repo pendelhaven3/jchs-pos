@@ -109,6 +109,7 @@ public class PurchasePaymentPanel extends StandardMagicPanel {
 	private MagicToolBarButton cancelButton;
 	private MagicToolBarButton postButton;
 	private MagicToolBarButton unpostButton;
+    private MagicToolBarButton generateEwtButton; // Expanded Withholding Tax
 	private JButton printPreviewButton;
 	private JButton printButton;
 	private JTabbedPane tabbedPane;
@@ -251,6 +252,7 @@ public class PurchasePaymentPanel extends StandardMagicPanel {
 		cancelButton.setEnabled(newPayment);
 		postButton.setEnabled(newPayment);
 		unpostButton.setEnabled(purchasePayment.isPosted() && loginService.getLoggedInUser().isSupervisor());
+        generateEwtButton.setEnabled(true);
 		addReceivingReceiptButton.setEnabled(newPayment);
 		removeReceivingReceiptButton.setEnabled(newPayment);
 		addCashPaymentButton.setEnabled(newPayment);
@@ -308,6 +310,7 @@ public class PurchasePaymentPanel extends StandardMagicPanel {
 		cancelButton.setEnabled(false);
 		postButton.setEnabled(false);
 		unpostButton.setEnabled(false);
+        generateEwtButton.setEnabled(false);
 		printPreviewButton.setEnabled(false);
 		printButton.setEnabled(false);
 	}
@@ -554,6 +557,11 @@ public class PurchasePaymentPanel extends StandardMagicPanel {
 		MagicToolBarButton printChequeButton = new MagicToolBarButton("cheque", "Print Cheque");
 		printChequeButton.addActionListener(e -> printCheque());
 		toolBar.add(printChequeButton);
+		
+        
+        generateEwtButton = new MagicToolBarButton("ewt", "Generate EWT Adjustment");
+        generateEwtButton.addActionListener(e -> generateEwtAdjustment());
+        toolBar.add(generateEwtButton);
 	}
 
 	private void printPaymentSummary() {
@@ -1159,4 +1167,23 @@ public class PurchasePaymentPanel extends StandardMagicPanel {
 		printChequeDialog.setVisible(true);
 	}
 	
+    private void generateEwtAdjustment() {
+        try {
+            purchasePaymentService.generateEwtAdjustment(purchasePayment);
+        } catch (Exception e) {
+            logger.error("Error while generating EWT adjustment", e);
+            showMessageForUnexpectedError();
+            return;
+        }
+        
+        showMessage("EWT adjustment added");
+        
+        if (!purchasePayment.isPosted()) {
+            updateDisplay(purchasePayment);
+            tabbedPane.setSelectedIndex(5);
+        } else {
+            getMagicFrame().switchToPurchasePaymentAdjustmentListPanel();
+        }
+    }
+    
 }

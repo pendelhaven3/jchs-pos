@@ -82,4 +82,16 @@ public class PurchasePaymentPaymentAdjustment {
 			.isEquals();
 	}
 	
+    public boolean isBadStockAdjustment() {
+        return PurchasePaymentAdjustmentType.PURCHASE_RETURN_BAD_STOCK_CODE.equals(adjustmentType.getCode());
+    }
+    
+    public boolean isCancelledItemsAdjustment() {
+        return PurchasePaymentAdjustmentType.PURCHASE_RETURN_GOOD_STOCK_CODE.equals(adjustmentType.getCode());
+    }
+    
+    public boolean isDiscountAdjustment() {
+        return PurchasePaymentAdjustmentType.DISCOUNT_CODE.equals(adjustmentType.getCode());
+    }
+	
 }

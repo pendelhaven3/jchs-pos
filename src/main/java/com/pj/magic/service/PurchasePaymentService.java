@@ -65,4 +65,6 @@ public interface PurchasePaymentService {
 
 	void unpost(PurchasePayment purchasePayment);
 
+    void generateEwtAdjustment(PurchasePayment purchasePayment);
+	
 }
