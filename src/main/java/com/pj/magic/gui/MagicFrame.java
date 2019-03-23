@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.stereotype.Component;
 
+import com.pj.magic.OnStartUp;
 import com.pj.magic.gui.component.CardLayoutPanel;
 import com.pj.magic.gui.panels.AdjustmentInListPanel;
 import com.pj.magic.gui.panels.AdjustmentInPanel;
@@ -29,6 +30,8 @@ import com.pj.magic.gui.panels.AreaListPanel;
 import com.pj.magic.gui.panels.BackupDataPanel;
 import com.pj.magic.gui.panels.BadStockReturnListPanel;
 import com.pj.magic.gui.panels.BadStockReturnPanel;
+import com.pj.magic.gui.panels.BirForm2307ReportListPanel;
+import com.pj.magic.gui.panels.BirForm2307ReportPanel;
 import com.pj.magic.gui.panels.ChangePasswordPanel;
 import com.pj.magic.gui.panels.CreditCardListPanel;
 import com.pj.magic.gui.panels.CreditCardStatementListPanel;
@@ -136,6 +139,7 @@ import com.pj.magic.model.AdjustmentType;
 import com.pj.magic.model.Area;
 import com.pj.magic.model.AreaInventoryReport;
 import com.pj.magic.model.BadStockReturn;
+import com.pj.magic.model.BirForm2307Report;
 import com.pj.magic.model.CreditCard;
 import com.pj.magic.model.CreditCardStatement;
 import com.pj.magic.model.Customer;
@@ -308,6 +312,8 @@ public class MagicFrame extends JFrame {
 			"DAILY_PRODUCT_QUANTITY_DISCREPANCY_REPORT_PANEL";
 	public static final String PILFERAGE_REPORT_PANEL = "PILFERAGE_REPORT_PANEL";
     public static final String EWT_REPORT_PANEL = "EWT_REPORT_LIST_PANEL";
+    public static final String BIR_FORM_2307_REPORT_LIST_PANEL = "BIR_FORM_2307_REPORT_LIST_PANEL";
+    public static final String BIR_FORM_2307_REPORT_PANEL = "BIR_FORM_2307_REPORT_PANEL";
 	
 	@Value("${application.title}")
 	private String baseTitle;
@@ -423,9 +429,12 @@ public class MagicFrame extends JFrame {
 	@Autowired private ProductQuantityDiscrepancyReportPanel productQuantityDiscrepancyReportPanel;
 	@Autowired private PilferageReportPanel pilferageReportPanel;
     @Autowired private EwtReportPanel ewtReportPanel;
+    @Autowired private BirForm2307ReportListPanel birForm2307ReportListPanel;
+    @Autowired private BirForm2307ReportPanel birForm2307ReportPanel;
 	
 	@Autowired private SystemService systemParameterService;
 	@Autowired private DataSource dataSource;
+    @Autowired private OnStartUp onStartUp;
 	
 	private CardLayoutPanel panelHolder;
 	private static final ResourceBundle resourceBundle = ResourceBundle.getBundle("application");
@@ -450,6 +459,7 @@ public class MagicFrame extends JFrame {
 		} else {
             initializeBaseTitle();
 			addPanels();
+            onStartUp.fire();
 		}
 	}
 	
@@ -596,6 +606,8 @@ public class MagicFrame extends JFrame {
 		panelHolder.add(productQuantityDiscrepancyReportPanel, PRODUCT_QUANTITY_DISCREPANCY_REPORT_PANEL);
 		panelHolder.add(pilferageReportPanel, PILFERAGE_REPORT_PANEL);
         panelHolder.add(ewtReportPanel, EWT_REPORT_PANEL);
+        panelHolder.add(birForm2307ReportListPanel, BIR_FORM_2307_REPORT_LIST_PANEL);
+        panelHolder.add(birForm2307ReportPanel, BIR_FORM_2307_REPORT_PANEL);
         getContentPane().add(panelHolder);
 
         switchToMainMenuPanel();
@@ -1421,4 +1433,10 @@ public class MagicFrame extends JFrame {
         ((CardLayout)panelHolder.getLayout()).show(panelHolder, panelName);
     }
 
+    public void switchToBirForm2307ReportPanel(BirForm2307Report report) {
+        addPanelNameToTitle(birForm2307ReportPanel.getTitle());
+        birForm2307ReportPanel.updateDisplay(report);
+        ((CardLayout)panelHolder.getLayout()).show(panelHolder, BIR_FORM_2307_REPORT_PANEL);
+    }
+    
 }

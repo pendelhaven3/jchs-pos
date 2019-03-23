@@ -198,3 +198,18 @@ create table CREDIT_CARD_STATEMENT_PAYMENT (
   primary key (ID),
   constraint CREDIT_CARD_STATEMENT_PAYMENT$FK foreign key (CREDIT_CARD_STATEMENT_ID) references CREDIT_CARD_STATEMENT (ID)
 );
+
+create table BIR_FORM_2307_REPORT (
+  ID integer auto_increment,
+  REPORT_NO integer not null,
+  FROM_DT date not null,
+  TO_DT date not null,
+  SUPPLIER_ID integer not null,
+  MONTH1_NET_AMT numeric(12, 2) null,
+  MONTH2_NET_AMT numeric(12, 2) null,
+  MONTH3_NET_AMT numeric(12, 2) null,
+  CREATE_DT datetime not null,
+  CREATED_BY integer null,
+  primary key (ID),
+  constraint BIR_FORM_2307_REPORT$FK foreign key (SUPPLIER_ID) references SUPPLIER (ID)
+);

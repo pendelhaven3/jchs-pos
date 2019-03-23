@@ -3,6 +3,7 @@ package com.pj.magic.service;
 import java.util.Date;
 import java.util.List;
 
+import com.pj.magic.model.BirForm2307Report;
 import com.pj.magic.model.StockCardInventoryReportItem;
 import com.pj.magic.model.report.CustomerSalesSummaryReport;
 import com.pj.magic.model.report.EwtReport;
@@ -41,4 +42,10 @@ public interface ReportService {
 
     EwtReport generateEwtReport(EwtReportCriteria criteria);
 	
+    BirForm2307Report generateBirForm2307Report(EwtReportCriteria criteria);
+    
+    BirForm2307Report getBirForm2307Report(Long id);
+
+    BirForm2307Report regenerateBirForm2307Report(BirForm2307Report report, EwtReportCriteria criteria);
+    
 }
