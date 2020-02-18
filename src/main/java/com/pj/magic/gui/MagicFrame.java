@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.stereotype.Component;
 
-import com.pj.magic.OnStartUp;
 import com.pj.magic.gui.component.CardLayoutPanel;
 import com.pj.magic.gui.panels.AdjustmentInListPanel;
 import com.pj.magic.gui.panels.AdjustmentInPanel;
@@ -434,7 +433,6 @@ public class MagicFrame extends JFrame {
 	
 	@Autowired private SystemService systemParameterService;
 	@Autowired private DataSource dataSource;
-    @Autowired private OnStartUp onStartUp;
 	
 	private CardLayoutPanel panelHolder;
 	private static final ResourceBundle resourceBundle = ResourceBundle.getBundle("application");
@@ -459,7 +457,6 @@ public class MagicFrame extends JFrame {
 		} else {
             initializeBaseTitle();
 			addPanels();
-            onStartUp.fire();
 		}
 	}
 	
