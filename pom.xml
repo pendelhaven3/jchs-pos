@@ -70,11 +70,11 @@
 		    <artifactId>opencsv</artifactId>
 		    <version>4.0</version>
 		</dependency>
-		<dependency>
-		    <groupId>net.iryndin</groupId>
-		    <artifactId>jdbf</artifactId>
-		    <version>2.1.0</version>
-		</dependency>
+        <dependency>
+            <groupId>com.github.spyhunter99</groupId>
+            <artifactId>jdbf</artifactId>
+            <version>2.2.0</version>
+        </dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
