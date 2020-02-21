@@ -20,7 +20,6 @@ public class InventoryCheck {
 	private List<AreaInventoryReport> areaReports = new ArrayList<>();
 	private boolean posted;
 	private Date postDate;
-	private User postedBy;
 	private List<InventoryCheckSummaryItem> summaryItems = new ArrayList<>();
 
 	public InventoryCheck() {
@@ -79,7 +78,7 @@ public class InventoryCheck {
 	public BigDecimal getTotalBeginningValue() {
 		BigDecimal totalValue = Constants.ZERO;
 		for (InventoryCheckSummaryItem summaryItem : summaryItems) {
-			totalValue = totalValue.add(summaryItem.getBeginningValue());
+//			totalValue = totalValue.add(summaryItem.getBeginningValue());
 		}
 		return totalValue;
 	}
@@ -109,7 +108,8 @@ public class InventoryCheck {
 
 			@Override
 			public boolean apply(InventoryCheckSummaryItem input) {
-				return input.getBeginningInventory() > 0;
+//				return input.getBeginningInventory() > 0;
+				return true;
 			}
 		}));
 	}
@@ -120,7 +120,8 @@ public class InventoryCheck {
 
 			@Override
 			public boolean apply(InventoryCheckSummaryItem input) {
-				return input.getBeginningInventory() != input.getQuantity();
+//				return input.getBeginningInventory() != input.getQuantity();
+				return true;
 			}
 		}));
 	}
@@ -146,14 +147,6 @@ public class InventoryCheck {
 							product.getDescription().toUpperCase().contains(codeOrDescription);
 				}
 				
-				if (include && withDiscrepancy != null) {
-					if (withDiscrepancy) {
-						include = (input.getBeginningInventory() != input.getQuantity());
-					} else {
-						include = (input.getBeginningInventory() == input.getQuantity());
-					}
-				}
-				
 				return include;
 			}
 		}));
@@ -165,7 +158,8 @@ public class InventoryCheck {
 
 			@Override
 			public boolean apply(InventoryCheckSummaryItem input) {
-				return input.getBeginningInventory() > 0 || input.getQuantity() > 0;
+//				return input.getBeginningInventory() > 0 || input.getQuantity() > 0;
+				return true;
 			}
 		}));
 	}
@@ -178,12 +172,4 @@ public class InventoryCheck {
 		this.postDate = postDate;
 	}
 
-	public User getPostedBy() {
-		return postedBy;
-	}
-
-	public void setPostedBy(User postedBy) {
-		this.postedBy = postedBy;
-	}
-	
 }

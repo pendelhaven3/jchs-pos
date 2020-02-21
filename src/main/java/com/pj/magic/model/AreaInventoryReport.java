@@ -3,12 +3,17 @@ package com.pj.magic.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class AreaInventoryReport {
 
 	private Long id;
 	private InventoryCheck parent;
 	private Integer reportNumber;
-	private Area area;
+	private String area;
 	private String checker;
 	private String doubleChecker;
 	private User createdBy;
@@ -30,14 +35,6 @@ public class AreaInventoryReport {
 
 	public void setParent(InventoryCheck parent) {
 		this.parent = parent;
-	}
-
-	public Area getArea() {
-		return area;
-	}
-
-	public void setArea(Area area) {
-		this.area = area;
 	}
 
 	public String getChecker() {

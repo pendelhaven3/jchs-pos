@@ -25,7 +25,6 @@ import com.pj.magic.gui.panels.AdjustmentOutPanel;
 import com.pj.magic.gui.panels.AdjustmentTypeListPanel;
 import com.pj.magic.gui.panels.AreaInventoryReportListPanel;
 import com.pj.magic.gui.panels.AreaInventoryReportPanel;
-import com.pj.magic.gui.panels.AreaListPanel;
 import com.pj.magic.gui.panels.BackupDataPanel;
 import com.pj.magic.gui.panels.BadStockReturnListPanel;
 import com.pj.magic.gui.panels.BadStockReturnPanel;
@@ -49,7 +48,6 @@ import com.pj.magic.gui.panels.InventoryReportPanel;
 import com.pj.magic.gui.panels.LoginPanel;
 import com.pj.magic.gui.panels.MainMenuPanel;
 import com.pj.magic.gui.panels.MaintainAdjustmentTypePanel;
-import com.pj.magic.gui.panels.MaintainAreaPanel;
 import com.pj.magic.gui.panels.MaintainCreditCardPanel;
 import com.pj.magic.gui.panels.MaintainCustomerPanel;
 import com.pj.magic.gui.panels.MaintainManufacturerPanel;
@@ -135,7 +133,6 @@ import com.pj.magic.gui.panels.promo.PromoRedemptionRebatesPanel;
 import com.pj.magic.model.AdjustmentIn;
 import com.pj.magic.model.AdjustmentOut;
 import com.pj.magic.model.AdjustmentType;
-import com.pj.magic.model.Area;
 import com.pj.magic.model.AreaInventoryReport;
 import com.pj.magic.model.BadStockReturn;
 import com.pj.magic.model.BirForm2307Report;
@@ -358,8 +355,6 @@ public class MagicFrame extends JFrame {
 	@Autowired private ResetPasswordPanel resetPasswordPanel;
 	@Autowired private ProductCanvassPanel productCanvassPanel;
 	@Autowired private StockCardInventoryReportPanel stockCardInventoryReportPanel;
-	@Autowired private AreaListPanel areaListPanel;
-	@Autowired private MaintainAreaPanel maintainAreaPanel;
 	@Autowired private PaymentPanel paymentPanel;
 	@Autowired private PaymentListPanel paymentListPanel;
 	@Autowired private PaymentTerminalAssignmentListPanel paymentTerminalAssignmentListPanel;
@@ -530,8 +525,6 @@ public class MagicFrame extends JFrame {
 		panelHolder.add(resetPasswordPanel, RESET_PASSWORD_PANEL);
 		panelHolder.add(productCanvassPanel, PRODUCT_CANVASS_PANEL);
 		panelHolder.add(stockCardInventoryReportPanel, STOCK_CARD_INVENTORY_REPORT_PANEL);
-		panelHolder.add(areaListPanel, AREA_LIST_PANEL);
-		panelHolder.add(maintainAreaPanel, MAINTAIN_AREA_PANEL);
 		panelHolder.add(paymentPanel, PAYMENT_PANEL);
 		panelHolder.add(paymentListPanel, PAYMENT_LIST_PANEL);
 		panelHolder.add(paymentTerminalAssignmentListPanel, PAYMENT_TERMINAL_ASSIGNMENT_LIST_PANEL);
@@ -943,27 +936,6 @@ public class MagicFrame extends JFrame {
 		addPanelNameToTitle("Stock Card Inventory Report");
 		stockCardInventoryReportPanel.updateDisplay();
 		((CardLayout)panelHolder.getLayout()).show(panelHolder, STOCK_CARD_INVENTORY_REPORT_PANEL);
-	}
-
-	public void switchToAreaListPanel() {
-		addPanelNameToTitle("Area List");
-		areaListPanel.updateDisplay();
-		((CardLayout)panelHolder.getLayout()).show(panelHolder, AREA_LIST_PANEL);
-	}
-
-	public void switchToEditAreaPanel(Area area) {
-		addPanelNameToTitle("Edit Area");
-		switchToMaintainAreaPanel(area);
-	}
-	
-	public void switchToAddNewAreaPanel() {
-		addPanelNameToTitle("Add New Area");
-		switchToMaintainAreaPanel(new Area());
-	}
-	
-	private void switchToMaintainAreaPanel(Area area) {
-		maintainAreaPanel.updateDisplay(area);
-		((CardLayout)panelHolder.getLayout()).show(panelHolder, MAINTAIN_AREA_PANEL);
 	}
 
 	public void switchToPaymentListPanel() {

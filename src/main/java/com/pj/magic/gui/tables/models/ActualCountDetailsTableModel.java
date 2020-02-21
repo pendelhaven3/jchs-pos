@@ -42,7 +42,7 @@ public class ActualCountDetailsTableModel extends AbstractTableModel {
 		case REPORT_NO_COLUMN_INDEX:
 			return item.getParent().getReportNumber();
 		case AREA_COLUMN_INDEX:
-			return item.getParent().getArea().getName();
+			return item.getParent().getArea();
 		case UNIT_COLUMN_INDEX:
 			return item.getUnit();
 		case QUANTITY_COLUMN_INDEX:

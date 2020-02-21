@@ -19,6 +19,7 @@ public class InventoryCheckSummaryPrintItem {
 		unit = item.getUnit();
 		cost = item.getCost();
 		
+		/*
 		switch (reportType) {
 		case BEGINNING_INVENTORY:
 			quantity = item.getBeginningInventory();
@@ -33,6 +34,7 @@ public class InventoryCheckSummaryPrintItem {
 			quantityValue = item.getActualValue();
 			break;
 		}
+		*/
 	}
 
 	public Product getProduct() {
@@ -75,16 +77,8 @@ public class InventoryCheckSummaryPrintItem {
 		this.quantityValue = quantityValue;
 	}
 
-	public int getBeginningInventory() {
-		return item.getBeginningInventory();
-	}
-	
 	public int getActualCount() {
 		return item.getQuantity();
-	}
-	
-	public int getQuantityDifference() {
-		return item.getQuantityDifference();
 	}
 	
 }

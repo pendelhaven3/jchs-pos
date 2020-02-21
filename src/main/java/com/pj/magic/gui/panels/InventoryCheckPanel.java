@@ -67,7 +67,6 @@ public class InventoryCheckPanel extends StandardMagicPanel {
 	private JButton saveButton;
 	private JDatePickerImpl datePicker;
 	private JButton postButton;
-	private JLabel totalBeginningValueField;
 	private JLabel totalActualValueField;
 	private JButton printPreviewButton;
 	private JButton printButton;
@@ -110,6 +109,7 @@ public class InventoryCheckPanel extends StandardMagicPanel {
 
 	@Override
 	protected void registerKeyBindings() {
+		/*
 		summaryTable.onEnterKey(new AbstractAction() {
 			
 			@Override
@@ -125,6 +125,7 @@ public class InventoryCheckPanel extends StandardMagicPanel {
 				openActualCountDetailsDialog();
 			}
 		});
+		*/
 	}
 
 	private void openActualCountDetailsDialog() {
@@ -145,7 +146,6 @@ public class InventoryCheckPanel extends StandardMagicPanel {
 		
 		updateInventoryDateField(inventoryCheck.getInventoryDate());
 		datePicker.getComponents()[1].setVisible(false);
-		totalBeginningValueField.setText(FormatterUtil.formatAmount(inventoryCheck.getTotalBeginningValue()));
 		totalActualValueField.setText(FormatterUtil.formatAmount(inventoryCheck.getTotalActualValue()));
 		
 		postButton.setEnabled(!inventoryCheck.isPosted() && loginService.getLoggedInUser().isSupervisor());
@@ -175,7 +175,6 @@ public class InventoryCheckPanel extends StandardMagicPanel {
 	private void clearDisplay() {
 		updateInventoryDateField(new Date());
 		datePicker.getComponents()[1].setVisible(true);
-		totalBeginningValueField.setText(null);
 		totalActualValueField.setText(null);
 		summaryTable.setItems(new ArrayList<InventoryCheckSummaryItem>());
 		postButton.setEnabled(false);
@@ -278,28 +277,7 @@ public class InventoryCheckPanel extends StandardMagicPanel {
 		c.gridx = 0;
 		c.gridy = currentRow;
 		c.anchor = GridBagConstraints.WEST;
-		panel.add(ComponentUtil.createLabel(160, "Total Beginning Value:"), c);
-		
-		c = new GridBagConstraints();
-		c.weightx = 1.0;
-		c.gridx = 1;
-		c.gridy = currentRow;
-		c.anchor = GridBagConstraints.WEST;
-		totalBeginningValueField = ComponentUtil.createRightLabel(120, "");
-		panel.add(totalBeginningValueField, c);
-		
-		c = new GridBagConstraints(); // right side space
-		c.gridx = 2;
-		c.gridy = currentRow;
-		panel.add(ComponentUtil.createFiller(10, 1), c);
-		
-		currentRow++;
-		
-		c = new GridBagConstraints();
-		c.gridx = 0;
-		c.gridy = currentRow;
-		c.anchor = GridBagConstraints.WEST;
-		panel.add(ComponentUtil.createLabel(150, "Total Actual Value:"), c);
+		panel.add(ComponentUtil.createLabel(150, "Total Value:"), c);
 		
 		c = new GridBagConstraints();
 		c.weightx = 1.0;
@@ -353,7 +331,7 @@ public class InventoryCheckPanel extends StandardMagicPanel {
 				printPreviewInventoryCheck();
 			}
 		});
-		toolBar.add(printPreviewButton);
+//		toolBar.add(printPreviewButton);
 		
 		printButton = new MagicToolBarButton("print", "Print");
 		printButton.addActionListener(new ActionListener() {
@@ -363,7 +341,7 @@ public class InventoryCheckPanel extends StandardMagicPanel {
 				print();
 			}
 		});
-		toolBar.add(printButton);
+//		toolBar.add(printButton);
 	}
 
 	private void searchSummaryItems() {

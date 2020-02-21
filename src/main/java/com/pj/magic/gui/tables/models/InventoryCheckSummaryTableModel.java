@@ -15,7 +15,7 @@ import com.pj.magic.util.FormatterUtil;
 public class InventoryCheckSummaryTableModel extends AbstractTableModel {
 
 	private static final String[] columnNames = 
-		{"Code", "Description", "Unit", "Beginning Inv.", "Actual Count", "Difference", "Cost", "Actual Value"};
+		{"Code", "Description", "Unit", "Quantity", "Cost", "Value"};
 	
 	private List<InventoryCheckSummaryItem> items = new ArrayList<>();
 	
@@ -44,12 +44,8 @@ public class InventoryCheckSummaryTableModel extends AbstractTableModel {
 			return item.getProduct().getDescription();
 		case InventoryCheckSummaryTable.UNIT_COLUMN_INDEX:
 			return item.getUnit();
-		case InventoryCheckSummaryTable.BEGINNING_INVENTORY_COLUMN_INDEX:
-			return item.getProduct().getUnitQuantity(item.getUnit());
 		case InventoryCheckSummaryTable.ACTUAL_COUNT_COLUMN_INDEX:
 			return item.getQuantity();
-		case InventoryCheckSummaryTable.QUANTITY_DIFFERENCE_COLUMN_INDEX:
-			return item.getQuantityDifference();
 		case InventoryCheckSummaryTable.COST_COLUMN_INDEX:
 			return FormatterUtil.formatAmount(item.getCost());
 		case InventoryCheckSummaryTable.ACTUAL_VALUE_COLUMN_INDEX:
@@ -71,6 +67,18 @@ public class InventoryCheckSummaryTableModel extends AbstractTableModel {
 
 	public InventoryCheckSummaryItem getItem(int row) {
 		return items.get(row);
+	}
+	
+	@Override
+	public Class<?> getColumnClass(int columnIndex) {
+		switch (columnIndex) {
+		case InventoryCheckSummaryTable.ACTUAL_COUNT_COLUMN_INDEX:
+		case InventoryCheckSummaryTable.COST_COLUMN_INDEX:
+		case InventoryCheckSummaryTable.ACTUAL_VALUE_COLUMN_INDEX:
+			return Number.class;
+		default:
+			return super.getColumnClass(columnIndex);
+		}
 	}
 	
 }

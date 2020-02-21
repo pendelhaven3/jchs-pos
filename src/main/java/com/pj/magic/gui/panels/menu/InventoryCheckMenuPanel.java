@@ -27,6 +27,8 @@ import com.pj.magic.service.LoginService;
 @Component
 public class InventoryCheckMenuPanel extends MenuPanel {
 
+	private static final String INVENTORY_CHECK_LIST = "Inventory Check List";
+	private static final String AREA_INVENTORY_REPORT_LIST = "Area Inventory Reports";
 	private static final String INVENTORY_CORRECTION = "Inventory Correction";
 	
 	@Autowired private LoginService loginService;
@@ -90,10 +92,10 @@ public class InventoryCheckMenuPanel extends MenuPanel {
 	
 	private void selectMenuItem() {
 		switch ((String)table.getValueAt(table.getSelectedRow(), 0)) {
-		case "Inventory Check Summary":
+		case INVENTORY_CHECK_LIST:
 			getMagicFrame().switchToInventoryCheckListPanel();
 			break;
-		case "Area Inventory Reports":
+		case AREA_INVENTORY_REPORT_LIST:
 			getMagicFrame().switchToAreaInventoryReportListPanel();
 			break;
 		case INVENTORY_CORRECTION:
@@ -110,9 +112,8 @@ public class InventoryCheckMenuPanel extends MenuPanel {
 	private class MainMenuTableModel extends AbstractTableModel {
 
 		private final List<String> allMenuItems = Arrays.asList(
-				"Inventory Check Summary",
-				"Area Inventory Reports",
-				INVENTORY_CORRECTION
+				INVENTORY_CHECK_LIST,
+				AREA_INVENTORY_REPORT_LIST
 		);
 		
 		private List<String> menuItems = new ArrayList<>();
@@ -125,9 +126,6 @@ public class InventoryCheckMenuPanel extends MenuPanel {
 		public void setUser(User user) {
 			menuItems.clear();
 			menuItems.addAll(allMenuItems);
-			if (!user.isSupervisor()) {
-				menuItems.remove(INVENTORY_CORRECTION);
-			}
 			fireTableDataChanged();
 		}
 		

@@ -17,7 +17,6 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import com.pj.magic.dao.AreaInventoryReportItemDao;
-import com.pj.magic.model.Area;
 import com.pj.magic.model.AreaInventoryReport;
 import com.pj.magic.model.AreaInventoryReportItem;
 import com.pj.magic.model.Product;
@@ -28,13 +27,10 @@ public class AreaInventoryReportItemDaoImpl extends MagicDao implements AreaInve
 	
 	private static final String BASE_SELECT_SQL =
 			"select a.ID, AREA_INV_REPORT_ID, PRODUCT_ID, UNIT, QUANTITY,"
-			+ " b.REPORT_NO, b.AREA_ID,"
-			+ " c.NAME as AREA_NAME"
+			+ " b.REPORT_NO, b.AREA"
 			+ " from AREA_INV_REPORT_ITEM a"
 			+ " join AREA_INV_REPORT b"
 			+ "   on b.ID = a.AREA_INV_REPORT_ID"
-			+ " left join AREA c"
-			+ "   on c.ID = b.AREA_ID"
 			+ " where 1 = 1";
 
 	private AreaInventoryReportItemRowMapper rowMapper = new AreaInventoryReportItemRowMapper();
@@ -137,9 +133,7 @@ public class AreaInventoryReportItemDaoImpl extends MagicDao implements AreaInve
 			AreaInventoryReport parent = new AreaInventoryReport();
 			parent.setId(rs.getLong("AREA_INV_REPORT_ID"));
 			parent.setReportNumber(rs.getInt("REPORT_NO"));
-			if (rs.getLong("AREA_ID") != 0) {
-				parent.setArea(new Area(rs.getLong("AREA_ID"), rs.getString("AREA_NAME")));
-			}
+			parent.setArea(rs.getString("AREA"));
 			item.setParent(parent);
 			
 			item.setProduct(new Product(rs.getLong("PRODUCT_ID")));

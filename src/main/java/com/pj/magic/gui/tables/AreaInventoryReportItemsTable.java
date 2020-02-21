@@ -98,21 +98,8 @@ public class AreaInventoryReportItemsTable extends MagicTable {
 			}
 		});
 		columnModel.getColumn(PRODUCT_CODE_COLUMN_INDEX).setCellEditor(new ProductCodeCellEditor(productCodeTextField));
-		
+
 		MagicTextField unitTextField = new MagicTextField();
-		unitTextField.setMaximumLength(UNIT_MAXIMUM_LENGTH);
-		unitTextField.addKeyListener(new KeyAdapter() {
-			
-			@Override
-			public void keyReleased(KeyEvent event) {
-				if (KeyUtil.isAlphaNumericKeyCode(event.getKeyCode())) {
-					JTextField textField = (JTextField)event.getComponent();
-					if (textField.getText().length() == UNIT_MAXIMUM_LENGTH) {
-						getCellEditor().stopCellEditing();
-					}
-				}
-			}
-		});
 		columnModel.getColumn(UNIT_COLUMN_INDEX).setCellEditor(new UnitCellEditor(unitTextField));
 		
 		MagicTextField quantityTextField = new MagicTextField();

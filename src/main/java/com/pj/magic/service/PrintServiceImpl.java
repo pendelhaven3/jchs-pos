@@ -573,7 +573,7 @@ public class PrintServiceImpl implements PrintService {
 			Map<String, Object> reportData = new HashMap<>();
 			reportData.put("areaInventoryReport", areaInventoryReport);
 			if (areaInventoryReport.getArea() != null) {
-				reportData.put("area", areaInventoryReport.getArea().getName());
+				reportData.put("area", areaInventoryReport.getArea());
 			} else {
 				reportData.put("area", "");
 			}

@@ -18,18 +18,14 @@ import org.springframework.stereotype.Repository;
 
 import com.pj.magic.dao.InventoryCheckDao;
 import com.pj.magic.model.InventoryCheck;
-import com.pj.magic.model.User;
 import com.pj.magic.util.DbUtil;
 
 @Repository
 public class InventoryCheckDaoImpl extends MagicDao implements InventoryCheckDao {
 
 	private static final String BASE_SELECT_SQL =
-			"select a.ID, INVENTORY_DT, POST_IND, POST_DT, POST_BY,"
-			+ " b.USERNAME as POST_BY_USERNAME"
-			+ " from INVENTORY_CHECK a"
-			+ " left join USER b"
-			+ "   on b.ID = a.POST_BY";
+			"select a.ID, INVENTORY_DT, POST_IND, POST_DT"
+			+ " from INVENTORY_CHECK a";
 	
 	private InventoryCheckRowMapper inventoryCheckRowMapper = new InventoryCheckRowMapper();
 	
@@ -61,12 +57,11 @@ public class InventoryCheckDaoImpl extends MagicDao implements InventoryCheckDao
 	}
 
 	private static final String UPDATE_SQL =
-			"update INVENTORY_CHECK set POST_IND = ?, POST_BY = ?, POST_DT = ? where ID = ?";
+			"update INVENTORY_CHECK set POST_IND = ?, POST_DT = ? where ID = ?";
 	
 	private void update(InventoryCheck inventoryCheck) {
 		getJdbcTemplate().update(UPDATE_SQL,
 				inventoryCheck.isPosted() ? "Y" : "N",
-				inventoryCheck.isPosted() ? inventoryCheck.getPostedBy().getId() : null,
 				inventoryCheck.isPosted() ? inventoryCheck.getPostDate() : null,
 				inventoryCheck.getId());
 	}
@@ -100,7 +95,6 @@ public class InventoryCheckDaoImpl extends MagicDao implements InventoryCheckDao
 			inventoryCheck.setPosted("Y".equals(rs.getString("POST_IND")));
 			if (inventoryCheck.isPosted()) {
 				inventoryCheck.setPostDate(rs.getTimestamp("POST_DT"));
-				inventoryCheck.setPostedBy(new User(rs.getLong("POST_BY"), rs.getString("POST_BY_USERNAME")));
 			}
 			return inventoryCheck;
 		}

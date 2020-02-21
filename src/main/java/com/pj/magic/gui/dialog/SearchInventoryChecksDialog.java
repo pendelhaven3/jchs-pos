@@ -129,22 +129,6 @@ public class SearchInventoryChecksDialog extends MagicDialog {
 		c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = currentRow;
-		c.anchor = GridBagConstraints.WEST;
-		add(ComponentUtil.createLabel(140, "Status:"), c);
-
-		c = new GridBagConstraints();
-		c.weightx = 1.0;
-		c.gridx = 1;
-		c.gridy = currentRow;
-		c.anchor = GridBagConstraints.WEST;
-		statusComboBox.setPreferredSize(new Dimension(200, 25));
-		add(statusComboBox, c);
-		
-		currentRow++;
-		
-		c = new GridBagConstraints();
-		c.gridx = 0;
-		c.gridy = currentRow;
 		add(Box.createVerticalStrut(15), c);
 		
 		currentRow++;

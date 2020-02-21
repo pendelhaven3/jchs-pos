@@ -118,9 +118,6 @@ public class RecordsMaintenanceMenuPanel extends MenuPanel {
 		case ADJUSTMENT_TYPE_LIST:
 			getMagicFrame().switchToAdjustmentTypeListPanel();
 			break;
-		case AREA_LIST:
-			getMagicFrame().switchToAreaListPanel();
-			break;
 		case CREDIT_CARD_LIST:
 			getMagicFrame().switchToCreditCardListPanel();
 			break;
