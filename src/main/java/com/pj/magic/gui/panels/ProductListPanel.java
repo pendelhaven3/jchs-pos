@@ -220,6 +220,8 @@ public class ProductListPanel extends StandardMagicPanel {
         ) {
             String[] nextLine = null;
             while ((nextLine = reader.readNext()) != null) {
+            	LOGGER.info("updating product code " + nextLine[0]);
+            	
                 String unit1 = nextLine[8];
                 String unit2 = nextLine[9];
                 if ("null".equals(unit2)) {
