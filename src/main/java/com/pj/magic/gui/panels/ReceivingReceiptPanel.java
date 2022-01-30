@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -47,10 +46,13 @@ import com.pj.magic.gui.dialog.SetDiscountsForAllItemsDialog;
 import com.pj.magic.gui.dialog.StatusDetailsDialog;
 import com.pj.magic.gui.tables.ReceivingReceiptItemsTable;
 import com.pj.magic.model.ReceivingReceipt;
+import com.pj.magic.report.excel.ReceivingReceiptExcelGenerator;
 import com.pj.magic.service.ExcelService;
 import com.pj.magic.service.PrintService;
 import com.pj.magic.service.ReceivingReceiptService;
+import com.pj.magic.service.SupplierService;
 import com.pj.magic.util.ComponentUtil;
+import com.pj.magic.util.ExcelUtil;
 import com.pj.magic.util.FileUtil;
 import com.pj.magic.util.FormatterUtil;
 import com.pj.magic.util.HtmlUtil;
@@ -73,6 +75,7 @@ public class ReceivingReceiptPanel extends StandardMagicPanel {
 	@Autowired private StatusDetailsDialog statusDialog;
 	@Autowired private SetDiscountsForAllItemsDialog setDiscountsForAllItemsDialog;
     @Autowired private ExcelService excelService;
+    @Autowired private SupplierService supplierService;
 	
 	private ReceivingReceipt receivingReceipt;
 	private JLabel receivingReceiptNumberField;
@@ -535,6 +538,8 @@ public class ReceivingReceiptPanel extends StandardMagicPanel {
             }
         }); 
         toolBar.add(toExcelButton);
+        
+        toolBar.add(new MagicToolBarButton("excel", "Generate new format Excel spreadsheet", e -> generateNewFormatExcelFile()));
 	}
 
     protected void openSetDiscountsForAllItemsDialog() {
@@ -614,4 +619,27 @@ public class ReceivingReceiptPanel extends StandardMagicPanel {
             .toString();
     }
     
+    private void generateNewFormatExcelFile() {
+        excelFileChooser.setSelectedFile(new File(generateDefaultSpreadsheetName() + ".xlsx"));
+        
+        int returnVal = excelFileChooser.showSaveDialog(this);
+        if (returnVal != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+        
+        ReceivingReceiptExcelGenerator excelGenerator = new ReceivingReceiptExcelGenerator(supplierService);
+        
+        try (
+            Workbook workbook = excelGenerator.generateSpreadsheet(receivingReceipt);
+            FileOutputStream out = new FileOutputStream(excelFileChooser.getSelectedFile());
+        ) {
+            workbook.write(out);
+            if (confirm("Excel file generated.\nDo you wish to open the file?")) {
+    			ExcelUtil.openExcelFile(excelFileChooser.getSelectedFile());
+            }
+        } catch (Exception e) {
+        	showMessageForUnexpectedError();
+        }
+    }
+	
 }
