@@ -34,5 +34,9 @@ public interface ProductDao {
 	void delete(Product product);
 	
 	void updateMaximumStockLevel(List<Product> products);
+
+	List<String> getAllActiveProductCodes();
+
+	void updateActiveIndicator(String productCode, boolean active);
 	
 }

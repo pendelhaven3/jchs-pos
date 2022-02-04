@@ -177,10 +177,10 @@ public class ProductDaoImpl extends MagicDao implements ProductDao {
 		StringBuilder sql = new StringBuilder(BASE_SELECT_SQL);
 		List<Object> params = new ArrayList<>();
 		
-//		if (criteria.getActive() != null) {
-//			sql.append(" and ACTIVE_IND = ?");
-//			params.add(criteria.getActive() ? "Y" : "N");
-//		}
+		if (criteria.getActive() != null) {
+			sql.append(" and ACTIVE_IND = ?");
+			params.add(criteria.getActive() ? "Y" : "N");
+		}
 		
 //		sql.append(" and b.PRICING_SCHEME_ID = ?");
 //		params.add(criteria.getPricingScheme().getId());
@@ -296,6 +296,16 @@ public class ProductDaoImpl extends MagicDao implements ProductDao {
 		}
 		
 		getJdbcTemplate().batchUpdate(UPDATE_MAXIMUM_STOCK_LEVEL_SQL, params);
+	}
+
+	@Override
+	public List<String> getAllActiveProductCodes() {
+		return getJdbcTemplate().queryForList("select CODE from PRODUCT where ACTIVE_IND = 'Y'", String.class);
+	}
+
+	@Override
+	public void updateActiveIndicator(String productCode, boolean active) {
+		getJdbcTemplate().update("update PRODUCT set ACTIVE_IND = ? where CODE = ?", active ? "Y" : "N", productCode);
 	}
 
 }

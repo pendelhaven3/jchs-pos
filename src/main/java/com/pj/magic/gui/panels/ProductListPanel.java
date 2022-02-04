@@ -64,12 +64,12 @@ public class ProductListPanel extends StandardMagicPanel {
 	private MagicFileChooser fileChooser = new MagicFileChooser();
 	
 	public void updateDisplay() {
-		List<Product> products = productService.getAllProducts();
+		List<Product> products = productService.getAllActiveProducts();
 		tableModel.setItems(products);
 		if (!products.isEmpty()) {
 			table.changeSelection(0, 0, false, false);
 		}
-//		searchProductsDialog.updateDisplay();
+		searchProductsDialog.updateDisplay();
 	}
 
 	@Override
@@ -164,7 +164,7 @@ public class ProductListPanel extends StandardMagicPanel {
             
             @Override
             public void actionPerformed(ActionEvent e) {
-                showAllProducts();
+                showActiveProducts();
             }
         });
         toolBar.add(showAllButton);
@@ -181,8 +181,8 @@ public class ProductListPanel extends StandardMagicPanel {
         toolBar.add(searchButton);
 	}
 
-	private void showAllProducts() {
-		tableModel.setItems(productService.getAllProducts());
+	private void showActiveProducts() {
+		tableModel.setItems(productService.getAllActiveProducts());
 		table.changeSelection(0, 0, false, false);
 		table.requestFocusInWindow();
 		searchProductsDialog.updateDisplay();
@@ -214,6 +214,8 @@ public class ProductListPanel extends StandardMagicPanel {
             showErrorMessage("Unexpected error occurred");
             return;
         }
+        
+        List<String> activeProductCodes = productService.getAllActiveProductCodes();
         
         try (
             CSVReader reader = new CSVReaderBuilder(new StringReader(csvString)).withSkipLines(1).build();
@@ -247,12 +249,16 @@ public class ProductListPanel extends StandardMagicPanel {
                 }
                 
                 productService.updateProduct(product);
+                activeProductCodes.remove(product.getCode());
             }
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
             showErrorMessage("Unexpected error occurred");
             return;
         }
+        
+        LOGGER.info("Updating {} products as inactive", activeProductCodes.size());
+        productService.updateProductsAsInactive(activeProductCodes);
         
         showMessage("Product list updated");
         updateDisplay();

@@ -55,5 +55,9 @@ public interface ProductService {
 	boolean saveDailyProductStartingQuantities();
 
     void updateProduct(Product product);
+
+	List<String> getAllActiveProductCodes();
+
+	void updateProductsAsInactive(List<String> activeProductCodes);
 	
 }
