@@ -8,7 +8,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,12 +42,17 @@ public class ReceivingReceiptDaoImpl extends MagicDao implements ReceivingReceip
 			"select a.ID, RECEIVING_RECEIPT_NO, SUPPLIER_ID, POST_IND, a.VAT_INCLUSIVE, VAT_RATE,"
 			+ " a.PAYMENT_TERM_ID, c.NAME as PAYMENT_TERM_NAME, a.REMARKS, REFERENCE_NO, RECEIVED_DT,"
 			+ " POST_DT, POST_BY, CANCEL_IND, CANCEL_DT, CANCEL_BY,"
-			+ " RELATED_PURCHASE_ORDER_NO, RECEIVED_BY, b.CODE as SUPPLIER_CODE, b.NAME as SUPPLIER_NAME"
+			+ " RELATED_PURCHASE_ORDER_NO, RECEIVED_BY, b.CODE as SUPPLIER_CODE, b.NAME as SUPPLIER_NAME,"
+			+ " d.USERNAME as POST_BY_USERNAME, e.USERNAME as CANCEL_BY_USERNAME"
 			+ " from RECEIVING_RECEIPT a"
 			+ " join SUPPLIER b"
 			+ "   on b.ID = a.SUPPLIER_ID"
 			+ " join PAYMENT_TERM c"
 			+ "   on c.ID = a.PAYMENT_TERM_ID"
+			+ " left join USER d"
+			+ "   on d.ID = a.POST_BY"
+			+ " left join USER e"
+			+ "   on e.ID = a.CANCEL_BY"
 			+ " where 1 = 1";
 
 	private static final String RECEIVING_RECEIPT_NUMBER_SEQUENCE = "RECEIVING_RECEIPT_NO_SEQ";
@@ -96,8 +100,7 @@ public class ReceivingReceiptDaoImpl extends MagicDao implements ReceivingReceip
 				ps.setString(5, receivingReceipt.getRemarks());
 				ps.setDate(6, new Date(receivingReceipt.getReceivedDate().getTime()));
 				ps.setLong(7, receivingReceipt.getRelatedPurchaseOrderNumber());
-//				ps.setLong(8, receivingReceipt.getReceivedBy().getId());
-                ps.setNull(8, Types.INTEGER);
+				ps.setLong(8, receivingReceipt.getReceivedBy().getId());
 				ps.setString(9,  receivingReceipt.isVatInclusive() ? "Y" : "N");
 				ps.setBigDecimal(10, receivingReceipt.getVatRate());
 				return ps;
@@ -124,14 +127,14 @@ public class ReceivingReceiptDaoImpl extends MagicDao implements ReceivingReceip
 				receivingReceipt.getSupplier().getId(),
 				receivingReceipt.isPosted() ? "Y" : "N",
 				receivingReceipt.isPosted() ? receivingReceipt.getPostDate() : null,
-				null,
+				receivingReceipt.isPosted() ? receivingReceipt.getPostedBy().getId() : null,
 				receivingReceipt.getPaymentTerm().getId(),
 				receivingReceipt.getRemarks(),
 				receivingReceipt.getReferenceNumber(),
 				receivingReceipt.getReceivedDate(),
 				receivingReceipt.isCancelled() ? "Y" : "N",
 				receivingReceipt.isCancelled() ? receivingReceipt.getCancelDate() : null,
-				null,
+				receivingReceipt.isCancelled() ? receivingReceipt.getCancelledBy().getId() : null,
 				receivingReceipt.getId());
 	}
 	
@@ -152,14 +155,14 @@ public class ReceivingReceiptDaoImpl extends MagicDao implements ReceivingReceip
 			receivingReceipt.setPosted("Y".equals(rs.getString("POST_IND")));
 			if (receivingReceipt.isPosted()) {
 				receivingReceipt.setPostDate(rs.getTimestamp("POST_DT"));
-//				receivingReceipt.setPostedBy(
-//						new User(rs.getLong("POST_BY"), rs.getString("POST_BY_USERNAME")));
+				receivingReceipt.setPostedBy(
+						new User(rs.getLong("POST_BY"), rs.getString("POST_BY_USERNAME")));
 			}
 			receivingReceipt.setCancelled("Y".equals(rs.getString("CANCEL_IND")));
 			if (receivingReceipt.isCancelled()) {
 				receivingReceipt.setCancelDate(rs.getDate("CANCEL_DT"));
-//				receivingReceipt.setCancelledBy(
-//						new User(rs.getLong("CANCEL_BY"), rs.getString("CANCEL_BY_USERNAME")));
+				receivingReceipt.setCancelledBy(
+						new User(rs.getLong("CANCEL_BY"), rs.getString("CANCEL_BY_USERNAME")));
 			}
 			receivingReceipt.setPaymentTerm(
 					new PaymentTerm(rs.getLong("PAYMENT_TERM_ID"), rs.getString("PAYMENT_TERM_NAME")));
@@ -167,7 +170,7 @@ public class ReceivingReceiptDaoImpl extends MagicDao implements ReceivingReceip
 			receivingReceipt.setReferenceNumber(rs.getString("REFERENCE_NO"));
 			receivingReceipt.setReceivedDate(rs.getDate("RECEIVED_DT"));
 			receivingReceipt.setRelatedPurchaseOrderNumber(rs.getLong("RELATED_PURCHASE_ORDER_NO"));
-//			receivingReceipt.setReceivedBy(new User(rs.getLong("RECEIVED_BY")));
+			receivingReceipt.setReceivedBy(new User(rs.getLong("RECEIVED_BY")));
 			receivingReceipt.setVatInclusive("Y".equals(rs.getString("VAT_INCLUSIVE")));
 			receivingReceipt.setVatRate(rs.getBigDecimal("VAT_RATE"));
 			return receivingReceipt;

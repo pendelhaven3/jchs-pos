@@ -600,7 +600,7 @@ public class MagicFrame extends JFrame {
         panelHolder.add(birForm2307ReportPanel, BIR_FORM_2307_REPORT_PANEL);
         getContentPane().add(panelHolder);
 
-        switchToMainMenuPanel();
+        switchToLoginPanel();
 	}
 	
 	public void switchToLoginPanel() {

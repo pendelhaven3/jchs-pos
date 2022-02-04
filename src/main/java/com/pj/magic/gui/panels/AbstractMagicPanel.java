@@ -208,7 +208,7 @@ public abstract class AbstractMagicPanel extends JPanel {
 				getMagicFrame().switchToLoginPanel();
 			}
 		});
-//		toolBar.add(logoutButton);
+		toolBar.add(logoutButton);
 	}
 	
 	protected void setFocusOnNextFieldOnEnterKey(JComponent component) {

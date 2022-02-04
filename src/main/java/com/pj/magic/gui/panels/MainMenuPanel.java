@@ -249,10 +249,10 @@ public class MainMenuPanel extends StandardMagicPanel {
 //				STOCK_MOVEMENT,
 				REPORTS,
 				INVENTORY_CHECK,
-				RECORDS_MAINTENANCE
+				RECORDS_MAINTENANCE,
 //				BACKUP_RESTORE_DATA,
-//				ADMIN,
-//				CHANGE_PASSWORD
+				ADMIN,
+				CHANGE_PASSWORD
 		);
 		
 		private List<String> menuItems = new ArrayList<>();

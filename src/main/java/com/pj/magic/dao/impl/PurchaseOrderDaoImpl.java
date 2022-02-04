@@ -29,9 +29,11 @@ public class PurchaseOrderDaoImpl extends MagicDao implements PurchaseOrderDao {
 	private static final String BASE_SELECT_SQL =
 			"select a.ID, PURCHASE_ORDER_NO, SUPPLIER_ID, POST_IND, DELIVERY_IND,"
 			+ " a.PAYMENT_TERM_ID, a.REMARKS, REFERENCE_NO, POST_DT, a.VAT_INCLUSIVE,"
-			+ " b.CODE as SUPPLIER_CODE, b.NAME as SUPPLIER_NAME"
-			+ " from PURCHASE_ORDER a, SUPPLIER b"
-			+ " where a.SUPPLIER_ID = b.ID";
+			+ " b.CODE as SUPPLIER_CODE, b.NAME as SUPPLIER_NAME,"
+			+ " a.CREATED_BY, c.USERNAME as CREATED_BY_USERNAME"
+			+ " from PURCHASE_ORDER a, SUPPLIER b, USER c"
+			+ " where a.SUPPLIER_ID = b.ID"
+			+ " and a.CREATED_BY = c.ID";
 	
 	private static final String PURCHASE_ORDER_NUMBER_SEQUENCE = "PURCHASE_ORDER_NO_SEQ";
 	
@@ -77,8 +79,7 @@ public class PurchaseOrderDaoImpl extends MagicDao implements PurchaseOrderDao {
 				} else {
 					ps.setNull(3, Types.INTEGER);
 				}
-//				ps.setLong(4, purchaseOrder.getCreatedBy().getId());
-                ps.setNull(4, Types.INTEGER);
+				ps.setLong(4, purchaseOrder.getCreatedBy().getId());
 				ps.setString(5, purchaseOrder.isVatInclusive() ? "Y" : "N");
 				return ps;
 			}
@@ -133,7 +134,7 @@ public class PurchaseOrderDaoImpl extends MagicDao implements PurchaseOrderDao {
 			purchaseOrder.setRemarks(rs.getString("REMARKS"));
 			purchaseOrder.setReferenceNumber(rs.getString("REFERENCE_NO"));
 			purchaseOrder.setPostDate(rs.getDate("POST_DT"));
-//			purchaseOrder.setCreatedBy(new User(rs.getLong("CREATED_BY"), rs.getString("CREATED_BY_USERNAME")));
+			purchaseOrder.setCreatedBy(new User(rs.getLong("CREATED_BY"), rs.getString("CREATED_BY_USERNAME")));
 			purchaseOrder.setVatInclusive("Y".equals(rs.getString("VAT_INCLUSIVE")));
 			return purchaseOrder;
 		}

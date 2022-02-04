@@ -102,8 +102,8 @@ public class AdminMenuPanel extends MenuPanel {
 
 		private final List<String> menuItems = Arrays.asList(
 				"User List",
-				"Reset Password",
-				"Payment Terminal Assignments"
+				"Reset Password"
+//				"Payment Terminal Assignments"
 		);
 		
 		@Override

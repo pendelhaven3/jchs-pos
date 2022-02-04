@@ -33,12 +33,7 @@ public class LoginServiceImpl implements LoginService {
 
 	@Override
 	public User getLoggedInUser() {
-	    User user = new User();
-	    user.setUsername("ADMIN");
-	    user.setSupervisor(true);
-	    return user;
-	    
-//		return loggedInUser;
+		return loggedInUser;
 	}
 
 }

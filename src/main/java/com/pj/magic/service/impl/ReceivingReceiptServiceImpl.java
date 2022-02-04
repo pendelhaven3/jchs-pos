@@ -117,6 +117,7 @@ public class ReceivingReceiptServiceImpl implements ReceivingReceiptService {
 		
 		updated.setPosted(true);
 		updated.setPostDate(systemDao.getCurrentDateTime());
+		updated.setPostedBy(loginService.getLoggedInUser());
 		receivingReceiptDao.save(updated);
 	}
 
