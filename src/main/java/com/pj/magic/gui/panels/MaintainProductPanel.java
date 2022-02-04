@@ -11,6 +11,7 @@ import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -49,6 +50,7 @@ public class MaintainProductPanel extends StandardMagicPanel {
 	private MagicTextField descriptionField;
 	private MagicTextField maximumStockLevelField;
 	private MagicTextField minimumStockLevelField;
+	private JCheckBox activeIndicatorCheckBox;
 	private JButton saveButton;
 	private JButton addSupplierButton;
     private JButton deleteSupplierButton;
@@ -71,6 +73,8 @@ public class MaintainProductPanel extends StandardMagicPanel {
 		minimumStockLevelField.setMaximumLength(4);
 		minimumStockLevelField.setNumbersOnly(true);
 
+		activeIndicatorCheckBox = new JCheckBox("Yes");
+		
 		saveButton = new JButton("Save");
 		saveButton.addActionListener(e -> saveProduct());
 		
@@ -116,6 +120,7 @@ public class MaintainProductPanel extends StandardMagicPanel {
 	protected void initializeFocusOrder(List<JComponent> focusOrder) {
 		focusOrder.add(maximumStockLevelField);
 		focusOrder.add(minimumStockLevelField);
+		focusOrder.add(activeIndicatorCheckBox);
 		focusOrder.add(saveButton);
 	}
 	
@@ -127,6 +132,7 @@ public class MaintainProductPanel extends StandardMagicPanel {
 		if (confirm("Save?")) {
 			product.setMaximumStockLevel(Integer.parseInt(maximumStockLevelField.getText()));
 			product.setMinimumStockLevel(Integer.parseInt(minimumStockLevelField.getText()));
+			product.setActive(activeIndicatorCheckBox.isSelected());
 			
 			try {
 				productService.save(product);
@@ -229,6 +235,20 @@ public class MaintainProductPanel extends StandardMagicPanel {
 		currentRow++;
 		
         c = new GridBagConstraints();
+		c.gridx = 0;
+		c.gridy = currentRow;
+        c.anchor = GridBagConstraints.WEST;
+		mainPanel.add(ComponentUtil.createLabel(175, "Active? "), c);
+		
+        c = new GridBagConstraints();
+		c.gridx = 1;
+		c.gridy = currentRow;
+		c.anchor = GridBagConstraints.WEST;
+		mainPanel.add(activeIndicatorCheckBox, c);
+
+		currentRow++;
+		
+        c = new GridBagConstraints();
         c.insets.top = 10;
         c.gridx = 0;
         c.gridy = currentRow;
@@ -309,6 +329,7 @@ public class MaintainProductPanel extends StandardMagicPanel {
 		descriptionField.setText(product.getDescription());
 		maximumStockLevelField.setText(String.valueOf(product.getMaximumStockLevel()));
 		minimumStockLevelField.setText(String.valueOf(product.getMinimumStockLevel()));
+		activeIndicatorCheckBox.setSelected(product.isActive());
 		
         tableModel.setItems(productService.getProductSuppliers(product));
 		addSupplierButton.setEnabled(true);

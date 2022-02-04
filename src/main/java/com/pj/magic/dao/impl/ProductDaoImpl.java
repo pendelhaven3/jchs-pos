@@ -35,7 +35,8 @@ public class ProductDaoImpl extends MagicDao implements ProductDao {
 			"select a.ID, a.CODE, a.DESCRIPTION,"
 			+ " a.UOM_CODE, a.UOM_CODE1, a.UOM_QTY, a.UOM_QTY1,"
 			+ " MAX_STOCK_LEVEL, MIN_STOCK_LEVEL,"
-			+ " a.GROSS_COST, a.GROSS_COST1, a.FINAL_COST, a.FINAL_COST1"
+			+ " a.GROSS_COST, a.GROSS_COST1, a.FINAL_COST, a.FINAL_COST1,"
+			+ " a.ACTIVE_IND"
 			+ " from PRODUCT a"
 			+ " where 1 = 1";
 	
@@ -76,6 +77,7 @@ public class ProductDaoImpl extends MagicDao implements ProductDao {
 			product.setDescription(rs.getString("DESCRIPTION"));
 			product.setMaximumStockLevel(rs.getInt("MAX_STOCK_LEVEL"));
 			product.setMinimumStockLevel(rs.getInt("MIN_STOCK_LEVEL"));
+			product.setActive("Y".equals(rs.getString("ACTIVE_IND")));
 			
 			String unit1 = rs.getString("UOM_CODE");
 			String unit2 = rs.getString("UOM_CODE1");
@@ -124,7 +126,7 @@ public class ProductDaoImpl extends MagicDao implements ProductDao {
 
 	private static final String UPDATE_SQL =
 			"update PRODUCT set CODE = ?, DESCRIPTION = ?,"
-			+ " UOM_CODE = ?, UOM_CODE1 = ?, UOM_QTY = ?, UOM_QTY1 = ?, MAX_STOCK_LEVEL = ?, MIN_STOCK_LEVEL = ?"
+			+ " UOM_CODE = ?, UOM_CODE1 = ?, UOM_QTY = ?, UOM_QTY1 = ?, MAX_STOCK_LEVEL = ?, MIN_STOCK_LEVEL = ?, ACTIVE_IND = ?"
 			+ " where ID = ?";
 	
 	private void update(Product product) {
@@ -137,6 +139,7 @@ public class ProductDaoImpl extends MagicDao implements ProductDao {
                 product.getUnitConversions().size() > 1 ? product.getUnitConversions().get(1).getQuantity() : null,
                 product.getMaximumStockLevel(),
                 product.getMinimumStockLevel(),
+				product.isActive() ? "Y" : "N",
 				product.getId());
 	}
 

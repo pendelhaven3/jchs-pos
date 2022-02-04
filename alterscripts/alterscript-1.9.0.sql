@@ -20,3 +20,4 @@ update RECEIVING_RECEIPT set RECEIVED_BY = 1;
 
 alter table RECEIVING_RECEIPT modify column RECEIVED_BY integer not null;
 
+alter table PRODUCT add ACTIVE_IND char(1) default 'Y';
