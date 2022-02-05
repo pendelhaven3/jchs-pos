@@ -138,7 +138,7 @@ public class ReceivingReceiptExcelGenerator {
         row = sheet.createRow(currentRow);
         
         row.createCell(0).setCellValue("Total Items: " + receivingReceipt.getTotalNumberOfItems());
-        row.createCell(2).setCellValue("Encoder: ");
+        row.createCell(2).setCellValue("Encoder: " + receivingReceipt.getReceivedBy().getUsername());
         
         cell = row.createCell(7);
         cell.setCellValue("Sub Total: ");

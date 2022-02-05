@@ -43,12 +43,14 @@ public class ReceivingReceiptDaoImpl extends MagicDao implements ReceivingReceip
 			+ " a.PAYMENT_TERM_ID, c.NAME as PAYMENT_TERM_NAME, a.REMARKS, REFERENCE_NO, RECEIVED_DT,"
 			+ " POST_DT, POST_BY, CANCEL_IND, CANCEL_DT, CANCEL_BY,"
 			+ " RELATED_PURCHASE_ORDER_NO, RECEIVED_BY, b.CODE as SUPPLIER_CODE, b.NAME as SUPPLIER_NAME,"
-			+ " d.USERNAME as POST_BY_USERNAME, e.USERNAME as CANCEL_BY_USERNAME"
+			+ " d.USERNAME as POST_BY_USERNAME, e.USERNAME as CANCEL_BY_USERNAME, f.USERNAME as RECEIVED_BY_USERNAME"
 			+ " from RECEIVING_RECEIPT a"
 			+ " join SUPPLIER b"
 			+ "   on b.ID = a.SUPPLIER_ID"
 			+ " join PAYMENT_TERM c"
 			+ "   on c.ID = a.PAYMENT_TERM_ID"
+			+ " join USER f"
+			+ "   on f.ID = a.RECEIVED_BY"
 			+ " left join USER d"
 			+ "   on d.ID = a.POST_BY"
 			+ " left join USER e"
@@ -170,7 +172,7 @@ public class ReceivingReceiptDaoImpl extends MagicDao implements ReceivingReceip
 			receivingReceipt.setReferenceNumber(rs.getString("REFERENCE_NO"));
 			receivingReceipt.setReceivedDate(rs.getDate("RECEIVED_DT"));
 			receivingReceipt.setRelatedPurchaseOrderNumber(rs.getLong("RELATED_PURCHASE_ORDER_NO"));
-			receivingReceipt.setReceivedBy(new User(rs.getLong("RECEIVED_BY")));
+			receivingReceipt.setReceivedBy(new User(rs.getLong("RECEIVED_BY"), rs.getString("RECEIVED_BY_USERNAME")));
 			receivingReceipt.setVatInclusive("Y".equals(rs.getString("VAT_INCLUSIVE")));
 			receivingReceipt.setVatRate(rs.getBigDecimal("VAT_RATE"));
 			return receivingReceipt;
