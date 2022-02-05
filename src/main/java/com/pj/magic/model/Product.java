@@ -34,6 +34,7 @@ public class Product implements Comparable<Product>, Serializable {
 	private List<UnitConversion> unitConversions = new ArrayList<>();
 	private List<UnitCost> unitCosts = new ArrayList<>();
 	private BigDecimal companyListPrice;
+	private int availableQuantity;
 
 	public Product() {
 	}
@@ -486,5 +487,13 @@ public class Product implements Comparable<Product>, Serializable {
                     .isEquals();
         }
     }
-	
+
+	public int getAvailableQuantity() {
+		return availableQuantity;
+	}
+
+	public void setAvailableQuantity(int availableQuantity) {
+		this.availableQuantity = availableQuantity;
+	}
+    
 }

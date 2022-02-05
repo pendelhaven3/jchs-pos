@@ -36,7 +36,7 @@ public class ProductDaoImpl extends MagicDao implements ProductDao {
 			+ " a.UOM_CODE, a.UOM_CODE1, a.UOM_QTY, a.UOM_QTY1,"
 			+ " MAX_STOCK_LEVEL, MIN_STOCK_LEVEL,"
 			+ " a.GROSS_COST, a.GROSS_COST1, a.FINAL_COST, a.FINAL_COST1,"
-			+ " a.ACTIVE_IND"
+			+ " a.ACTIVE_IND, a.AVAIL_QTY"
 			+ " from PRODUCT a"
 			+ " where 1 = 1";
 	
@@ -78,6 +78,7 @@ public class ProductDaoImpl extends MagicDao implements ProductDao {
 			product.setMaximumStockLevel(rs.getInt("MAX_STOCK_LEVEL"));
 			product.setMinimumStockLevel(rs.getInt("MIN_STOCK_LEVEL"));
 			product.setActive("Y".equals(rs.getString("ACTIVE_IND")));
+			product.setAvailableQuantity(rs.getInt("AVAIL_QTY"));
 			
 			String unit1 = rs.getString("UOM_CODE");
 			String unit2 = rs.getString("UOM_CODE1");
