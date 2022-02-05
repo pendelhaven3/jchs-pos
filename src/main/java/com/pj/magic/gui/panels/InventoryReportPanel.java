@@ -50,7 +50,7 @@ public class InventoryReportPanel extends StandardMagicPanel {
 	private JButton generateButton;
 	
 	public void updateDisplay() {
-		manufacturerComboBox.setSelectedIndex(0);
+//		manufacturerComboBox.setSelectedIndex(0);
 		generateReport();
 	}
 
@@ -70,7 +70,7 @@ public class InventoryReportPanel extends StandardMagicPanel {
 
 	private void generateReport() {
 		InventoryReportCriteria criteria = new InventoryReportCriteria();
-		criteria.setManufacturer((Manufacturer)manufacturerComboBox.getSelectedItem());
+//		criteria.setManufacturer((Manufacturer)manufacturerComboBox.getSelectedItem());
 		
 		InventoryReport report = reportService.getInventoryReport(criteria);
 		tableModel.setItems(report.getItems());
@@ -94,55 +94,57 @@ public class InventoryReportPanel extends StandardMagicPanel {
 		
 		int currentRow = 0;
 		
+//		GridBagConstraints c = new GridBagConstraints();
+//		c.gridx = 0;
+//		c.gridy = currentRow;
+//		mainPanel.add(Box.createHorizontalStrut(50), c);
+//		
+//		c = new GridBagConstraints();
+//		c.gridx = 1;
+//		c.gridy = currentRow;
+//		c.anchor = GridBagConstraints.WEST;
+//		mainPanel.add(ComponentUtil.createLabel(150, "Manufacturer:"), c);
+//		
+//		c = new GridBagConstraints();
+//		c.gridx = 2;
+//		c.gridy = currentRow;
+//		c.anchor = GridBagConstraints.WEST;
+//		manufacturerComboBox.setPreferredSize(new Dimension(200, 25));
+//		mainPanel.add(manufacturerComboBox, c);
+//		
+//		c = new GridBagConstraints();
+//		c.gridx = 3;
+//		c.gridy = currentRow;
+//		c.weightx = 1.0;
+//		mainPanel.add(Box.createGlue(), c);
+//		
+//		currentRow++;
+//		
+//		c = new GridBagConstraints();
+//		c.gridx = 0;
+//		c.gridy = currentRow;
+//		mainPanel.add(Box.createVerticalStrut(20), c);
+//		
+//		currentRow++;
+//		
+//		c = new GridBagConstraints();
+//		c.gridx = 2;
+//		c.gridy = currentRow;
+//		generateButton.setPreferredSize(new Dimension(120, 25));
+//		mainPanel.add(generateButton, c);
+		
+		currentRow++;
+		
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = currentRow;
-		mainPanel.add(Box.createHorizontalStrut(50), c);
-		
-		c = new GridBagConstraints();
-		c.gridx = 1;
-		c.gridy = currentRow;
-		c.anchor = GridBagConstraints.WEST;
-		mainPanel.add(ComponentUtil.createLabel(150, "Manufacturer:"), c);
-		
-		c = new GridBagConstraints();
-		c.gridx = 2;
-		c.gridy = currentRow;
-		c.anchor = GridBagConstraints.WEST;
-		manufacturerComboBox.setPreferredSize(new Dimension(200, 25));
-		mainPanel.add(manufacturerComboBox, c);
-		
-		c = new GridBagConstraints();
-		c.gridx = 3;
-		c.gridy = currentRow;
-		c.weightx = 1.0;
-		mainPanel.add(Box.createGlue(), c);
-		
-		currentRow++;
-		
-		c = new GridBagConstraints();
-		c.gridx = 0;
-		c.gridy = currentRow;
 		mainPanel.add(Box.createVerticalStrut(20), c);
 		
 		currentRow++;
 		
 		c = new GridBagConstraints();
-		c.gridx = 2;
-		c.gridy = currentRow;
-		generateButton.setPreferredSize(new Dimension(120, 25));
-		mainPanel.add(generateButton, c);
-		
-		currentRow++;
-		
-		c = new GridBagConstraints();
-		c.gridx = 0;
-		c.gridy = currentRow;
-		mainPanel.add(Box.createVerticalStrut(20), c);
-		
-		currentRow++;
-		
 		c.fill = GridBagConstraints.BOTH;
+		c.weightx = c.weighty = 1.0;
 		c.gridx = 0;
 		c.gridy = currentRow;
 		c.gridwidth = 4;

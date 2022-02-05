@@ -176,33 +176,7 @@ public class ReportDaoImpl extends MagicDao implements ReportDao {
 	}
 
 	private static final String GET_ALL_INVENTORY_REPORT_ITEMS_SQL =
-			" select ID, CODE, DESCRIPTION, UNIT, QUANTITY, COST"
-			+ " from ("
-			+ "   select ID, CODE, DESCRIPTION, 'CSE' as UNIT, AVAIL_QTY_CSE as QUANTITY, FINAL_COST_CSE as COST, MANUFACTURER_ID"
-			+ "   from PRODUCT"
-			+ "   where UNIT_IND_CSE = 'Y'"
-			+ "   and AVAIL_QTY_CSE > 0"
-			+ "   union all"
-			+ "   select ID, CODE, DESCRIPTION, 'TIE' as UNIT, AVAIL_QTY_TIE as QUANTITY, FINAL_COST_TIE as COST, MANUFACTURER_ID"
-			+ "   from PRODUCT"
-			+ "   where UNIT_IND_TIE = 'Y'"
-			+ "   and AVAIL_QTY_TIE > 0"
-			+ "   union all"
-			+ "   select ID, CODE, DESCRIPTION, 'CTN' as UNIT, AVAIL_QTY_CTN as QUANTITY, FINAL_COST_CTN as COST, MANUFACTURER_ID"
-			+ "   from PRODUCT"
-			+ "   where UNIT_IND_CTN = 'Y'"
-			+ "   and AVAIL_QTY_CTN > 0"
-			+ "   union all"
-			+ "   select ID, CODE, DESCRIPTION, 'DOZ' as UNIT, AVAIL_QTY_DOZ as QUANTITY, FINAL_COST_DOZ as COST, MANUFACTURER_ID"
-			+ "   from PRODUCT"
-			+ "   where UNIT_IND_DOZ = 'Y'"
-			+ "   and AVAIL_QTY_DOZ > 0"
-			+ "   union all"
-			+ "   select ID, CODE, DESCRIPTION, 'PCS' as UNIT, AVAIL_QTY_PCS as QUANTITY, FINAL_COST_PCS as COST, MANUFACTURER_ID"
-			+ "   from PRODUCT"
-			+ "   where UNIT_IND_PCS = 'Y'"
-			+ "   and AVAIL_QTY_PCS > 0"
-			+ " ) a";
+			" select ID, CODE, DESCRIPTION, UOM_CODE as UNIT, AVAIL_QTY as QUANTITY, 0 as COST from PRODUCT";
 	
 	@Override
 	public List<InventoryReportItem> getInventoryReportItems(InventoryReportCriteria criteria) {

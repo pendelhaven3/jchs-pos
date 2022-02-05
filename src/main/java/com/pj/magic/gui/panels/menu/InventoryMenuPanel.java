@@ -121,10 +121,10 @@ public class InventoryMenuPanel extends MenuPanel {
 
 		private final List<String> allMenuItems = Arrays.asList(
 				PRODUCT_LIST,
-				PRICING_SCHEME,
-				PRICE_CHANGES_REPORT,
-				INVENTORY_REPORT,
-				UPLOAD_MAXIMUM_STOCK_LEVEL_CHANGES
+//				PRICING_SCHEME,
+//				PRICE_CHANGES_REPORT,
+				INVENTORY_REPORT
+//				UPLOAD_MAXIMUM_STOCK_LEVEL_CHANGES
 		);
 		
 		private List<String> menuItems = new ArrayList<>();

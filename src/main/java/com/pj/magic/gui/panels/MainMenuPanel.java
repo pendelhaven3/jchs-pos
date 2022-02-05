@@ -223,7 +223,7 @@ public class MainMenuPanel extends StandardMagicPanel {
 			getMagicFrame().switchToPromoRedemptionPromoListPanel();
 			break;
         case PRODUCTS:
-            getMagicFrame().switchToProductListPanel();
+			getMagicFrame().switchToInventoryMenuPanel();
             break;
 		}
 	}
