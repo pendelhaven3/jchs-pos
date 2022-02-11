@@ -309,4 +309,14 @@ public class ProductDaoImpl extends MagicDao implements ProductDao {
 		getJdbcTemplate().update("update PRODUCT set ACTIVE_IND = ? where CODE = ?", active ? "Y" : "N", productCode);
 	}
 
+	@Override
+	public void subtractAvailableQuantity(Product product, int quantity) {
+		getJdbcTemplate().update("update PRODUCT set AVAIL_QTY = AVAIL_QTY - ? where ID = ?", quantity, product.getId());
+	}
+
+	@Override
+	public void addAvailableQuantity(Product product, int quantity) {
+		getJdbcTemplate().update("update PRODUCT set AVAIL_QTY = AVAIL_QTY + ? where ID = ?", quantity, product.getId());
+	}
+
 }

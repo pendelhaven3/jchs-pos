@@ -38,5 +38,9 @@ public interface ProductDao {
 	List<String> getAllActiveProductCodes();
 
 	void updateActiveIndicator(String productCode, boolean active);
+
+	void subtractAvailableQuantity(Product product, int quantity);
+
+	void addAvailableQuantity(Product product, int quantity);
 	
 }

@@ -495,5 +495,9 @@ public class Product implements Comparable<Product>, Serializable {
 	public void setAvailableQuantity(int availableQuantity) {
 		this.availableQuantity = availableQuantity;
 	}
+	
+	public boolean isWholesale() {
+		return code.length() == 14 && code.endsWith("01");
+	}
     
 }

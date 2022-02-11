@@ -5,48 +5,30 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.StringJoiner;
-import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.opencsv.CSVReader;
-import com.opencsv.CSVReaderBuilder;
+import com.pj.magic.exception.FileAlreadyImportedException;
+import com.pj.magic.exception.NotEnoughStocksException;
 import com.pj.magic.gui.component.MagicFileChooser;
 import com.pj.magic.gui.component.MagicToolBar;
 import com.pj.magic.gui.component.MagicToolBarButton;
 import com.pj.magic.gui.tables.MagicListTable;
 import com.pj.magic.gui.tables.models.ListBackedTableModel;
-import com.pj.magic.model.TrisysSales;
 import com.pj.magic.model.TrisysSalesImport;
-import com.pj.magic.model.TrisysSalesItem;
-import com.pj.magic.service.LoginService;
-import com.pj.magic.service.SystemService;
 import com.pj.magic.service.TrisysSalesService;
 import com.pj.magic.util.ComponentUtil;
 import com.pj.magic.util.DbfFileFilter;
 import com.pj.magic.util.FormatterUtil;
 
 import lombok.extern.slf4j.Slf4j;
-import net.iryndin.jdbf.core.DbfMetadata;
-import net.iryndin.jdbf.core.DbfRecord;
-import net.iryndin.jdbf.reader.DbfReader;
 
 @Component
 @Slf4j
@@ -57,8 +39,6 @@ public class TrisysSalesImportListPanel extends StandardMagicPanel {
     private static final int IMPORT_BY_COLUMN_INDEX = 2;
     
 	@Autowired private TrisysSalesService trisysSalesService;
-	@Autowired private SystemService systemService;
-	@Autowired private LoginService loginService;
 	
 	private MagicListTable table;
 	private TrisysSalesImportTableModel tableModel = new TrisysSalesImportTableModel();
@@ -150,118 +130,39 @@ public class TrisysSalesImportListPanel extends StandardMagicPanel {
             return;
         }
         
-        String filename = FilenameUtils.getBaseName(fileChooser.getSelectedFile().getName());
-        if (trisysSalesService.findByFile(filename) != null) {
-        	showErrorMessage("File already imported");
-        	return;
-        }
-        
-        String csvString = null;
-        try {
-            csvString = convertDbfToCsv(fileChooser.getSelectedFile());
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
-            showMessageForUnexpectedError();
-            return;
-        }
-        
-        TrisysSalesImport salesImport = null;
-        TrisysSales sales = null;
+        /*
         try (
             CSVReader reader = new CSVReaderBuilder(new StringReader(csvString)).withSkipLines(1).build();
         ) {
             String[] nextLine = null;
             while ((nextLine = reader.readNext()) != null) {
-            	for (String part : nextLine) {
-            		System.out.print(part);
-            		System.out.print(" - ");
-            	}
-            	System.out.println();
-            	
-        		Date salesDate = new SimpleDateFormat("yyyyMMdd").parse(nextLine[1]);
-            	String terminal = nextLine[11];
-            	if (salesImport == null) {
-                    salesImport = new TrisysSalesImport();
-                    salesImport.setFile(filename);
-                    salesImport.setImportDate(systemService.getCurrentDateTime());
-                    salesImport.setImportBy(loginService.getLoggedInUser());
-                    trisysSalesService.saveTrisysSalesImport(salesImport);
-            	}
-            	
-            	String saleNumber = nextLine[0];
-            	
-            	if (sales != null && sales.getSaleNumber().equals(saleNumber) && !sales.getTerminal().equals(terminal)) {
-            		showErrorMessage("Multiple terminals in sale number");
+            	String productCode = nextLine[2];
+            	if (productService.findProductByCode(productCode) == null) {
+            		showErrorMessage("Product code not defined: " + productCode);
             		return;
             	}
-        		
-            	if (sales == null || !sales.getSaleNumber().equals(saleNumber)) {
-            		sales = new TrisysSales();
-            		sales.setSalesImport(salesImport);
-            		sales.setSaleNumber(saleNumber);
-            		sales.setTerminal(terminal);
-                    sales.setSalesDate(salesDate);
-            		trisysSalesService.saveTrisysSales(sales);
-            	}
-            	
-            	String productCode = nextLine[2];
-            	BigDecimal unitCost = new BigDecimal(nextLine[7]);
-            	BigDecimal sellPrice = new BigDecimal(nextLine[8]);
-            	BigDecimal total = new BigDecimal(nextLine[10]);
-            	
-            	TrisysSalesItem item = new TrisysSalesItem();
-            	item.setSales(sales);
-            	item.setProductCode(productCode);
-            	item.setQuantity(total.divide(sellPrice, 2, RoundingMode.HALF_EVEN).intValue());
-            	item.setUnitCost(unitCost);
-            	item.setSellPrice(sellPrice);
-            	trisysSalesService.saveSalesItem(item);
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             showMessageForUnexpectedError();
             return;
         }
+        */
         
-        updateDisplay();
-    }
-	
-	private static String convertDbfToCsv(File file) throws IOException {
-	    StringBuilder sb = new StringBuilder();
-	    
-        DbfRecord rec;
-        try (
-            DbfReader reader = new DbfReader(file);
-        ) {
-            DbfMetadata meta = reader.getMetadata();
-            List<String> fields = meta.getFields().stream().map(f -> f.getName()).collect(Collectors.toList());
-            sb.append(fields.stream().collect(Collectors.joining(",")));
-            sb.append("\n");
-
-            while ((rec = reader.read()) != null) {
-                rec.setStringCharset(StandardCharsets.UTF_8);
-
-                StringJoiner sj = new StringJoiner(",");
-                for (String s : fields) {
-                    String value = rec.getString(s);
-                    
-                    if (value != null && value.contains("\"")) {
-                        value = value.replaceAll("\"", "\"\"");
-                        value = "\"" + value + "\"";
-                    }
-                    if (value != null && value.contains(",")) {
-                        value = "\"" + value + "\"";
-                    }
-                    sj.add(value);
-                }
-
-                sb.append(sj.toString());
-                sb.append("\n");
-            }
-            return sb.toString();
+        try {
+            trisysSalesService.importTrisysSales(fileChooser.getSelectedFile());
+            showMessage("Trisys sales file imported");
+            updateDisplay();
+        } catch (FileAlreadyImportedException e) {
+        	showErrorMessage("File already imported");
+        } catch (NotEnoughStocksException e) {
+        	showErrorMessage("Not enough stocks for product " + e.getProductCode());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            showMessageForUnexpectedError();
         }
     }
-
+	
     private class TrisysSalesImportTableModel extends ListBackedTableModel<TrisysSalesImport> {
 
         private final String[] columnNames = {"File", "Import Date", "Import By"};

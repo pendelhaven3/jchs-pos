@@ -20,6 +20,7 @@ import com.pj.magic.dao.SalesRequisitionItemDao;
 import com.pj.magic.dao.StockQuantityConversionItemDao;
 import com.pj.magic.dao.SupplierDao;
 import com.pj.magic.dao.SystemDao;
+import com.pj.magic.exception.NotEnoughStocksException;
 import com.pj.magic.model.PricingScheme;
 import com.pj.magic.model.Product;
 import com.pj.magic.model.ProductPriceHistory;
@@ -215,6 +216,22 @@ public class ProductServiceImpl implements ProductService {
         	LOGGER.info("Update product as inactive: {}", productCode);
 			productDao.updateActiveIndicator(productCode, false);
 		}
+	}
+
+	@Transactional(noRollbackFor = NotEnoughStocksException.class)
+	@Override
+	public void subtractAvailableQuantity(Product product, int quantity) {
+		Product fromDb = productDao.get(product.getId());
+		if (fromDb.getAvailableQuantity() < quantity) {
+			throw new NotEnoughStocksException(product.getCode());
+		}
+		productDao.subtractAvailableQuantity(product, quantity);
+	}
+
+	@Transactional
+	@Override
+	public void addAvailableQuantity(Product product, int quantity) {
+		productDao.addAvailableQuantity(product, quantity);
 	}
 
 }

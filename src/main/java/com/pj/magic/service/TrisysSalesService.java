@@ -1,5 +1,6 @@
 package com.pj.magic.service;
 
+import java.io.File;
 import java.util.List;
 
 import com.pj.magic.model.TrisysSalesImport;
@@ -15,5 +16,6 @@ public interface TrisysSalesService {
 	TrisysSalesImport findByFile(String file);
 	TrisysSales getTrisysSales(Long id);
 	void saveSalesItem(TrisysSalesItem item);
+	void importTrisysSales(File file) throws Exception;
 	
 }

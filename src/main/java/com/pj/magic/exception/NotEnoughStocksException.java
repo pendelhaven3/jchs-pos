@@ -4,14 +4,22 @@ import com.pj.magic.model.AdjustmentOutItem;
 import com.pj.magic.model.SalesRequisitionItem;
 import com.pj.magic.model.StockQuantityConversionItem;
 
+import lombok.Getter;
+
+@Getter
 public class NotEnoughStocksException extends RuntimeException {
 
 	private SalesRequisitionItem salesRequisitionItem;
 	private StockQuantityConversionItem stockQuantityConversionItem;
 	private AdjustmentOutItem adjustmentOutItem;
+	private String productCode;
 
 	public NotEnoughStocksException() {
 		
+	}
+	
+	public NotEnoughStocksException(String productCode) {
+		this.productCode = productCode;
 	}
 	
 	public NotEnoughStocksException(SalesRequisitionItem item) {
@@ -26,16 +34,4 @@ public class NotEnoughStocksException extends RuntimeException {
 		this.adjustmentOutItem = adjustmentOutItem;
 	}
 
-	public SalesRequisitionItem getSalesRequisitionItem() {
-		return salesRequisitionItem;
-	}
-	
-	public StockQuantityConversionItem getStockQuantityConversionItem() {
-		return stockQuantityConversionItem;
-	}
-	
-	public AdjustmentOutItem getAdjustmentOutItem() {
-		return adjustmentOutItem;
-	}
-	
 }
