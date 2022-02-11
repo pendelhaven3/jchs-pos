@@ -238,7 +238,7 @@ public class MainMenuPanel extends StandardMagicPanel {
         private static final long serialVersionUID = -8941683427387469626L;
 
         private final List<String> allMenuItems = Arrays.asList(
-//				SALES,
+				SALES,
                 PRODUCTS,
 				PURCHASES,
 //                PRODUCT_MAINTENANCE_AND_PRICING_SCHEMES,

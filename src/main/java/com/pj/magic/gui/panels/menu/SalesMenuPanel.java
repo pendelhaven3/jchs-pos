@@ -32,6 +32,7 @@ public class SalesMenuPanel extends MenuPanel {
 	private static final String SALES_INVOICE = "Sales Invoice";
 	private static final String STOCK_QUANTITY_CONVERSION = "Stock Quantity Conversion";
 	private static final String SALES_REQUISITION = "Sales Requisition";
+	private static final String IMPORT_TRISYS_SALES_LIST = "Import Trisys Sales";
 	
 	private MagicListTable table;
 	private MainMenuTableModel tableModel;
@@ -115,6 +116,9 @@ public class SalesMenuPanel extends MenuPanel {
 		case SALES_REQUISITION_SEPARATE_ITEMS_LIST:
 			getMagicFrame().switchToSalesRequisitionSeparateItemsPanel();
 			break;
+		case IMPORT_TRISYS_SALES_LIST:
+			getMagicFrame().switchToImportTrisysSalesListPanel();
+			break;
 		}
 	}
 
@@ -126,14 +130,15 @@ public class SalesMenuPanel extends MenuPanel {
 	private class MainMenuTableModel extends AbstractTableModel {
 
 		private final List<String> menuItems = Arrays.asList(
-				SALES_REQUISITION,
-				STOCK_QUANTITY_CONVERSION,
-				SALES_INVOICE,
-				MARK_SALES_INVOICE,
-				SALES_RETURN,
-				BAD_STOCK_RETURN,
-				NO_MORE_STOCK_ADJUSTMENT,
-				SALES_REQUISITION_SEPARATE_ITEMS_LIST
+//				SALES_REQUISITION,
+//				STOCK_QUANTITY_CONVERSION,
+//				SALES_INVOICE,
+//				MARK_SALES_INVOICE,
+//				SALES_RETURN,
+//				BAD_STOCK_RETURN,
+//				NO_MORE_STOCK_ADJUSTMENT,
+//				SALES_REQUISITION_SEPARATE_ITEMS_LIST,
+				IMPORT_TRISYS_SALES_LIST
 		);
 		
 		@Override

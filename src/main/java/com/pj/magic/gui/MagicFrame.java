@@ -18,102 +18,7 @@ import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.stereotype.Component;
 
 import com.pj.magic.gui.component.CardLayoutPanel;
-import com.pj.magic.gui.panels.AdjustmentInListPanel;
-import com.pj.magic.gui.panels.AdjustmentInPanel;
-import com.pj.magic.gui.panels.AdjustmentOutListPanel;
-import com.pj.magic.gui.panels.AdjustmentOutPanel;
-import com.pj.magic.gui.panels.AdjustmentTypeListPanel;
-import com.pj.magic.gui.panels.AreaInventoryReportListPanel;
-import com.pj.magic.gui.panels.AreaInventoryReportPanel;
-import com.pj.magic.gui.panels.BackupDataPanel;
-import com.pj.magic.gui.panels.BadStockReturnListPanel;
-import com.pj.magic.gui.panels.BadStockReturnPanel;
-import com.pj.magic.gui.panels.BirForm2307ReportListPanel;
-import com.pj.magic.gui.panels.BirForm2307ReportPanel;
-import com.pj.magic.gui.panels.ChangePasswordPanel;
-import com.pj.magic.gui.panels.CreditCardListPanel;
-import com.pj.magic.gui.panels.CreditCardStatementListPanel;
-import com.pj.magic.gui.panels.CreditCardStatementPanel;
-import com.pj.magic.gui.panels.CustomerCheckPaymentsReportPanel;
-import com.pj.magic.gui.panels.CustomerListPanel;
-import com.pj.magic.gui.panels.CustomerSalesSummaryReportPanel;
-import com.pj.magic.gui.panels.DailyProductQuantityDiscrepancyReportListPanel;
-import com.pj.magic.gui.panels.DisbursementReportPanel;
-import com.pj.magic.gui.panels.EwtReportPanel;
-import com.pj.magic.gui.panels.InventoryCheckListPanel;
-import com.pj.magic.gui.panels.InventoryCheckPanel;
-import com.pj.magic.gui.panels.InventoryCorrectionListPanel;
-import com.pj.magic.gui.panels.InventoryCorrectionPanel;
-import com.pj.magic.gui.panels.InventoryReportPanel;
-import com.pj.magic.gui.panels.LoginPanel;
-import com.pj.magic.gui.panels.MainMenuPanel;
-import com.pj.magic.gui.panels.MaintainAdjustmentTypePanel;
-import com.pj.magic.gui.panels.MaintainCreditCardPanel;
-import com.pj.magic.gui.panels.MaintainCustomerPanel;
-import com.pj.magic.gui.panels.MaintainManufacturerPanel;
-import com.pj.magic.gui.panels.MaintainPaymentAdjustmentPanel;
-import com.pj.magic.gui.panels.MaintainPaymentTermPanel;
-import com.pj.magic.gui.panels.MaintainPaymentTerminalAssignmentPanel;
-import com.pj.magic.gui.panels.MaintainPricingSchemePanel;
-import com.pj.magic.gui.panels.MaintainProductCategoryPanel;
-import com.pj.magic.gui.panels.MaintainProductPanel;
-import com.pj.magic.gui.panels.MaintainPurchasePaymentAdjustmentPanel;
-import com.pj.magic.gui.panels.MaintainPurchasePaymentAdjustmentTypePanel;
-import com.pj.magic.gui.panels.MaintainSupplierPanel;
-import com.pj.magic.gui.panels.MaintainUserPanel;
-import com.pj.magic.gui.panels.ManufacturerListPanel;
-import com.pj.magic.gui.panels.MarkSalesInvoicePanel;
-import com.pj.magic.gui.panels.NoMoreStockAdjustmentListPanel;
-import com.pj.magic.gui.panels.NoMoreStockAdjustmentPanel;
-import com.pj.magic.gui.panels.PaymentAdjustmentListPanel;
-import com.pj.magic.gui.panels.PaymentListPanel;
-import com.pj.magic.gui.panels.PaymentPanel;
-import com.pj.magic.gui.panels.PaymentTermListPanel;
-import com.pj.magic.gui.panels.PaymentTerminalAssignmentListPanel;
-import com.pj.magic.gui.panels.PilferageReportPanel;
-import com.pj.magic.gui.panels.PostedSalesAndProfitReportPanel;
-import com.pj.magic.gui.panels.PriceChangesReportPanel;
-import com.pj.magic.gui.panels.PricingSchemeListPanel;
-import com.pj.magic.gui.panels.ProductCanvassPanel;
-import com.pj.magic.gui.panels.ProductCategoryListPanel;
-import com.pj.magic.gui.panels.ProductListPanel;
-import com.pj.magic.gui.panels.ProductQuantityDiscrepancyReportPanel;
-import com.pj.magic.gui.panels.PromoPointsPanel;
-import com.pj.magic.gui.panels.PurchaseOrderListPanel;
-import com.pj.magic.gui.panels.PurchaseOrderPanel;
-import com.pj.magic.gui.panels.PurchasePaymentAdjustmentListPanel;
-import com.pj.magic.gui.panels.PurchasePaymentAdjustmentTypeListPanel;
-import com.pj.magic.gui.panels.PurchasePaymentBankTransfersReportPanel;
-import com.pj.magic.gui.panels.PurchasePaymentCheckPaymentsReportPanel;
-import com.pj.magic.gui.panels.PurchasePaymentCreditCardPaymentsReportPanel;
-import com.pj.magic.gui.panels.PurchasePaymentListPanel;
-import com.pj.magic.gui.panels.PurchasePaymentPanel;
-import com.pj.magic.gui.panels.PurchaseReturnBadStockListPanel;
-import com.pj.magic.gui.panels.PurchaseReturnBadStockPanel;
-import com.pj.magic.gui.panels.PurchaseReturnListPanel;
-import com.pj.magic.gui.panels.PurchaseReturnPanel;
-import com.pj.magic.gui.panels.ReceivingReceiptListPanel;
-import com.pj.magic.gui.panels.ReceivingReceiptPanel;
-import com.pj.magic.gui.panels.ResetPasswordPanel;
-import com.pj.magic.gui.panels.SalesByManufacturerReportPanel;
-import com.pj.magic.gui.panels.SalesInvoiceListPanel;
-import com.pj.magic.gui.panels.SalesInvoicePanel;
-import com.pj.magic.gui.panels.SalesRequisitionListPanel;
-import com.pj.magic.gui.panels.SalesRequisitionPanel;
-import com.pj.magic.gui.panels.SalesRequisitionSeparateItemsPanel;
-import com.pj.magic.gui.panels.SalesReturnListPanel;
-import com.pj.magic.gui.panels.SalesReturnPanel;
-import com.pj.magic.gui.panels.StandardMagicPanel;
-import com.pj.magic.gui.panels.StockCardInventoryReportPanel;
-import com.pj.magic.gui.panels.StockOfftakeReportPanel;
-import com.pj.magic.gui.panels.StockQuantityConversionListPanel;
-import com.pj.magic.gui.panels.StockQuantityConversionPanel;
-import com.pj.magic.gui.panels.SupplierListPanel;
-import com.pj.magic.gui.panels.UnpaidCreditCardPaymentsListPanel;
-import com.pj.magic.gui.panels.UnpaidReceivingReceiptsListPanel;
-import com.pj.magic.gui.panels.UnpaidSalesInvoicesListPanel;
-import com.pj.magic.gui.panels.UploadMaximumStockLevelChangesPanel;
-import com.pj.magic.gui.panels.UserListPanel;
+import com.pj.magic.gui.panels.*;
 import com.pj.magic.gui.panels.menu.AdminMenuPanel;
 import com.pj.magic.gui.panels.menu.InventoryCheckMenuPanel;
 import com.pj.magic.gui.panels.menu.InventoryMenuPanel;
@@ -164,6 +69,8 @@ import com.pj.magic.model.SalesRequisition;
 import com.pj.magic.model.SalesReturn;
 import com.pj.magic.model.StockQuantityConversion;
 import com.pj.magic.model.Supplier;
+import com.pj.magic.model.TrisysSalesImport;
+import com.pj.magic.model.TrisysSales;
 import com.pj.magic.model.User;
 import com.pj.magic.model.report.ProductQuantityDiscrepancyReport;
 import com.pj.magic.service.SystemService;
@@ -310,6 +217,9 @@ public class MagicFrame extends JFrame {
     public static final String EWT_REPORT_PANEL = "EWT_REPORT_LIST_PANEL";
     public static final String BIR_FORM_2307_REPORT_LIST_PANEL = "BIR_FORM_2307_REPORT_LIST_PANEL";
     public static final String BIR_FORM_2307_REPORT_PANEL = "BIR_FORM_2307_REPORT_PANEL";
+    public static final String TRISYS_SALES_IMPORT_LIST_PANEL = "TRISYS_SALES_IMPORT_LIST_PANEL";
+    public static final String TRISYS_SALES_IMPORT_PANEL = "TRISYS_SALES_IMPORT_PANEL";
+    public static final String TRISYS_SALES_PANEL = "TRISYS_SALES_PANEL";
 	
 	@Value("${application.title}")
 	private String baseTitle;
@@ -425,6 +335,9 @@ public class MagicFrame extends JFrame {
     @Autowired private EwtReportPanel ewtReportPanel;
     @Autowired private BirForm2307ReportListPanel birForm2307ReportListPanel;
     @Autowired private BirForm2307ReportPanel birForm2307ReportPanel;
+    @Autowired private TrisysSalesImportListPanel importTrisysSalesListPanel;
+    @Autowired private TrisysSalesImportPanel trisysSalesImportPanel;
+    @Autowired private TrisysSalesPanel trisysSalesPanel;
 	
 	@Autowired private SystemService systemParameterService;
 	@Autowired private DataSource dataSource;
@@ -598,6 +511,9 @@ public class MagicFrame extends JFrame {
         panelHolder.add(ewtReportPanel, EWT_REPORT_PANEL);
         panelHolder.add(birForm2307ReportListPanel, BIR_FORM_2307_REPORT_LIST_PANEL);
         panelHolder.add(birForm2307ReportPanel, BIR_FORM_2307_REPORT_PANEL);
+        panelHolder.add(importTrisysSalesListPanel, TRISYS_SALES_IMPORT_LIST_PANEL);
+        panelHolder.add(trisysSalesImportPanel, TRISYS_SALES_IMPORT_PANEL);
+        panelHolder.add(trisysSalesPanel, TRISYS_SALES_PANEL);
         getContentPane().add(panelHolder);
 
         switchToLoginPanel();
@@ -1407,5 +1323,23 @@ public class MagicFrame extends JFrame {
         birForm2307ReportPanel.updateDisplay(report);
         ((CardLayout)panelHolder.getLayout()).show(panelHolder, BIR_FORM_2307_REPORT_PANEL);
     }
+
+	public void switchToImportTrisysSalesListPanel() {
+        addPanelNameToTitle(importTrisysSalesListPanel.getTitle());
+        importTrisysSalesListPanel.updateDisplay();
+        ((CardLayout)panelHolder.getLayout()).show(panelHolder, TRISYS_SALES_IMPORT_LIST_PANEL);
+	}
+
+	public void switchToTrisysSalesImportPanel(TrisysSalesImport salesImport) {
+        addPanelNameToTitle(trisysSalesImportPanel.getTitle());
+        trisysSalesImportPanel.updateDisplay(salesImport);
+        ((CardLayout)panelHolder.getLayout()).show(panelHolder, TRISYS_SALES_IMPORT_PANEL);
+	}
+
+	public void switchToTrisysSalesPanel(TrisysSales sales) {
+        addPanelNameToTitle(trisysSalesPanel.getTitle());
+        trisysSalesPanel.updateDisplay(sales);
+        ((CardLayout)panelHolder.getLayout()).show(panelHolder, TRISYS_SALES_PANEL);
+	}
     
 }
