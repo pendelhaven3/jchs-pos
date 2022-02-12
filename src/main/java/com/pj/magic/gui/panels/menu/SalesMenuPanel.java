@@ -23,8 +23,6 @@ import com.pj.magic.gui.tables.MagicSubmenuTable;
 @Component
 public class SalesMenuPanel extends MenuPanel {
 
-	private static final String SALES_REQUISITION_SEPARATE_ITEMS_LIST = 
-			"Sales Requisition Separate Items List";
 	private static final String NO_MORE_STOCK_ADJUSTMENT = "No More Stock Adjustment";
 	private static final String BAD_STOCK_RETURN = "Bad Stock Return";
 	private static final String SALES_RETURN = "Sales Return";
@@ -112,9 +110,6 @@ public class SalesMenuPanel extends MenuPanel {
 			break;
 		case NO_MORE_STOCK_ADJUSTMENT:
 			getMagicFrame().switchToNoMoreStockAdjustmentListPanel();
-			break;
-		case SALES_REQUISITION_SEPARATE_ITEMS_LIST:
-			getMagicFrame().switchToSalesRequisitionSeparateItemsPanel();
 			break;
 		case IMPORT_TRISYS_SALES_LIST:
 			getMagicFrame().switchToImportTrisysSalesListPanel();

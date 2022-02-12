@@ -324,7 +324,6 @@ public class MagicFrame extends JFrame {
 	@Autowired private CreditCardStatementListPanel creditCardStatementListPanel;
 	@Autowired private CreditCardStatementPanel creditCardStatementPanel;
 	@Autowired private StockOfftakeReportPanel stockOfftakeReportPanel;
-	@Autowired private SalesRequisitionSeparateItemsPanel salesRequisitionSeparateItemsPanel;
 	@Autowired private PromoRedemptionRebatesPanel promoRedemptionRebatesPanel;
 	@Autowired private UploadMaximumStockLevelChangesPanel uploadMaximumStockLevelChangesPanel;
 	@Autowired private InventoryCorrectionListPanel inventoryCorrectionListPanel;
@@ -499,7 +498,6 @@ public class MagicFrame extends JFrame {
 		panelHolder.add(creditCardStatementListPanel, CREDIT_CARD_STATEMENT_LIST_PANEL);
 		panelHolder.add(creditCardStatementPanel, CREDIT_CARD_STATEMENT_PANEL);
 		panelHolder.add(stockOfftakeReportPanel, STOCK_OFFTAKE_REPORT_PANEL);
-		panelHolder.add(salesRequisitionSeparateItemsPanel, SALES_REQUISITION_SEPARATE_ITEMS_PANEL);
 		panelHolder.add(promoRedemptionRebatesPanel, PROMO_REDEMPTION_REBATES_PANEL);
 		panelHolder.add(uploadMaximumStockLevelChangesPanel, UPLOAD_MAXIMUM_STOCK_LEVEL_CHANGES_PANEL);
 		panelHolder.add(inventoryCorrectionListPanel, INVENTORY_CORRECTION_LIST_PANEL);
@@ -1261,12 +1259,6 @@ public class MagicFrame extends JFrame {
 		addPanelNameToTitle("Stock Offtake Report");
 		stockOfftakeReportPanel.updateDisplay();
 		((CardLayout)panelHolder.getLayout()).show(panelHolder, STOCK_OFFTAKE_REPORT_PANEL);
-	}
-
-	public void switchToSalesRequisitionSeparateItemsPanel() {
-		addPanelNameToTitle("Sales Requisition Separate Items");
-		salesRequisitionSeparateItemsPanel.updateDisplay();
-		((CardLayout)panelHolder.getLayout()).show(panelHolder, SALES_REQUISITION_SEPARATE_ITEMS_PANEL);
 	}
 
 	public void switchToPromoRedemptionRebatesPanel(PromoRedemption promoRedemption) {
