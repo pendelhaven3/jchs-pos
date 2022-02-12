@@ -110,6 +110,7 @@ public class ReceivingReceiptServiceImpl implements ReceivingReceiptService {
 				product.autoCalculateCostsOfSmallerUnits(item.getUnit());
 			}
 			productDao.updateCosts(product);
+			productDao.addAvailableQuantity(product, item.getQuantity());
 			
 			item.setCurrentCost(currentCost);
 			receivingReceiptItemDao.save(item);
