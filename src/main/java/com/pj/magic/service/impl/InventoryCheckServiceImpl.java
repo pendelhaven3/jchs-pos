@@ -9,11 +9,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.pj.magic.dao.AreaInventoryReportItemDao;
 import com.pj.magic.dao.InventoryCheckDao;
 import com.pj.magic.dao.InventoryCheckSummaryItemDao;
+import com.pj.magic.dao.ProductDao;
 import com.pj.magic.dao.SystemDao;
 import com.pj.magic.model.AreaInventoryReportItem;
 import com.pj.magic.model.InventoryCheck;
 import com.pj.magic.model.InventoryCheckSummaryItem;
-import com.pj.magic.model.Product;
 import com.pj.magic.model.search.AreaInventoryReportItemSearchCriteria;
 import com.pj.magic.service.InventoryCheckService;
 
@@ -24,6 +24,7 @@ public class InventoryCheckServiceImpl implements InventoryCheckService {
 	@Autowired private InventoryCheckSummaryItemDao inventoryCheckSummaryItemDao;
 	@Autowired private AreaInventoryReportItemDao areaInventoryReportItemDao;
 	@Autowired private SystemDao systemDao;
+	@Autowired private ProductDao productDao;
 	
 	@Override
 	public List<InventoryCheck> getAllInventoryChecks() {
@@ -70,6 +71,7 @@ public class InventoryCheckServiceImpl implements InventoryCheckService {
 	public void post(InventoryCheck inventoryCheck) {
 		InventoryCheck updated = getInventoryCheck(inventoryCheck.getId());
 		for (InventoryCheckSummaryItem item : updated.getSummaryItems()) {
+			productDao.addAvailableQuantity(item.getProduct(), item.getQuantity());
 			item.setParent(inventoryCheck);
 			inventoryCheckSummaryItemDao.save(item);
 		}
