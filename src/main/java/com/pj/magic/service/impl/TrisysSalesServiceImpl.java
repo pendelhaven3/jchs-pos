@@ -147,25 +147,22 @@ public class TrisysSalesServiceImpl implements TrisysSalesService {
             	Product product = productService.findProductByCode(productCode);
             	if (product != null) {
             		try {
-                    	productService.subtractAvailableQuantity(product, item.getQuantity());
+                    	productService.subtractAvailableQuantity(product, item.getQuantity(), !product.isWholesale());
             		} catch (NotEnoughStocksException e) {
-            			if (!product.isWholesale()) {
-            				Product wholesaleProduct = productService.findProductByCode(product.getCode() + "01");
-            				if (wholesaleProduct != null) {
-            					Product fromDb = productService.findProductByCode(product.getCode());
-            					int quantityToConvert = 1;
-            					while (item.getQuantity() > fromDb.getAvailableQuantity() + product.getUnitConversions().get(1).getQuantity() * quantityToConvert) {
-            						quantityToConvert++;
-            					}
-            					productService.subtractAvailableQuantity(wholesaleProduct, quantityToConvert);
-            					productService.addAvailableQuantity(product, product.getUnitConversions().get(1).getQuantity() * quantityToConvert);
-            					productService.subtractAvailableQuantity(product, item.getQuantity());
-            				} else {
-            					throw e;
-            				}
-            			} else {
-            				throw e;
-            			}
+        				Product wholesaleProduct = productService.findProductByCode(product.getCode() + "01");
+        				if (wholesaleProduct != null && wholesaleProduct.getAvailableQuantity() > 0) {
+        					Product fromDb = productService.findProductByCode(product.getCode());
+        					int quantityToConvert = 1;
+        					while (item.getQuantity() > (fromDb.getAvailableQuantity() + product.getUnitConversions().get(1).getQuantity() * quantityToConvert)
+        							&& wholesaleProduct.getAvailableQuantity() > quantityToConvert) {
+        						quantityToConvert++;
+        					}
+        					productService.subtractAvailableQuantity(wholesaleProduct, quantityToConvert, false);
+        					productService.addAvailableQuantity(product, product.getUnitConversions().get(1).getQuantity() * quantityToConvert);
+        					productService.subtractAvailableQuantity(product, item.getQuantity(), false);
+        				} else {
+                        	productService.subtractAvailableQuantity(product, item.getQuantity(), false);
+        				}
             		}
             	}
             }

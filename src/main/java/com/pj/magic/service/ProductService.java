@@ -63,5 +63,7 @@ public interface ProductService {
 	void subtractAvailableQuantity(Product product, int quantity);
 
 	void addAvailableQuantity(Product product, int quantity);
+
+	void subtractAvailableQuantity(Product product, int quantity, boolean allowNegative);
 	
 }
