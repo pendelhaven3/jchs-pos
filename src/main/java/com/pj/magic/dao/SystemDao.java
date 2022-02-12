@@ -5,5 +5,6 @@ import java.util.Date;
 public interface SystemDao {
 
 	Date getCurrentDateTime();
+	void synchSuppliers();
 	
 }

@@ -220,6 +220,7 @@ public class MagicFrame extends JFrame {
     public static final String TRISYS_SALES_IMPORT_LIST_PANEL = "TRISYS_SALES_IMPORT_LIST_PANEL";
     public static final String TRISYS_SALES_IMPORT_PANEL = "TRISYS_SALES_IMPORT_PANEL";
     public static final String TRISYS_SALES_PANEL = "TRISYS_SALES_PANEL";
+    public static final String ADMIN_MISCELLANEOUS_PANEL = "ADMIN_MISCELLANEOUS_PANEL";
 	
 	@Value("${application.title}")
 	private String baseTitle;
@@ -337,6 +338,7 @@ public class MagicFrame extends JFrame {
     @Autowired private TrisysSalesImportListPanel importTrisysSalesListPanel;
     @Autowired private TrisysSalesImportPanel trisysSalesImportPanel;
     @Autowired private TrisysSalesPanel trisysSalesPanel;
+    @Autowired private AdminMiscellaneousPanel adminMiscellaneousPanel;
 	
 	@Autowired private SystemService systemParameterService;
 	@Autowired private DataSource dataSource;
@@ -512,6 +514,7 @@ public class MagicFrame extends JFrame {
         panelHolder.add(importTrisysSalesListPanel, TRISYS_SALES_IMPORT_LIST_PANEL);
         panelHolder.add(trisysSalesImportPanel, TRISYS_SALES_IMPORT_PANEL);
         panelHolder.add(trisysSalesPanel, TRISYS_SALES_PANEL);
+        panelHolder.add(adminMiscellaneousPanel, ADMIN_MISCELLANEOUS_PANEL);
         getContentPane().add(panelHolder);
 
         switchToLoginPanel();
@@ -1332,6 +1335,11 @@ public class MagicFrame extends JFrame {
         addPanelNameToTitle(trisysSalesPanel.getTitle());
         trisysSalesPanel.updateDisplay(sales);
         ((CardLayout)panelHolder.getLayout()).show(panelHolder, TRISYS_SALES_PANEL);
+	}
+
+	public void switchToAdminMiscellaneousPanel() {
+        addPanelNameToTitle("Admin Miscellaneous");
+        ((CardLayout)panelHolder.getLayout()).show(panelHolder, ADMIN_MISCELLANEOUS_PANEL);
 	}
     
 }
