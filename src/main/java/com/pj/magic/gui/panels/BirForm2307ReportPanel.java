@@ -494,7 +494,7 @@ public class BirForm2307ReportPanel extends StandardMagicPanel {
 				.append(supplier.getName())
 				.append(" - FORM 2307 - ")
 				.append(FormatterUtil.formatDateInFilename(new Date()))
-				.append(".xls")
+				.append(".xlsx")
 				.toString();
 	}
 	
