@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
@@ -34,6 +35,7 @@ import com.pj.magic.gui.dialog.SearchProductsDialog;
 import com.pj.magic.gui.tables.MagicListTable;
 import com.pj.magic.gui.tables.models.ListBackedTableModel;
 import com.pj.magic.model.Product;
+import com.pj.magic.model.Unit;
 import com.pj.magic.model.UnitConversion;
 import com.pj.magic.model.search.ProductSearchCriteria;
 import com.pj.magic.service.ProductService;
@@ -175,6 +177,8 @@ public class ProductListPanel extends StandardMagicPanel {
 		table.requestFocusInWindow();
 		searchProductsDialog.updateDisplay();
 	}
+
+	private List<String> VALID_UNITS = Arrays.asList(Unit.values());
 	
     private void updateProductsFromDbf() {
         fileChooser.setFileFilter(new FileFilter() {
@@ -217,6 +221,16 @@ public class ProductListPanel extends StandardMagicPanel {
                 if ("null".equals(unit2)) {
                     unit2 = null;
                 }
+
+                if (!VALID_UNITS.contains(unit1)) { // TODO: Remove
+                	System.out.println("rejected1: " + nextLine[0]);
+                	continue;
+                }
+                
+                if (!StringUtils.isEmpty(unit2) && !VALID_UNITS.contains(unit2)) {  // TODO: Remove
+                	System.out.println("rejected2: " + nextLine[0]);
+                	continue;
+                }
                 
                 int unitConversion1 = (int)Float.parseFloat(nextLine[13]);
                 int unitConversion2 = 0;
@@ -232,7 +246,7 @@ public class ProductListPanel extends StandardMagicPanel {
                     product.getUnits().add(unit2);
                 }
                 product.getUnitConversions().add(new UnitConversion(unit1, unitConversion1));
-                if (!StringUtils.isEmpty(nextLine[14])) {
+                if (!StringUtils.isEmpty(nextLine[9]) && !"null".equals(nextLine[9])) {
                     product.getUnitConversions().add(new UnitConversion(unit2, unitConversion2));
                 }
                 

@@ -28,6 +28,7 @@ import com.pj.magic.model.Supplier;
 import com.pj.magic.model.search.ProductSearchCriteria;
 import com.pj.magic.repository.DailyProductStartingQuantityRepository;
 import com.pj.magic.service.LoginService;
+import com.pj.magic.service.Product2Service;
 import com.pj.magic.service.ProductService;
 
 @Service
@@ -48,6 +49,7 @@ public class ProductServiceImpl implements ProductService {
 	@Autowired private LoginService loginService;
 	@Autowired private DailyProductStartingQuantityRepository dailyProductStartingQuantityRepository;
 	@Autowired private SystemDao systemDao;
+	@Autowired private Product2Service product2Service;
 	
 	@Override
 	public List<Product> getAllProducts() {
@@ -187,13 +189,24 @@ public class ProductServiceImpl implements ProductService {
     public void updateProduct(Product product) {
 	    Product existing = productDao.findByCode(product.getCode());
 	    if (existing == null) {
+	    	product.setProduct2Id(product2Service.saveFromTrisys(product));
 	        productDao.save(product);
-	    } else if (!existing.areFieldsEqual(product)) {
-            product.setId(existing.getId());
-            product.setMinimumStockLevel(existing.getMinimumStockLevel());
-            product.setMaximumStockLevel(existing.getMaximumStockLevel());
-            product.setActive(true);
-            productDao.save(product);
+	    } else {
+	    	boolean shouldUpdate = !existing.areFieldsEqual(product) 
+	    			|| existing.getProduct2Id() == null
+	    			|| !existing.hasActiveUnit(product.getUnits().get(0));
+	    		
+			if (shouldUpdate) {
+	            product.setId(existing.getId());
+	            product.setActiveUnits(product.getUnits());
+		    	product.setProduct2Id(product2Service.saveFromTrisys(product));
+	            productDao.save(product);
+			} else {
+				Product product2 = product2Service.getProduct(existing.getProduct2Id());
+				if (!product2.hasActiveUnit(product.getUnits().get(0))) {
+					productDao.updateActiveIndicator(product.getCode(), true);
+				}
+			}
 	    }
     }
 

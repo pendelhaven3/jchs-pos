@@ -40,11 +40,7 @@ public class Product implements Comparable<Product>, Serializable {
 	private List<UnitCost> unitCosts = new ArrayList<>();
 	private BigDecimal companyListPrice;
 	private int availableQuantity;
-	private String skuCase;
-	private String skuTies;
-	private String skuPack;
-	private String skuHdzn;
-	private String skuPieces;
+	private Long product2Id;
 
 	public Product() {
 	}
@@ -231,6 +227,12 @@ public class Product implements Comparable<Product>, Serializable {
 	public void addUnit(String unit) {
 		if (!units.contains(unit)) {
 			units.add(unit);
+		}
+	}
+
+	public void addActiveUnit(String unit) {
+		if (!activeUnits.contains(unit)) {
+			activeUnits.add(unit);
 		}
 	}
 

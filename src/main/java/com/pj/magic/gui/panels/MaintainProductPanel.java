@@ -935,11 +935,11 @@ public class MaintainProductPanel extends StandardMagicPanel {
 		
 //		companyListPriceField.setText(FormatterUtil.formatAmount(product.getCompanyListPrice()));
 		
-		caseSkuField.setText(product.getSkuCase());
-		tiesSkuField.setText(product.getSkuTies());
-		packSkuField.setText(product.getSkuPack());
-		hdznSkuField.setText(product.getSkuHdzn());
-		piecesSkuField.setText(product.getSkuPieces());
+		caseSkuField.setText(null);
+		tiesSkuField.setText(null);
+		packSkuField.setText(null);
+		hdznSkuField.setText(null);
+		piecesSkuField.setText(null);
 		
 		productSuppliersTable.updateDisplay(product);
 		addSupplierButton.setEnabled(true);
