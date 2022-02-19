@@ -259,7 +259,7 @@ public class SelectProductDialog extends MagicDialog {
 		private static final int UNIT_PRICE_COLUMN_INDEX = 2;
 		
 		private final String[] columnNames = {"Unit", "Quantity", "Price"};
-		private final String[] units = {Unit.CASE, Unit.TIE, Unit.CARTON, Unit.DOZEN, Unit.PIECES};
+		private final String[] units = {Unit.CASE, Unit.TIES, Unit.PACK, Unit.HDZN, Unit.PIECES};
 		
 		private Product product;
 		
@@ -320,7 +320,7 @@ public class SelectProductDialog extends MagicDialog {
 		private static final int QUANTITY_COLUMN_INDEX = 1;
 		private static final int UNIT_COST_COLUMN_INDEX = 2;
 		private final String[] columnNames = {"Unit", "Quantity", "Cost"};
-		private final String[] units = {Unit.CASE, Unit.TIE, Unit.CARTON, Unit.DOZEN, Unit.PIECES};
+		private final String[] units = {Unit.CASE, Unit.TIES, Unit.PACK, Unit.HDZN, Unit.PIECES};
 		
 		private Product product;
 		

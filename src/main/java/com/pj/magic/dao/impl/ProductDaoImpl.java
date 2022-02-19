@@ -9,7 +9,6 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -25,22 +24,106 @@ import com.pj.magic.model.Supplier;
 import com.pj.magic.model.Unit;
 import com.pj.magic.model.UnitConversion;
 import com.pj.magic.model.UnitCost;
+import com.pj.magic.model.UnitPrice;
+import com.pj.magic.model.UnitQuantity;
 import com.pj.magic.model.search.ProductSearchCriteria;
-import com.pj.magic.util.NumberUtil;
 
 @Repository
 public class ProductDaoImpl extends MagicDao implements ProductDao {
 	
 	private static final String BASE_SELECT_SQL =
-			"select a.ID, a.CODE, a.DESCRIPTION,"
-			+ " a.UOM_CODE, a.UOM_CODE1, a.UOM_QTY, a.UOM_QTY1,"
+			"select a.ID, a.DESCRIPTION,"
+			+ " a.SKU_CASE, a.SKU_TIES, a.SKU_PACK, a.SKU_HDZN, a.SKU_PCS,"
+			+ " UNIT_IND_CASE, UNIT_IND_TIES, UNIT_IND_PACK, UNIT_IND_HDZN, UNIT_IND_PCS,"
+			+ " ACTIVE_UNIT_IND_CASE, ACTIVE_UNIT_IND_TIES, ACTIVE_UNIT_IND_PACK, ACTIVE_UNIT_IND_HDZN, ACTIVE_UNIT_IND_PCS,"
+			+ " 0 as UNIT_PRICE_CASE, 0 as UNIT_PRICE_TIES, 0 as UNIT_PRICE_PACK, 0 as UNIT_PRICE_HDZN, 0 as UNIT_PRICE_PCS,"
+			+ " AVAIL_QTY_CASE, AVAIL_QTY_TIES, AVAIL_QTY_PACK, AVAIL_QTY_HDZN, AVAIL_QTY_PCS,"
+			+ " UNIT_CONV_CASE, UNIT_CONV_TIES, UNIT_CONV_PACK, UNIT_CONV_HDZN, UNIT_CONV_PCS,"
+			+ " GROSS_COST_CASE, GROSS_COST_TIES, GROSS_COST_PACK, GROSS_COST_HDZN, GROSS_COST_PCS,"
+			+ " FINAL_COST_CASE, FINAL_COST_TIES, FINAL_COST_PACK, FINAL_COST_HDZN, FINAL_COST_PCS,"
 			+ " MAX_STOCK_LEVEL, MIN_STOCK_LEVEL,"
-			+ " a.GROSS_COST, a.GROSS_COST1, a.FINAL_COST, a.FINAL_COST1,"
-			+ " a.ACTIVE_IND, a.AVAIL_QTY"
+			+ " a.ACTIVE_IND"
 			+ " from PRODUCT a"
 			+ " where 1 = 1";
 	
-	private ProductRowMapper productRowMapper = new ProductRowMapper();
+	private RowMapper<Product> productRowMapper = new RowMapper<Product>() {
+
+		@Override
+		public Product mapRow(ResultSet rs, int rowNum) throws SQLException {
+			Product product = new Product();
+			product.setId(rs.getLong("ID"));
+//            product.setCode(rs.getString("CODE"));
+			product.setDescription(rs.getString("DESCRIPTION"));
+			product.setMaximumStockLevel(rs.getInt("MAX_STOCK_LEVEL"));
+			product.setMinimumStockLevel(rs.getInt("MIN_STOCK_LEVEL"));
+			product.setActive("Y".equals(rs.getString("ACTIVE_IND")));
+			
+			if ("Y".equals(rs.getString("UNIT_IND_CASE"))) {
+				product.getUnits().add(Unit.CASE);
+				product.getUnitPrices().add(new UnitPrice(Unit.CASE, rs.getBigDecimal("UNIT_PRICE_CASE")));
+				product.getUnitQuantities().add(new UnitQuantity(Unit.CASE, rs.getInt("AVAIL_QTY_CASE")));
+				product.getUnitConversions().add(new UnitConversion(Unit.CASE, rs.getInt("UNIT_CONV_CASE")));
+				product.getUnitCosts().add(
+						new UnitCost(Unit.CASE, rs.getBigDecimal("GROSS_COST_CASE"), rs.getBigDecimal("FINAL_COST_CASE")));
+				if ("Y".equals(rs.getString("ACTIVE_UNIT_IND_CASE"))) {
+					product.getActiveUnits().add(Unit.CASE);
+				}
+			}
+			if ("Y".equals(rs.getString("UNIT_IND_TIES"))) {
+				product.getUnits().add(Unit.TIES);
+				product.getUnitPrices().add(new UnitPrice(Unit.TIES, rs.getBigDecimal("UNIT_PRICE_TIES")));
+				product.getUnitQuantities().add(new UnitQuantity(Unit.TIES, rs.getInt("AVAIL_QTY_TIES")));
+				product.getUnitConversions().add(new UnitConversion(Unit.TIES, rs.getInt("UNIT_CONV_TIES")));
+				product.getUnitCosts().add(
+						new UnitCost(Unit.TIES, rs.getBigDecimal("GROSS_COST_TIES"), rs.getBigDecimal("FINAL_COST_TIES")));
+				if ("Y".equals(rs.getString("ACTIVE_UNIT_IND_TIES"))) {
+					product.getActiveUnits().add(Unit.TIES);
+				}
+			}
+			if ("Y".equals(rs.getString("UNIT_IND_PACK"))) {
+				product.getUnits().add(Unit.PACK);
+				product.getUnitPrices().add(new UnitPrice(Unit.PACK, rs.getBigDecimal("UNIT_PRICE_PACK")));
+				product.getUnitQuantities().add(new UnitQuantity(Unit.PACK, rs.getInt("AVAIL_QTY_PACK")));
+				product.getUnitConversions().add(new UnitConversion(Unit.PACK, rs.getInt("UNIT_CONV_PACK")));
+				product.getUnitCosts().add(
+						new UnitCost(Unit.PACK, rs.getBigDecimal("GROSS_COST_PACK"), rs.getBigDecimal("FINAL_COST_PACK")));
+				if ("Y".equals(rs.getString("ACTIVE_UNIT_IND_PACK"))) {
+					product.getActiveUnits().add(Unit.PACK);
+				}
+			}
+			if ("Y".equals(rs.getString("UNIT_IND_HDZN"))) {
+				product.getUnits().add(Unit.HDZN);
+				product.getUnitPrices().add(new UnitPrice(Unit.HDZN, rs.getBigDecimal("UNIT_PRICE_HDZN")));
+				product.getUnitQuantities().add(new UnitQuantity(Unit.HDZN, rs.getInt("AVAIL_QTY_HDZN")));
+				product.getUnitConversions().add(new UnitConversion(Unit.HDZN, rs.getInt("UNIT_CONV_HDZN")));
+				product.getUnitCosts().add(
+						new UnitCost(Unit.HDZN, rs.getBigDecimal("GROSS_COST_HDZN"), rs.getBigDecimal("FINAL_COST_HDZN")));
+				if ("Y".equals(rs.getString("ACTIVE_UNIT_IND_HDZN"))) {
+					product.getActiveUnits().add(Unit.HDZN);
+				}
+			}
+			if ("Y".equals(rs.getString("UNIT_IND_PCS"))) {
+				product.getUnits().add(Unit.PIECES);
+				product.getUnitPrices().add(new UnitPrice(Unit.PIECES, rs.getBigDecimal("UNIT_PRICE_PCS")));
+				product.getUnitQuantities().add(new UnitQuantity(Unit.PIECES, rs.getInt("AVAIL_QTY_PCS")));
+				product.getUnitConversions().add(new UnitConversion(Unit.PIECES, rs.getInt("UNIT_CONV_PCS")));
+				product.getUnitCosts().add(
+						new UnitCost(Unit.PIECES, rs.getBigDecimal("GROSS_COST_PCS"), rs.getBigDecimal("FINAL_COST_PCS")));
+				if ("Y".equals(rs.getString("ACTIVE_UNIT_IND_PCS"))) {
+					product.getActiveUnits().add(Unit.PIECES);
+				}
+			}
+			
+			product.setSkuCase(rs.getString("SKU_CASE"));
+			product.setSkuTies(rs.getString("SKU_TIES"));
+			product.setSkuPack(rs.getString("SKU_PACK"));
+			product.setSkuHdzn(rs.getString("SKU_HDZN"));
+			product.setSkuPieces(rs.getString("SKU_PCS"));
+			
+			return product;
+		}
+		
+	};
 	
     private static final String FIND_ALL_SQL = BASE_SELECT_SQL + " order by DESCRIPTION";
 	
@@ -67,39 +150,6 @@ public class ProductDaoImpl extends MagicDao implements ProductDao {
 		return getJdbcTemplate().queryForObject(FIND_BY_ID_SQL, productRowMapper, id);
 	}
 
-	private class ProductRowMapper implements RowMapper<Product> {
-
-		@Override
-		public Product mapRow(ResultSet rs, int rowNum) throws SQLException {
-			Product product = new Product();
-			product.setId(rs.getLong("ID"));
-            product.setCode(rs.getString("CODE"));
-			product.setDescription(rs.getString("DESCRIPTION"));
-			product.setMaximumStockLevel(rs.getInt("MAX_STOCK_LEVEL"));
-			product.setMinimumStockLevel(rs.getInt("MIN_STOCK_LEVEL"));
-			product.setActive("Y".equals(rs.getString("ACTIVE_IND")));
-			product.setAvailableQuantity(rs.getInt("AVAIL_QTY"));
-			
-			String unit1 = rs.getString("UOM_CODE");
-			String unit2 = rs.getString("UOM_CODE1");
-			
-			product.getUnits().add(unit1);
-            product.getUnitConversions().add(new UnitConversion(unit1, rs.getInt("UOM_QTY")));
-            product.getUnitCosts().add(new UnitCost(unit1, NumberUtil.nvl(rs.getBigDecimal("GROSS_COST")), 
-                    NumberUtil.nvl(rs.getBigDecimal("FINAL_COST"))));
-            
-            if (!StringUtils.isEmpty(unit2)) {
-                product.getUnits().add(unit2);
-                product.getUnitConversions().add(new UnitConversion(unit2, rs.getInt("UOM_QTY1")));
-                product.getUnitCosts().add(new UnitCost(unit2, NumberUtil.nvl(rs.getBigDecimal("GROSS_COST1")), 
-                        NumberUtil.nvl(rs.getBigDecimal("FINAL_COST1"))));
-            }
-			
-			return product;
-		}
-		
-	}
-
 	private static final String UPDATE_AVAILABLE_QUANTITIES_SQL =
 			"update PRODUCT"
 			+ " set AVAIL_QTY_CSE = ?, AVAIL_QTY_CTN = ?, AVAIL_QTY_TIE = ?, AVAIL_QTY_DOZ = ?, AVAIL_QTY_PCS = ?"
@@ -109,9 +159,9 @@ public class ProductDaoImpl extends MagicDao implements ProductDao {
 	public void updateAvailableQuantities(Product product) {
 		getJdbcTemplate().update(UPDATE_AVAILABLE_QUANTITIES_SQL,
 				product.getUnitQuantity(Unit.CASE),
-				product.getUnitQuantity(Unit.CARTON),
-				product.getUnitQuantity(Unit.TIE),
-				product.getUnitQuantity(Unit.DOZEN),
+				product.getUnitQuantity(Unit.PACK),
+				product.getUnitQuantity(Unit.TIES),
+				product.getUnitQuantity(Unit.HDZN),
 				product.getUnitQuantity(Unit.PIECES),
 				product.getId());
 	}
@@ -279,13 +329,6 @@ public class ProductDaoImpl extends MagicDao implements ProductDao {
 		}
 	}
 
-	private static final String DELETE_SQL = "delete from PRODUCT where ID = ?";
-	
-	@Override
-	public void delete(Product product) {
-		getJdbcTemplate().update(DELETE_SQL, product.getId());
-	}
-
 	private static final String UPDATE_MAXIMUM_STOCK_LEVEL_SQL = 
 			"update PRODUCT set MAX_STOCK_LEVEL = ? where ID = ?";
 	
@@ -298,10 +341,16 @@ public class ProductDaoImpl extends MagicDao implements ProductDao {
 		
 		getJdbcTemplate().batchUpdate(UPDATE_MAXIMUM_STOCK_LEVEL_SQL, params);
 	}
+	
+	private static final String GET_ALL_ACTIVE_PRODUCT_CODES_SQL =
+			"select a.CODE from PRODUCT_SKU a"
+			+ " join PRODUCT b"
+			+ "   on b.ID = a.PRODUCT_ID"
+			+ " where b.ACTIVE_IND = 'Y'";
 
 	@Override
 	public List<String> getAllActiveProductCodes() {
-		return getJdbcTemplate().queryForList("select CODE from PRODUCT where ACTIVE_IND = 'Y'", String.class);
+		return getJdbcTemplate().queryForList(GET_ALL_ACTIVE_PRODUCT_CODES_SQL, String.class);
 	}
 
 	@Override

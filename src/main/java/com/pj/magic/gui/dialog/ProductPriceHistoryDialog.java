@@ -121,13 +121,13 @@ public class ProductPriceHistoryDialog extends MagicDialog {
 				BigDecimal unitPriceCase = history.getUnitPrice(Unit.CASE);
 				return (unitPriceCase != null) ? FormatterUtil.formatAmount(unitPriceCase) : null;
 			case UNIT_PRICE_TIE_COLUMN_INDEX:
-				BigDecimal unitPriceTie = history.getUnitPrice(Unit.TIE);
+				BigDecimal unitPriceTie = history.getUnitPrice(Unit.TIES);
 				return (unitPriceTie != null) ? FormatterUtil.formatAmount(unitPriceTie) : null;
 			case UNIT_PRICE_CARTON_COLUMN_INDEX:
-				BigDecimal unitPriceCarton = history.getUnitPrice(Unit.CARTON);
+				BigDecimal unitPriceCarton = history.getUnitPrice(Unit.PACK);
 				return (unitPriceCarton != null) ? FormatterUtil.formatAmount(unitPriceCarton) : null;
 			case UNIT_PRICE_DOZEN_COLUMN_INDEX:
-				BigDecimal unitPriceDozen = history.getUnitPrice(Unit.DOZEN);
+				BigDecimal unitPriceDozen = history.getUnitPrice(Unit.HDZN);
 				return (unitPriceDozen != null) ? FormatterUtil.formatAmount(unitPriceDozen) : null;
 			case UNIT_PRICE_PIECES_COLUMN_INDEX:
 				BigDecimal unitPricePieces = history.getUnitPrice(Unit.PIECES);

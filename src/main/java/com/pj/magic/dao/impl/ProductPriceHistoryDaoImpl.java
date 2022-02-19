@@ -51,14 +51,14 @@ public class ProductPriceHistoryDaoImpl extends MagicDao implements ProductPrice
 				history.getProduct().getId(),
 				history.getUpdatedBy().getId(),
 				history.getUnitPrice(Unit.CASE),
-				history.getUnitPrice(Unit.TIE),
-				history.getUnitPrice(Unit.CARTON),
-				history.getUnitPrice(Unit.DOZEN),
+				history.getUnitPrice(Unit.TIES),
+				history.getUnitPrice(Unit.PACK),
+				history.getUnitPrice(Unit.HDZN),
 				history.getUnitPrice(Unit.PIECES),
 				history.getPreviousUnitPrice(Unit.CASE),
-				history.getPreviousUnitPrice(Unit.TIE),
-				history.getPreviousUnitPrice(Unit.CARTON),
-				history.getPreviousUnitPrice(Unit.DOZEN),
+				history.getPreviousUnitPrice(Unit.TIES),
+				history.getPreviousUnitPrice(Unit.PACK),
+				history.getPreviousUnitPrice(Unit.HDZN),
 				history.getPreviousUnitPrice(Unit.PIECES)
 		);
 	}
@@ -95,17 +95,17 @@ public class ProductPriceHistoryDaoImpl extends MagicDao implements ProductPrice
 			
 			BigDecimal unitPriceTie = rs.getBigDecimal("UNIT_PRICE_TIE");
 			if (unitPriceTie != null) {
-				history.getUnitPrices().add(new UnitPrice(Unit.TIE, unitPriceTie));
+				history.getUnitPrices().add(new UnitPrice(Unit.TIES, unitPriceTie));
 			}
 			
 			BigDecimal unitPriceCarton = rs.getBigDecimal("UNIT_PRICE_CTN");
 			if (unitPriceCarton != null) {
-				history.getUnitPrices().add(new UnitPrice(Unit.CARTON, unitPriceCarton));
+				history.getUnitPrices().add(new UnitPrice(Unit.PACK, unitPriceCarton));
 			}
 
 			BigDecimal unitPriceDozen = rs.getBigDecimal("UNIT_PRICE_DOZ");
 			if (unitPriceDozen != null) {
-				history.getUnitPrices().add(new UnitPrice(Unit.DOZEN, unitPriceDozen));
+				history.getUnitPrices().add(new UnitPrice(Unit.HDZN, unitPriceDozen));
 			}
 
 			BigDecimal unitPricePieces = rs.getBigDecimal("UNIT_PRICE_PCS");
@@ -116,15 +116,15 @@ public class ProductPriceHistoryDaoImpl extends MagicDao implements ProductPrice
 			history.setPreviousUnitPrices(getPreviousUnitPrices(rs));
 			
 			if ("Y".equals(rs.getString("ACTIVE_UNIT_IND_TIE"))) {
-				history.getActiveUnits().add(Unit.TIE);
+				history.getActiveUnits().add(Unit.TIES);
 			}
 			
 			if ("Y".equals(rs.getString("ACTIVE_UNIT_IND_CTN"))) {
-				history.getActiveUnits().add(Unit.CARTON);
+				history.getActiveUnits().add(Unit.PACK);
 			}
 			
 			if ("Y".equals(rs.getString("ACTIVE_UNIT_IND_DOZ"))) {
-				history.getActiveUnits().add(Unit.DOZEN);
+				history.getActiveUnits().add(Unit.HDZN);
 			}
 			
 			if ("Y".equals(rs.getString("ACTIVE_UNIT_IND_PCS"))) {
@@ -144,17 +144,17 @@ public class ProductPriceHistoryDaoImpl extends MagicDao implements ProductPrice
 			
 			BigDecimal unitPriceTie = rs.getBigDecimal("PREV_UNIT_PRICE_TIE");
 			if (unitPriceTie != null) {
-				unitPrices.add(new UnitPrice(Unit.TIE, unitPriceTie));
+				unitPrices.add(new UnitPrice(Unit.TIES, unitPriceTie));
 			}
 			
 			BigDecimal unitPriceCarton = rs.getBigDecimal("PREV_UNIT_PRICE_CTN");
 			if (unitPriceCarton != null) {
-				unitPrices.add(new UnitPrice(Unit.CARTON, unitPriceCarton));
+				unitPrices.add(new UnitPrice(Unit.PACK, unitPriceCarton));
 			}
 
 			BigDecimal unitPriceDozen = rs.getBigDecimal("PREV_UNIT_PRICE_DOZ");
 			if (unitPriceDozen != null) {
-				unitPrices.add(new UnitPrice(Unit.DOZEN, unitPriceDozen));
+				unitPrices.add(new UnitPrice(Unit.HDZN, unitPriceDozen));
 			}
 
 			BigDecimal unitPricePieces = rs.getBigDecimal("PREV_UNIT_PRICE_PCS");

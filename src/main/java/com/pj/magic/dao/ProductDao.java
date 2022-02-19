@@ -31,8 +31,6 @@ public interface ProductDao {
 	
 	Product findByCodeAndPricingScheme(String code, PricingScheme pricingScheme);
 
-	void delete(Product product);
-	
 	void updateMaximumStockLevel(List<Product> products);
 
 	List<String> getAllActiveProductCodes();

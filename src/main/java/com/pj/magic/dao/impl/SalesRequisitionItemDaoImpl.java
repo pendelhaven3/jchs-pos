@@ -147,16 +147,16 @@ public class SalesRequisitionItemDaoImpl extends MagicDao implements SalesRequis
 				product.setUnitPrice(Unit.CASE, rs.getBigDecimal("UNIT_PRICE_CSE"));
 			}
 			if ("Y".equals(rs.getString("UNIT_IND_TIE"))) {
-				product.addUnit(Unit.TIE);
-				product.setUnitPrice(Unit.TIE, rs.getBigDecimal("UNIT_PRICE_TIE"));
+				product.addUnit(Unit.TIES);
+				product.setUnitPrice(Unit.TIES, rs.getBigDecimal("UNIT_PRICE_TIE"));
 			}
 			if ("Y".equals(rs.getString("UNIT_IND_CTN"))) {
-				product.addUnit(Unit.CARTON);
-				product.setUnitPrice(Unit.CARTON, rs.getBigDecimal("UNIT_PRICE_CTN"));
+				product.addUnit(Unit.PACK);
+				product.setUnitPrice(Unit.PACK, rs.getBigDecimal("UNIT_PRICE_CTN"));
 			}
 			if ("Y".equals(rs.getString("UNIT_IND_DOZ"))) {
-				product.addUnit(Unit.DOZEN);
-				product.setUnitPrice(Unit.DOZEN, rs.getBigDecimal("UNIT_PRICE_DOZ"));
+				product.addUnit(Unit.HDZN);
+				product.setUnitPrice(Unit.HDZN, rs.getBigDecimal("UNIT_PRICE_DOZ"));
 			}
 			if ("Y".equals(rs.getString("UNIT_IND_PCS"))) {
 				product.addUnit(Unit.PIECES);

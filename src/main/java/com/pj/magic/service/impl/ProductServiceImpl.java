@@ -160,14 +160,6 @@ public class ProductServiceImpl implements ProductService {
 				areaInventoryReportItemDao.findFirstByProduct(product) == null;
 	}
 
-	@Transactional
-	@Override
-	public void deleteProduct(Product product) {
-		supplierDao.deleteAllByProduct(product);
-		productPriceDao.deleteAllByProduct(product);
-		productDao.delete(product);
-	}
-
 	@Override
 	public List<ProductPriceHistory> getProductPriceHistory(Product product, PricingScheme pricingScheme) {
 		return productPriceHistoryDao.findAllByProductAndPricingScheme(product, pricingScheme);

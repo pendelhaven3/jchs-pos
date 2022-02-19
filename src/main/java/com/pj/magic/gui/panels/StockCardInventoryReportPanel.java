@@ -108,7 +108,7 @@ public class StockCardInventoryReportPanel extends StandardMagicPanel {
 		toDateModel = new UtilCalendarModel();
 		
 		unitComboBox = new JComboBox<>(
-				new String[] {null, Unit.PIECES, Unit.DOZEN, Unit.CARTON, Unit.TIE, Unit.CASE});
+				new String[] {null, Unit.PIECES, Unit.HDZN, Unit.PACK, Unit.TIES, Unit.CASE});
 		fromLastInventoryCheckCheckBox = new JCheckBox();
 		
 		salesInvoiceTransactionTypeCheckBox = new JCheckBox();

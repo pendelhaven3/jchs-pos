@@ -78,13 +78,13 @@ public class PromoRedemptionRewardDaoImpl extends MagicDao implements PromoRedem
 			case Unit.CASE:
 				finalCost = rs.getBigDecimal("FINAL_COST_CSE");
 				break;
-			case Unit.TIE:
+			case Unit.TIES:
 				finalCost = rs.getBigDecimal("FINAL_COST_TIE");
 				break;
-			case Unit.CARTON:
+			case Unit.PACK:
 				finalCost = rs.getBigDecimal("FINAL_COST_CTN");
 				break;
-			case Unit.DOZEN:
+			case Unit.HDZN:
 				finalCost = rs.getBigDecimal("FINAL_COST_DOZ");
 				break;
 			case Unit.PIECES:

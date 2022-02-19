@@ -14,6 +14,11 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import com.pj.magic.Constants;
 import com.pj.magic.util.NumberUtil;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class Product implements Comparable<Product>, Serializable {
 
     private static final long serialVersionUID = -6522062463737148407L;
@@ -35,6 +40,11 @@ public class Product implements Comparable<Product>, Serializable {
 	private List<UnitCost> unitCosts = new ArrayList<>();
 	private BigDecimal companyListPrice;
 	private int availableQuantity;
+	private String skuCase;
+	private String skuTies;
+	private String skuPack;
+	private String skuHdzn;
+	private String skuPieces;
 
 	public Product() {
 	}

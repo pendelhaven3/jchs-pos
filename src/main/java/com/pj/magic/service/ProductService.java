@@ -43,8 +43,6 @@ public interface ProductService {
 
 	boolean canDeleteProduct(Product product);
 
-	void deleteProduct(Product product);
-
 	List<ProductPriceHistory> getProductPriceHistory(Product product, PricingScheme pricingScheme);
 
 	void updateMaximumStockLevel(List<Product> products);
