@@ -10,6 +10,16 @@ create table SYSTEM_PARAMETER (
   constraint SYSTEM_PARAMETER$PK primary key (NAME)
 );
 
+create table USER (
+  ID integer auto_increment,
+  USERNAME varchar(15) not null,
+  PASSWORD varchar(100) not null,
+  SUPERVISOR_IND char(1) default 'Y' not null,
+  MODIFY_PRICING_IND char(1) default 'Y' not null,
+  constraint USER$PK primary key (ID),
+  constraint USER$UK unique (USERNAME)
+);
+
 create table PRODUCT (
   ID integer auto_increment,
   CODE varchar(14) not null,
@@ -24,8 +34,10 @@ create table PRODUCT (
   FINAL_COST1 numeric(9,2) null,
   MAX_STOCK_LEVEL integer(4) default 0,
   MIN_STOCK_LEVEL integer(4) default 0,
+  ACTIVE_IND char(1) default 'Y',
+  AVAIL_QTY integer(4) default 0 not null,
   constraint PRODUCT$PK primary key (ID),
-  constraint PRODUCT$CODE$UK unique (CODE)
+  constraint PRODUCT$UK unique (CODE)
 );
 
 create table PAYMENT_TERM (
@@ -74,12 +86,13 @@ create table PURCHASE_ORDER (
   REMARKS varchar(100) null,
   REFERENCE_NO varchar(30) null,
   POST_DT date null,
-  CREATED_BY integer null,
+  CREATED_BY integer not null,
   VAT_INCLUSIVE char(1) default 'Y' not null,
   constraint PURCHASE_ORDER$PK primary key (ID),
   constraint PURCHASE_ORDER$UK unique (PURCHASE_ORDER_NO),
   constraint PURCHASE_ORDER$FK foreign key (SUPPLIER_ID) references SUPPLIER (ID),
-  constraint PURCHASE_ORDER$FK2 foreign key (PAYMENT_TERM_ID) references PAYMENT_TERM (ID)
+  constraint PURCHASE_ORDER$FK2 foreign key (PAYMENT_TERM_ID) references PAYMENT_TERM (ID),
+  constraint PURCHASE_ORDER$FK3 foreign key (CREATED_BY) references USER (ID)
 );
 
 create table PURCHASE_ORDER_ITEM (
@@ -107,7 +120,7 @@ create table RECEIVING_RECEIPT (
   REMARKS varchar(100) null,
   REFERENCE_NO varchar(30) null,
   RECEIVED_DT datetime not null,
-  RECEIVED_BY integer null,
+  RECEIVED_BY integer not null,
   RELATED_PURCHASE_ORDER_NO integer not null,
   VAT_INCLUSIVE char(1) not null,
   VAT_RATE numeric(4, 2) not null,
@@ -118,7 +131,10 @@ create table RECEIVING_RECEIPT (
   constraint RECEIVING_RECEIPT$UK unique (RECEIVING_RECEIPT_NO),
   constraint RECEIVING_RECEIPT$FK foreign key (SUPPLIER_ID) references SUPPLIER (ID),
   constraint RECEIVING_RECEIPT$FK2 foreign key (PAYMENT_TERM_ID) references PAYMENT_TERM (ID),
-  constraint RECEIVING_RECEIPT$FK4 foreign key (RELATED_PURCHASE_ORDER_NO) references PURCHASE_ORDER (PURCHASE_ORDER_NO)
+  constraint RECEIVING_RECEIPT$FK3 foreign key (RELATED_PURCHASE_ORDER_NO) references PURCHASE_ORDER (PURCHASE_ORDER_NO),
+  constraint RECEIVING_RECEIPT$FK4 foreign key (RECEIVED_BY) references USER (ID),
+  constraint RECEIVING_RECEIPT$FK5 foreign key (POST_BY) references USER (ID),
+  constraint RECEIVING_RECEIPT$FK6 foreign key (CANCEL_BY) references USER (ID)
 );
 
 create table RECEIVING_RECEIPT_ITEM (
@@ -138,6 +154,30 @@ create table RECEIVING_RECEIPT_ITEM (
   constraint RECEIVING_RECEIPT_ITEM$FK2 foreign key (PRODUCT_ID) references PRODUCT (ID)
 );
 
+create table PURCHASE_RETURN (
+  ID integer auto_increment,
+  PURCHASE_RETURN_NO integer not null,
+  RECEIVING_RECEIPT_ID integer not null,
+  POST_IND char(1) default 'N' not null,
+  POST_DT datetime null,
+  REMARKS varchar(100) null,
+  PAID_IND char(1) default 'N' not null,
+  PAID_DT date null,
+  constraint PURCHASE_RETURN$PK primary key (ID),
+  constraint PURCHASE_RETURN$UK unique (PURCHASE_RETURN_NO),
+  constraint PURCHASE_RETURN$FK foreign key (RECEIVING_RECEIPT_ID) references RECEIVING_RECEIPT (ID)
+);
+
+create table PURCHASE_RETURN_ITEM (
+  ID integer auto_increment,
+  PURCHASE_RETURN_ID integer not null,
+  RECEIVING_RECEIPT_ITEM_ID integer not null,
+  QUANTITY integer not null,
+  constraint PURCHASE_RETURN_ITEM$PK primary key (ID),
+  constraint PURCHASE_RETURN_ITEM$FK foreign key (PURCHASE_RETURN_ID) references PURCHASE_RETURN (ID),
+  constraint PURCHASE_RETURN_ITEM$FK2 foreign key (RECEIVING_RECEIPT_ITEM_ID) references RECEIVING_RECEIPT_ITEM (ID)
+);
+
 create table PURCHASE_RETURN_BAD_STOCK (
   ID integer auto_increment,
   PURCHASE_RETURN_BAD_STOCK_NO integer not null,
@@ -148,7 +188,8 @@ create table PURCHASE_RETURN_BAD_STOCK (
   REMARKS varchar(100) null,
   constraint PURCHASE_RETURN_BAD_STOCK$PK primary key (ID),
   constraint PURCHASE_RETURN_BAD_STOCK$UK unique (PURCHASE_RETURN_BAD_STOCK_NO),
-  constraint PURCHASE_RETURN_BAD_STOCK$FK foreign key (SUPPLIER_ID) references SUPPLIER (ID)
+  constraint PURCHASE_RETURN_BAD_STOCK$FK foreign key (SUPPLIER_ID) references SUPPLIER (ID),
+  constraint PURCHASE_RETURN_BAD_STOCK$FK2 foreign key (POST_BY) references USER (ID)
 );
 
 create table PURCHASE_RETURN_BAD_STOCK_ITEM (
@@ -161,6 +202,121 @@ create table PURCHASE_RETURN_BAD_STOCK_ITEM (
   constraint PURCHASE_RETURN_BAD_STOCK_ITEM$PK primary key (ID),
   constraint PURCHASE_RETURN_BAD_STOCK_ITEM$FK foreign key (PURCHASE_RETURN_BAD_STOCK_ID) references PURCHASE_RETURN_BAD_STOCK (ID),
   constraint PURCHASE_RETURN_BAD_STOCK_ITEM$FK2 foreign key (PRODUCT_ID) references PRODUCT (ID)
+);
+
+create table CREDIT_CARD (
+  ID integer auto_increment,
+  USER varchar(20) not null,
+  BANK varchar(20) not null,
+  CARD_NUMBER varchar(20) not null,
+  CUTOFF_DT integer null,
+  CUSTOMER_NUMBER varchar(30) null,
+  constraint CREDIT_CARD$PK primary key (ID)
+);
+
+create table PURCHASE_PAYMENT_ADJ_TYPE (
+  ID integer auto_increment,
+  CODE varchar(12) not null,
+  DESCRIPTION varchar(100) not null,
+  constraint PURCHASE_PAYMENT_ADJ_TYPE$PK primary key (ID),
+  constraint PURCHASE_PAYMENT_ADJ_TYPE$UK unique (CODE)
+);
+
+create table PURCHASE_PAYMENT (
+  ID integer auto_increment,
+  PURCHASE_PAYMENT_NO integer not null,
+  SUPPLIER_ID integer not null,
+  POST_IND char(1) default 'N' not null,
+  POST_DT date null,
+  POST_BY integer null,
+  CREATE_DT date not null,
+  ENCODER integer null,
+  CANCEL_IND char(1) default 'N' not null,
+  CANCEL_DT date null,
+  CANCEL_BY integer null,
+  constraint PURCHASE_PAYMENT$PK primary key (ID),
+  constraint PURCHASE_PAYMENT$UK unique (PURCHASE_PAYMENT_NO),
+  constraint PURCHASE_PAYMENT$FK foreign key (SUPPLIER_ID) references SUPPLIER (ID)
+);
+
+create table PURCHASE_PAYMENT_RECEIVING_RECEIPT (
+  ID integer auto_increment,
+  PURCHASE_PAYMENT_ID integer not null,
+  RECEIVING_RECEIPT_ID integer not null,
+  constraint PURCHASE_PAYMENT_RECEIVING_RECEIPT$PK primary key (ID),
+  constraint PURCHASE_PAYMENT_RECEIVING_RECEIPT$FK foreign key (PURCHASE_PAYMENT_ID) references PURCHASE_PAYMENT (ID),
+  constraint PURCHASE_PAYMENT_RECEIVING_RECEIPT$FK2 foreign key (RECEIVING_RECEIPT_ID) references RECEIVING_RECEIPT (ID)
+);
+
+create table PURCHASE_PAYMENT_CASH_PAYMENT (
+  ID integer auto_increment,
+  PURCHASE_PAYMENT_ID integer not null,
+  AMOUNT numeric(10, 2) not null,
+  PAID_DT date not null,
+  PAID_BY integer null,
+  constraint PURCHASE_PAYMENT_CASH_PAYMENT$PK primary key (ID),
+  constraint PURCHASE_PAYMENT_CASH_PAYMENT$FK foreign key (PURCHASE_PAYMENT_ID) references PURCHASE_PAYMENT (ID)
+);
+
+create table PURCHASE_PAYMENT_CHECK_PAYMENT (
+  ID integer auto_increment,
+  PURCHASE_PAYMENT_ID integer not null,
+  BANK varchar(30) not null,
+  CHECK_DT date not null,
+  CHECK_NO varchar(50) not null,
+  AMOUNT numeric(10, 2) not null,
+  constraint PURCHASE_PAYMENT_CHECK_PAYMENT$PK primary key (ID),
+  constraint PURCHASE_PAYMENT_CHECK_PAYMENT$FK foreign key (PURCHASE_PAYMENT_ID) references PURCHASE_PAYMENT (ID)
+);
+
+create table PURCHASE_PAYMENT_CREDIT_CARD_PAYMENT (
+  ID integer auto_increment,
+  PURCHASE_PAYMENT_ID integer not null,
+  AMOUNT numeric(10, 2) not null,
+  CREDIT_CARD_ID integer not null,
+  TRANSACTION_DT date not null,
+  APPROVAL_CODE varchar(20) not null,
+  constraint PURCHASE_PAYMENT_CREDIT_CARD_PAYMENT$PK primary key (ID),
+  constraint PURCHASE_PAYMENT_CREDIT_CARD_PAYMENT$FK foreign key (PURCHASE_PAYMENT_ID) references PURCHASE_PAYMENT (ID),
+  constraint PURCHASE_PAYMENT_CREDIT_CARD_PAYMENT$FK2 foreign key (CREDIT_CARD_ID) references CREDIT_CARD (ID)
+);
+
+create table PURCHASE_PAYMENT_ADJUSTMENT (
+  ID integer auto_increment,
+  PURCHASE_PAYMENT_ADJUSTMENT_NO integer not null,
+  SUPPLIER_ID integer not null,
+  PURCHASE_PAYMENT_ADJ_TYPE_ID integer not null,
+  AMOUNT numeric(8, 2) not null,
+  POST_IND char(1) default 'N' not null,
+  POST_DT date null,
+  POST_BY integer null,
+  REMARKS varchar(100) null,
+  constraint PURCHASE_PAYMENT_ADJUSTMENT$PK primary key (ID),
+  constraint PURCHASE_PAYMENT_ADJUSTMENT$UK unique (PURCHASE_PAYMENT_ADJUSTMENT_NO),
+  constraint PURCHASE_PAYMENT_ADJUSTMENT$FK foreign key (SUPPLIER_ID) references SUPPLIER (ID),
+  constraint PURCHASE_PAYMENT_ADJUSTMENT$FK2 foreign key (PURCHASE_PAYMENT_ADJ_TYPE_ID) references PURCHASE_PAYMENT_ADJ_TYPE (ID)
+);
+
+create table PURCHASE_PAYMENT_PAYMENT_ADJUSTMENT (
+  ID integer auto_increment,
+  PURCHASE_PAYMENT_ID integer not null,
+  PURCHASE_PAYMENT_ADJ_TYPE_ID integer not null,
+  REFERENCE_NO varchar(30) not null,
+  AMOUNT numeric(10, 2) not null,
+  constraint PURCHASE_PAYMENT_PAYMENT_ADJUSTMENT$PK primary key (ID),
+  constraint PURCHASE_PAYMENT_PAYMENT_ADJUSTMENT$FK foreign key (PURCHASE_PAYMENT_ID) references PURCHASE_PAYMENT (ID),
+  constraint PURCHASE_PAYMENT_PAYMENT_ADJUSTMENT$FK2 foreign key (PURCHASE_PAYMENT_ADJ_TYPE_ID) references PURCHASE_PAYMENT_ADJ_TYPE (ID)
+);
+
+create table PURCHASE_PAYMENT_BANK_TRANSFER (
+  ID integer auto_increment,
+  PURCHASE_PAYMENT_ID integer not null,
+  BANK varchar(20) not null,
+  REFERENCE_NO varchar(20) not null,
+  AMOUNT numeric(10, 2) not null,
+  TRANSFER_DT date not null,
+  constraint PURCHASE_PAYMENT_BANK_TRANSFER$PK primary key (ID),
+  constraint PURCHASE_PAYMENT_BANK_TRANSFER$FK foreign key (PURCHASE_PAYMENT_ID) references PURCHASE_PAYMENT (ID)
 );
 
 create table CREDIT_CARD_STATEMENT (
@@ -259,4 +415,37 @@ create table INVENTORY_CHECK_SUMMARY_ITEM (
   constraint INVENTORY_CHECK_SUMMARY_ITEM$PK primary key (ID),
   constraint INVENTORY_CHECK_SUMMARY_ITEM$FK foreign key (INVENTORY_CHECK_ID) references INVENTORY_CHECK (ID),
   constraint INVENTORY_CHECK_SUMMARY_ITEM$FK2 foreign key (PRODUCT_ID) references PRODUCT (ID)
+);
+
+create table TRISYS_SALES_IMPORT (
+  ID integer auto_increment,
+  FILE varchar(100) not null,
+  IMPORT_DT datetime null,
+  IMPORT_BY integer null,
+  constraint TRISYS_SALES_IMPORT$PK primary key (ID),
+  constraint TRISYS_SALES_IMPORT$UK unique (FILE),
+  constraint TRISYS_SALES_IMPORT$FK foreign key (IMPORT_BY) references USER (ID)
+);
+
+create table TRISYS_SALES (
+  ID integer auto_increment,
+  TRISYS_SALES_IMPORT_ID integer not null,
+  SALE_NO varchar(20) not null,
+  TERMINAL varchar(20) not null,  
+  SALE_DT date not null,
+  constraint TRISYS_SALES$PK primary key (ID),
+  constraint TRISYS_SALES$UK unique (SALE_NO),
+  constraint TRISYS_SALES$FK foreign key (TRISYS_SALES_IMPORT_ID) references TRISYS_SALES_IMPORT (ID)
+);
+
+create table TRISYS_SALES_ITEM (
+  ID integer auto_increment,
+  TRISYS_SALES_ID integer not null,
+  PRODUCT_CODE varchar(20) not null,
+  QUANTITY integer not null,
+  UNIT_COST numeric(10, 2) not null,
+  SELL_PRICE numeric(10, 2) not null,
+  constraint TRISYS_SALES_ITEM$PK primary key (ID),
+  constraint TRISYS_SALES_ITEMS$UK unique (TRISYS_SALES_ID, PRODUCT_CODE),
+  constraint TRISYS_SALES_ITEM$FK foreign key (TRISYS_SALES_ID) references TRISYS_SALES (ID)
 );
