@@ -26,7 +26,6 @@ public class SalesMenuPanel extends MenuPanel {
 	private static final String NO_MORE_STOCK_ADJUSTMENT = "No More Stock Adjustment";
 	private static final String BAD_STOCK_RETURN = "Bad Stock Return";
 	private static final String SALES_RETURN = "Sales Return";
-	private static final String MARK_SALES_INVOICE = "Mark Sales Invoice";
 	private static final String SALES_INVOICE = "Sales Invoice";
 	private static final String STOCK_QUANTITY_CONVERSION = "Stock Quantity Conversion";
 	private static final String SALES_REQUISITION = "Sales Requisition";
@@ -98,9 +97,6 @@ public class SalesMenuPanel extends MenuPanel {
 			break;
 		case SALES_INVOICE:
 			getMagicFrame().switchToSalesInvoicesListPanel();
-			break;
-		case MARK_SALES_INVOICE:
-			getMagicFrame().switchToMarkSalesInvoicesPanel();
 			break;
 		case SALES_RETURN:
 			getMagicFrame().switchToSalesReturnListPanel();
