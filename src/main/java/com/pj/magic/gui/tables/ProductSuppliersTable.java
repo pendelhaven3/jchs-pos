@@ -16,14 +16,14 @@ import org.springframework.stereotype.Component;
 import com.pj.magic.gui.tables.models.ProductSuppliersTableModel;
 import com.pj.magic.model.Product;
 import com.pj.magic.model.Supplier;
-import com.pj.magic.service.ProductService;
+import com.pj.magic.service.Product2Service;
 
 @Component
 public class ProductSuppliersTable extends MagicListTable {
 
 	public static final int BUTTON_COLUMN_INDEX = 1;
 	
-	@Autowired private ProductService productService;
+	@Autowired private Product2Service product2Service;
 	@Autowired private ProductSuppliersTableModel tableModel;
 	
 	private DeleteSupplierButton tableButton = new DeleteSupplierButton();
@@ -42,7 +42,7 @@ public class ProductSuppliersTable extends MagicListTable {
 	}
 
 	public void updateDisplay(Product product) {
-		tableModel.setSuppliers(productService.getProductSuppliers(product));
+		tableModel.setSuppliers(product2Service.getProductSuppliers(product));
 	}
 	
 	public void clearDisplay() {

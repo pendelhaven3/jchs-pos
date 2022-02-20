@@ -50,7 +50,12 @@ public class ProductListPanel extends StandardMagicPanel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProductListPanel.class);
     
-    private static final int PRODUCT_DESCRIPTION_COLUMN_INDEX = 0;
+    private static final int PRODUCT_CODE_COLUMN_INDEX = 0;
+    private static final int PRODUCT_DESCRIPTION_COLUMN_INDEX = 1;
+    private static final int UOM_1_COLUMN_INDEX = 2;
+    private static final int UOM_2_COLUMN_INDEX = 3;
+    private static final int UOM_1_QUANTITY_COLUMN_INDEX = 4;
+    private static final int UOM_2_QUANTITY_COLUMN_INDEX = 5;
     
 	@Autowired private ProductService productService;
 	@Autowired private SearchProductsDialog searchProductsDialog;
@@ -71,6 +76,12 @@ public class ProductListPanel extends StandardMagicPanel {
 	@Override
 	protected void initializeComponents() {
 		table = new MagicListTable(tableModel);
+        table.getColumnModel().getColumn(PRODUCT_CODE_COLUMN_INDEX).setPreferredWidth(100);
+        table.getColumnModel().getColumn(PRODUCT_DESCRIPTION_COLUMN_INDEX).setPreferredWidth(300);
+        table.getColumnModel().getColumn(UOM_1_COLUMN_INDEX).setPreferredWidth(50);
+        table.getColumnModel().getColumn(UOM_2_COLUMN_INDEX).setPreferredWidth(50);
+        table.getColumnModel().getColumn(UOM_1_QUANTITY_COLUMN_INDEX).setPreferredWidth(50);
+        table.getColumnModel().getColumn(UOM_2_QUANTITY_COLUMN_INDEX).setPreferredWidth(50);
         
 		focusOnComponentWhenThisPanelIsDisplayed(table);
 	}
@@ -304,14 +315,24 @@ public class ProductListPanel extends StandardMagicPanel {
 
     private class ProductsTableModel extends ListBackedTableModel<Product>{
 
-        private final String[] columnNames = {"Description"};
+        private final String[] columnNames = {"Code", "Description", "UOM 1", "UOM 2", "UOM Qty 1", "UOM Qty 2"};
 	    
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
             Product product = getItem(rowIndex);
             switch (columnIndex) {
+            case PRODUCT_CODE_COLUMN_INDEX:
+                return product.getCode();
             case PRODUCT_DESCRIPTION_COLUMN_INDEX:
                 return product.getDescription();
+            case UOM_1_COLUMN_INDEX:
+                return product.getUnits().get(0);
+            case UOM_2_COLUMN_INDEX:
+                return product.getUnits().size() > 1 ? product.getUnits().get(1) : null;
+            case UOM_1_QUANTITY_COLUMN_INDEX:
+                return product.getUnitConversions().get(0).getQuantity();
+            case UOM_2_QUANTITY_COLUMN_INDEX:
+                return product.getUnitConversions().size() > 1 ? product.getUnitConversions().get(1).getQuantity() : null;
             default:
                 throw new RuntimeException("Fetching invalid column index: " + columnIndex);
             }

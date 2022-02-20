@@ -39,3 +39,10 @@ create table PRODUCT2 (
 
 alter table PRODUCT add PRODUCT2_ID integer null;
 alter table PRODUCT add constraint PRODUCT$FK foreign key (PRODUCT2_ID) references PRODUCT2 (ID);
+
+alter table SUPPLIER_PRODUCT drop foreign key SUPPLIER_PRODUCT$FK2;
+
+update SUPPLIER_PRODUCT a
+set a.PRODUCT_ID = (select b.PRODUCT2_ID from PRODUCT b where b.ID = a.PRODUCT_ID) 
+
+alter table SUPPLIER_PRODUCT add constraint SUPPLIER_PRODUCT$FK2 foreign key (PRODUCT_ID) references PRODUCT2 (ID);

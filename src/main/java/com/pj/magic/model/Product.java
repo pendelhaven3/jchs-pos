@@ -41,6 +41,7 @@ public class Product implements Comparable<Product>, Serializable {
 	private BigDecimal companyListPrice;
 	private int availableQuantity;
 	private Long product2Id;
+	private List<UnitSku> unitSkus = new ArrayList<>();
 
 	public Product() {
 	}
@@ -500,16 +501,27 @@ public class Product implements Comparable<Product>, Serializable {
         }
     }
 
-	public int getAvailableQuantity() {
-		return availableQuantity;
-	}
-
-	public void setAvailableQuantity(int availableQuantity) {
-		this.availableQuantity = availableQuantity;
-	}
-	
 	public boolean isWholesale() {
 		return code.length() == 14 && code.endsWith("01");
 	}
     
+	public void addUnitSku(String unit, String sku) {
+		for (UnitSku unitSku : unitSkus) {
+			if (unit.equals(unitSku.getUnit())) {
+				unitSku.setSku(sku);
+				return;
+			}
+		}
+		unitSkus.add(new UnitSku(unit, sku));
+	}
+	
+	public String getUnitSku(String unit) {
+		for (UnitSku unitSku : unitSkus) {
+			if (unit.equals(unitSku.getUnit())) {
+				return unitSku.getSku();
+			}
+		}
+		return null;
+	}
+	
 }

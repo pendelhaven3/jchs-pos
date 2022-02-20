@@ -85,26 +85,9 @@ public class ProductServiceImpl implements ProductService {
 		return productDao.search(criteria);
 	}
 
-	@Transactional
-	@Override
-	public void addProductSupplier(Product product, Supplier supplier) {
-		supplierDao.saveSupplierProduct(supplier, product);
-	}
-	
-	@Override
-	public List<Supplier> getProductSuppliers(Product product) {
-		return supplierDao.findAllByProduct(product);
-	}
-
 	@Override
 	public List<Supplier> getAvailableSuppliers(Product product) {
 		return supplierDao.findAllNotHavingProduct(product);
-	}
-
-	@Transactional
-	@Override
-	public void deleteProductSupplier(Product product, Supplier supplier) {
-		supplierDao.deleteSupplierProduct(supplier, product);
 	}
 
 	@Transactional

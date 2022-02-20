@@ -5,8 +5,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -19,7 +17,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -44,7 +41,7 @@ import com.pj.magic.model.ProductCategory;
 import com.pj.magic.model.ProductSubcategory;
 import com.pj.magic.model.Supplier;
 import com.pj.magic.model.Unit;
-import com.pj.magic.service.ProductService;
+import com.pj.magic.service.Product2Service;
 import com.pj.magic.util.ComponentUtil;
 
 @Component
@@ -54,7 +51,7 @@ public class MaintainProductPanel extends StandardMagicPanel {
 	private static final String NEXT_FIELD_ACTION_NAME = "nextField";
 	private static final String SAVE_ACTION_NAME = "save";
 	
-	@Autowired private ProductService productService;
+	@Autowired private Product2Service product2Service;
 //	@Autowired private ManufacturerService manufacturerService;
 //	@Autowired private ProductCategoryService categoryService;
 	@Autowired private ProductSuppliersTable productSuppliersTable;
@@ -260,7 +257,7 @@ public class MaintainProductPanel extends StandardMagicPanel {
 		if (confirm == JOptionPane.OK_OPTION) {
 			int selectedRow = productSuppliersTable.getSelectedRow();
 			Supplier supplier = productSuppliersTable.getSupplier(selectedRow);
-			productService.deleteProductSupplier(product, supplier);
+			product2Service.deleteProductSupplier(product, supplier);
 			productSuppliersTable.updateDisplay(product);
 		}
 	}
@@ -271,7 +268,7 @@ public class MaintainProductPanel extends StandardMagicPanel {
 		
 		Supplier supplier = selectSupplierDialog.getSelectedSupplier();
 		if (supplier != null) {
-			productService.addProductSupplier(product, supplier);
+			product2Service.addProductSupplier(product, supplier);
 			productSuppliersTable.updateDisplay(product);
 		}
 	}
@@ -306,8 +303,6 @@ public class MaintainProductPanel extends StandardMagicPanel {
 		}
 		
 		if (confirm("Save?")) {
-//			product.setCode(codeField.getText());
-//			product.setDescription(descriptionField.getText());
 			product.setMaximumStockLevel(Integer.parseInt(maximumStockLevelField.getText()));
 			product.setMinimumStockLevel(Integer.parseInt(minimumStockLevelField.getText()));
 			product.setActive(activeIndicatorCheckBox.isSelected());
@@ -322,7 +317,7 @@ public class MaintainProductPanel extends StandardMagicPanel {
 //			product.setManufacturer((Manufacturer)manufacturerComboBox.getSelectedItem());
 			
 			try {
-				productService.save(product);
+				product2Service.save(product);
 				showMessage("Saved");
 				getMagicFrame().switchToEditProductPanel(product);
 			} catch (Exception e) {
@@ -335,9 +330,6 @@ public class MaintainProductPanel extends StandardMagicPanel {
 
 	private boolean validateProduct() {
 		try {
-//			validateMandatoryField(codeField, "Code");
-//			validateProductCode();
-//			validateMandatoryField(descriptionField, "Description");
 			validateMandatoryField(maximumStockLevelField, "Maximum Stock Level");
 			validateMandatoryField(minimumStockLevelField, "Minimum Stock Level");
 			validateStockLevel();
@@ -861,7 +853,11 @@ public class MaintainProductPanel extends StandardMagicPanel {
 			return;
 		}
 		
-		this.product = product = productService.getProduct(product.getId());
+		if (product.getProduct2Id() != null) {
+			this.product = product = product2Service.getProduct(product.getProduct2Id());
+		} else {
+			this.product = product = product2Service.getProduct(product.getId());
+		}
 		
 		idField.setText(product.getId().toString());
 		descriptionField.setText(product.getDescription());
@@ -870,6 +866,7 @@ public class MaintainProductPanel extends StandardMagicPanel {
 		activeIndicatorCheckBox.setSelected(product.isActive());
 		
 		caseUnitIndicatorCheckBox.setSelected(product.hasUnit(Unit.CASE));
+		caseActiveUnitIndicatorCheckBox.setSelected(product.hasActiveUnit(Unit.CASE));
 		if (caseUnitIndicatorCheckBox.isSelected()) {
 			caseQuantityField.setText(String.valueOf(product.getUnitQuantity(Unit.CASE)));
 			caseUnitConversionField.setText(String.valueOf(product.getUnitConversion(Unit.CASE)));
@@ -935,11 +932,11 @@ public class MaintainProductPanel extends StandardMagicPanel {
 		
 //		companyListPriceField.setText(FormatterUtil.formatAmount(product.getCompanyListPrice()));
 		
-		caseSkuField.setText(null);
-		tiesSkuField.setText(null);
-		packSkuField.setText(null);
-		hdznSkuField.setText(null);
-		piecesSkuField.setText(null);
+		caseSkuField.setText(product.getUnitSku(Unit.CASE));
+		tiesSkuField.setText(product.getUnitSku(Unit.TIES));
+		packSkuField.setText(product.getUnitSku(Unit.PACK));
+		hdznSkuField.setText(product.getUnitSku(Unit.HDZN));
+		piecesSkuField.setText(product.getUnitSku(Unit.PIECES));
 		
 		productSuppliersTable.updateDisplay(product);
 		addSupplierButton.setEnabled(true);

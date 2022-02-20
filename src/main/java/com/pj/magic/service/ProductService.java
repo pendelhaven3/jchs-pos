@@ -27,14 +27,8 @@ public interface ProductService {
 
 	void save(Product product);
 	
-	void addProductSupplier(Product product, Supplier supplier);
-
-	List<Supplier> getProductSuppliers(Product product);
-
 	List<Supplier> getAvailableSuppliers(Product product);
 
-	void deleteProductSupplier(Product product, Supplier supplier);
-	
 	void saveUnitCostsAndPrices(Product product, PricingScheme pricingScheme);
 
 	List<Product> getAllActiveProductsBySupplier(Supplier supplier);

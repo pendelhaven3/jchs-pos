@@ -1,13 +1,10 @@
 package com.pj.magic.repository.impl;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Types;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
@@ -17,24 +14,15 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import com.pj.magic.Constants;
 import com.pj.magic.dao.impl.MagicDao;
-import com.pj.magic.model.Manufacturer;
-import com.pj.magic.model.PricingScheme;
 import com.pj.magic.model.Product;
-import com.pj.magic.model.ProductCategory;
-import com.pj.magic.model.ProductSubcategory;
-import com.pj.magic.model.Supplier;
-import com.pj.magic.model.TrisysSalesImport;
 import com.pj.magic.model.Unit;
 import com.pj.magic.model.UnitConversion;
 import com.pj.magic.model.UnitCost;
 import com.pj.magic.model.UnitPrice;
 import com.pj.magic.model.UnitQuantity;
-import com.pj.magic.model.User;
-import com.pj.magic.model.search.ProductSearchCriteria;
+import com.pj.magic.model.UnitSku;
 import com.pj.magic.repository.Product2Repository;
-import com.pj.magic.repository.TrisysSalesImportRepository;
 
 @Repository
 public class Product2RepositoryImpl extends MagicDao implements Product2Repository {
@@ -48,7 +36,7 @@ public class Product2RepositoryImpl extends MagicDao implements Product2Reposito
 			+ " UNIT_CONV_CASE, UNIT_CONV_TIES, UNIT_CONV_PACK, UNIT_CONV_HDZN, UNIT_CONV_PCS,"
 			+ " GROSS_COST_CASE, GROSS_COST_TIES, GROSS_COST_PACK, GROSS_COST_HDZN, GROSS_COST_PCS,"
 			+ " FINAL_COST_CASE, FINAL_COST_TIES, FINAL_COST_PACK, FINAL_COST_HDZN, FINAL_COST_PCS"
-//			+ " COMPANY_LIST_PRICE"
+//			+ " COMPANY_LIST_PRICE,"
 //			+ " MANUFACTURER_ID, c.NAME as MANUFACTURER_NAME,"
 //			+ " CATEGORY_ID, d.NAME as CATEGORY_NAME,"
 //			+ " SUBCATEGORY_ID, e.NAME as SUBCATEGORY_NAME"
@@ -151,7 +139,7 @@ public class Product2RepositoryImpl extends MagicDao implements Product2Reposito
 				subcategory.setName(rs.getString("SUBCATEGORY_NAME"));
 				product.setSubcategory(subcategory);
 			}
-			
+
 			product.setCompanyListPrice(rs.getBigDecimal("COMPANY_LIST_PRICE"));
 			*/
 			
@@ -274,6 +262,41 @@ public class Product2RepositoryImpl extends MagicDao implements Product2Reposito
 	@Override
 	public Product get(Long id) {
 		return getJdbcTemplate().queryForObject(GET_SQL, rowMapper, id);
+	}
+
+	private static final String UPDATE_SQL =
+			"update PRODUCT2 set MAX_STOCK_LEVEL = ?, MIN_STOCK_LEVEL = ?, ACTIVE_IND = ?,"
+			+ " ACTIVE_UNIT_IND_CASE = ?, ACTIVE_UNIT_IND_TIES = ?, ACTIVE_UNIT_IND_PACK = ?, ACTIVE_UNIT_IND_HDZN = ?, ACTIVE_UNIT_IND_PCS = ?"
+			+ " where ID = ?";
+	
+	@Override
+	public void update(Product product) {
+		getJdbcTemplate().update(UPDATE_SQL, 
+				product.getMaximumStockLevel(),
+				product.getMinimumStockLevel(),
+				product.isActive() ? "Y" : "N",
+				product.hasActiveUnit(Unit.CASE) ? "Y" : "N",
+				product.hasActiveUnit(Unit.TIES) ? "Y" : "N",
+				product.hasActiveUnit(Unit.PACK) ? "Y" : "N",
+				product.hasActiveUnit(Unit.HDZN) ? "Y" : "N",
+				product.hasActiveUnit(Unit.PIECES) ? "Y" : "N",
+				product.getId());
+	}
+
+	private static final String GET_UNIT_SKUS_SQL = "select CODE, UOM_CODE from PRODUCT where PRODUCT2_ID = ?";
+	
+	private RowMapper<UnitSku> unitSkuRowMapper = new RowMapper<UnitSku>() {
+
+		@Override
+		public UnitSku mapRow(ResultSet rs, int rowNum) throws SQLException {
+			return new UnitSku(rs.getString("UOM_CODE"), rs.getString("CODE"));
+		}
+		
+	};
+	
+	@Override
+	public List<UnitSku> getUnitSkus(Product product) {
+		return getJdbcTemplate().query(GET_UNIT_SKUS_SQL, unitSkuRowMapper, product.getId());
 	}
 
 	/*
