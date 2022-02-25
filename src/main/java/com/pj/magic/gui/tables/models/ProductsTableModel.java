@@ -11,7 +11,9 @@ public class ProductsTableModel extends AbstractTableModel {
 
 	public static final int CODE_COLUMN_INDEX = 0;
 	public static final int DESCRIPTION_COLUMN_INDEX = 1;
-	private static final String[] columnNames = {"Code", "Description"};
+	public static final int UNIT_COLUMN_INDEX = 2;
+	
+	private static final String[] columnNames = {"Code", "Description", "Unit"};
 	
 	private List<Product> products = new ArrayList<>();
 	
@@ -42,6 +44,8 @@ public class ProductsTableModel extends AbstractTableModel {
 			return product.getCode();
 		case DESCRIPTION_COLUMN_INDEX:
 			return product.getDescription();
+		case UNIT_COLUMN_INDEX:
+			return product.getUnits().get(0);
 		default:
 			throw new RuntimeException("Fetching invalid column index: " + columnIndex);
 		}

@@ -23,10 +23,12 @@ import com.pj.magic.dao.SystemDao;
 import com.pj.magic.exception.NotEnoughStocksException;
 import com.pj.magic.model.PricingScheme;
 import com.pj.magic.model.Product;
+import com.pj.magic.model.Product2;
 import com.pj.magic.model.ProductPriceHistory;
 import com.pj.magic.model.Supplier;
 import com.pj.magic.model.search.ProductSearchCriteria;
 import com.pj.magic.repository.DailyProductStartingQuantityRepository;
+import com.pj.magic.repository.Product2Repository;
 import com.pj.magic.service.LoginService;
 import com.pj.magic.service.Product2Service;
 import com.pj.magic.service.ProductService;
@@ -50,6 +52,7 @@ public class ProductServiceImpl implements ProductService {
 	@Autowired private DailyProductStartingQuantityRepository dailyProductStartingQuantityRepository;
 	@Autowired private SystemDao systemDao;
 	@Autowired private Product2Service product2Service;
+	@Autowired private Product2Repository product2Repository;
 	
 	@Override
 	public List<Product> getAllProducts() {
@@ -86,7 +89,7 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
-	public List<Supplier> getAvailableSuppliers(Product product) {
+	public List<Supplier> getAvailableSuppliers(Product2 product) {
 		return supplierDao.findAllNotHavingProduct(product);
 	}
 
@@ -96,8 +99,8 @@ public class ProductServiceImpl implements ProductService {
 		Product productBeforeUpdate = productDao.findByIdAndPricingScheme(product.getId(), pricingScheme);
 		
 		productPriceDao.updateUnitPrices(product, pricingScheme);
-		productDao.updateCosts(product);
-		productPriceHistoryDao.save(createProductPriceHistory(product, pricingScheme, productBeforeUpdate));
+//		product2Repository.updateCosts(product);
+//		productPriceHistoryDao.save(createProductPriceHistory(product, pricingScheme, productBeforeUpdate));
 	}
 
 	private ProductPriceHistory createProductPriceHistory(Product product, PricingScheme pricingScheme,
@@ -185,7 +188,7 @@ public class ProductServiceImpl implements ProductService {
 		    	product.setProduct2Id(product2Service.saveFromTrisys(product));
 	            productDao.save(product);
 			} else {
-				Product product2 = product2Service.getProduct(existing.getProduct2Id());
+				Product2 product2 = product2Service.getProduct(existing.getProduct2Id());
 				if (!product2.hasActiveUnit(product.getUnits().get(0))) {
 					productDao.updateActiveIndicator(product.getCode(), true);
 				}

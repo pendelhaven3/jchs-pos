@@ -7,19 +7,25 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.springframework.util.StringUtils;
 
 import com.pj.magic.model.Product;
+import com.pj.magic.model.Product2;
 import com.pj.magic.model.PurchaseOrderItem;
+
+import lombok.Getter;
+import lombok.Setter;
 
 /*
  * Wrapper class to separate table gui concerns of inputting purchase order items
  * from the business logic of purchase order item model.
  */
+@Getter
+@Setter
 public class PurchaseOrderItemRowItem {
 
 	private PurchaseOrderItem item;
 	private String unit;
 	private Integer quantity;
 	private BigDecimal cost;
-	private Product product;
+	private Product2 product;
 	private Integer actualQuantity;
 
 	public PurchaseOrderItemRowItem(PurchaseOrderItem item) {
@@ -69,14 +75,6 @@ public class PurchaseOrderItemRowItem {
 
 	public void setCost(BigDecimal cost) {
 		this.cost = cost;
-	}
-
-	public Product getProduct() {
-		return product;
-	}
-
-	public void setProduct(Product product) {
-		this.product = product;
 	}
 
 	public boolean isValid() {
@@ -133,7 +131,7 @@ public class PurchaseOrderItemRowItem {
 	}
 
 	public String getProductCode() {
-		return product != null ? product.getCode() : null;
+		return item.getCode();
 	}
 
 	public String getProductDescription() {

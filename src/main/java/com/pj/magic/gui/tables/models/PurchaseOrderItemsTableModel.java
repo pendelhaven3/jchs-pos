@@ -13,8 +13,10 @@ import org.springframework.stereotype.Component;
 
 import com.pj.magic.gui.tables.PurchaseOrderItemsTable;
 import com.pj.magic.gui.tables.rowitems.PurchaseOrderItemRowItem;
+import com.pj.magic.model.Product;
 import com.pj.magic.model.PurchaseOrder;
 import com.pj.magic.model.PurchaseOrderItem;
+import com.pj.magic.service.Product2Service;
 import com.pj.magic.service.ProductService;
 import com.pj.magic.service.PurchaseOrderService;
 import com.pj.magic.util.FormatterUtil;
@@ -30,6 +32,7 @@ public class PurchaseOrderItemsTableModel extends AbstractTableModel {
 	
 	@Autowired private ProductService productService;
 	@Autowired private PurchaseOrderService purchaseOrderService;
+	@Autowired private Product2Service product2Service;
 	
 	private List<PurchaseOrderItemRowItem> rowItems = new ArrayList<>();
 	private PurchaseOrderItemsTable table;
@@ -127,14 +130,13 @@ public class PurchaseOrderItemsTableModel extends AbstractTableModel {
 		String val = (String)value;
 		switch (columnIndex) {
 		case PurchaseOrderItemsTable.PRODUCT_CODE_COLUMN_INDEX:
-			if (rowItem.getProduct() != null && rowItem.getProduct().getCode().equals(val)) {
+			if (rowItem.getProduct() != null && rowItem.getItem().getCode().equals(val)) {
 				return;
 			}
-			rowItem.setProduct(productService.findProductByCode(val));
-			rowItem.setUnit(null);
-			break;
-		case PurchaseOrderItemsTable.UNIT_COLUMN_INDEX:
-			rowItem.setUnit(val);
+			Product product1 = productService.findProductByCode(val);
+			rowItem.setProduct(product2Service.getProduct(product1.getProduct2Id()));
+			rowItem.setUnit(product1.getUnits().get(0));
+			rowItem.getItem().setCode(product1.getCode());
 			break;
 		case PurchaseOrderItemsTable.QUANTITY_COLUMN_INDEX:
 			rowItem.setQuantity(Integer.valueOf(val));
@@ -184,13 +186,11 @@ public class PurchaseOrderItemsTableModel extends AbstractTableModel {
 						|| columnIndex == table.getCostColumnIndex();
 			} else {
 				return columnIndex == PurchaseOrderItemsTable.PRODUCT_CODE_COLUMN_INDEX
-						|| columnIndex == PurchaseOrderItemsTable.UNIT_COLUMN_INDEX
 						|| columnIndex == table.getActualQuantityColumnIndex()
 						|| columnIndex == table.getCostColumnIndex();
 			}
 		} else {
 			return columnIndex == PurchaseOrderItemsTable.PRODUCT_CODE_COLUMN_INDEX
-					|| columnIndex == PurchaseOrderItemsTable.UNIT_COLUMN_INDEX
 					|| columnIndex == PurchaseOrderItemsTable.QUANTITY_COLUMN_INDEX
 					|| columnIndex == table.getCostColumnIndex();
 		}
@@ -215,10 +215,9 @@ public class PurchaseOrderItemsTableModel extends AbstractTableModel {
 		addItem(item);
 	}
 
-	public boolean hasDuplicate(String unit, PurchaseOrderItemRowItem checkRowItem) {
+	public boolean hasDuplicate(String code, PurchaseOrderItemRowItem checkRowItem) {
 		for (PurchaseOrderItemRowItem rowItem : rowItems) {
-			if (checkRowItem.getProduct().equals(rowItem.getProduct()) 
-					&& unit.equals(rowItem.getUnit()) && rowItem != checkRowItem) {
+			if (rowItem != checkRowItem && code.equals(rowItem.getItem().getCode())) {
 				return true;
 			}
 		}

@@ -46,3 +46,11 @@ update SUPPLIER_PRODUCT a
 set a.PRODUCT_ID = (select b.PRODUCT2_ID from PRODUCT b where b.ID = a.PRODUCT_ID) 
 
 alter table SUPPLIER_PRODUCT add constraint SUPPLIER_PRODUCT$FK2 foreign key (PRODUCT_ID) references PRODUCT2 (ID);
+
+-- Purchase Order migration
+-- Receiving Receipt migration
+
+alter table PURCHASE_ORDER_ITEM drop foreign key PURCHASE_ORDER_ITEM$FK2;
+alter table RECEIVING_RECEIPT_ITEM drop foreign key RECEIVING_RECEIPT_ITEM$FK2;
+
+alter table PURCHASE_ORDER_ITEM add constraint PURCHASE_ORDER_ITEM$FK2 foreign key (PRODUCT_ID) references PRODUCT2 (ID);

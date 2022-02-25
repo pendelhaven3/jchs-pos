@@ -6,18 +6,24 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import com.pj.magic.model.Product;
+import com.pj.magic.model.Product2;
 import com.pj.magic.model.PurchaseReturnItem;
+
+import lombok.Getter;
+import lombok.Setter;
 
 /*
  * Wrapper class to separate table gui concerns of inputting purchase return items
  * from the business logic of purchase return item model.
  */
+@Getter
+@Setter
 public class PurchaseReturnItemRowItem {
 
 	private PurchaseReturnItem item;
 	private String unit;
 	private Integer quantity;
-	private Product product;
+	private Product2 product;
 
 	public PurchaseReturnItemRowItem(PurchaseReturnItem item) {
 		this.item = item;
@@ -46,14 +52,6 @@ public class PurchaseReturnItemRowItem {
 
 	public void setQuantity(Integer quantity) {
 		this.quantity = quantity;
-	}
-
-	public Product getProduct() {
-		return product;
-	}
-
-	public void setProduct(Product product) {
-		this.product = product;
 	}
 
 	public boolean isValid() {
@@ -108,7 +106,7 @@ public class PurchaseReturnItemRowItem {
 	}
 
 	public String getProductCode() {
-		return (product != null) ? product.getCode() : "";
+		return item.getCode();
 	}
 
 	public boolean isUpdating() {

@@ -14,7 +14,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import com.pj.magic.dao.PurchaseReturnItemDao;
-import com.pj.magic.model.Product;
+import com.pj.magic.model.Product2;
 import com.pj.magic.model.PurchaseReturn;
 import com.pj.magic.model.PurchaseReturnItem;
 import com.pj.magic.model.ReceivingReceipt;
@@ -57,9 +57,8 @@ public class PurchaseReturnItemDaoImpl extends MagicDao implements PurchaseRetur
 			item.setParent(new PurchaseReturn(rs.getLong("PURCHASE_RETURN_ID")));
 			item.setQuantity(rs.getInt("QUANTITY"));
 			
-			Product product = new Product();
+			Product2 product = new Product2();
 			product.setId(rs.getLong("PRODUCT_ID"));
-			product.setCode(rs.getString("PRODUCT_CODE"));
 			product.setDescription(rs.getString("PRODUCT_DESCRIPTION"));
 			
 			ReceivingReceiptItem receivingReceiptItem = new ReceivingReceiptItem();

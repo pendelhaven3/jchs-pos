@@ -17,7 +17,7 @@ import org.springframework.stereotype.Repository;
 
 import com.pj.magic.dao.SupplierDao;
 import com.pj.magic.model.PaymentTerm;
-import com.pj.magic.model.Product;
+import com.pj.magic.model.Product2;
 import com.pj.magic.model.Supplier;
 
 @Repository
@@ -155,7 +155,7 @@ public class SupplierDaoImpl extends MagicDao implements SupplierDao {
 			+ " order by a.NAME";
 	
 	@Override
-	public List<Supplier> findAllByProduct(Product product) {
+	public List<Supplier> findAllByProduct(Product2 product) {
 		return getJdbcTemplate().query(FIND_ALL_BY_PRODUCT, supplierRowMapper, product.getId());
 	}
 
@@ -163,7 +163,7 @@ public class SupplierDaoImpl extends MagicDao implements SupplierDao {
 			" insert into SUPPLIER_PRODUCT (SUPPLIER_ID, PRODUCT_ID) values (?, ?)";
 	
 	@Override
-	public void saveSupplierProduct(Supplier supplier, Product product) {
+	public void saveSupplierProduct(Supplier supplier, Product2 product) {
 		getJdbcTemplate().update(SAVE_PRODUCT_SUPPLIER_SQL, supplier.getId(), product.getId());
 	}
 	
@@ -177,7 +177,7 @@ public class SupplierDaoImpl extends MagicDao implements SupplierDao {
 			+ " order by a.NAME";
 
 	@Override
-	public List<Supplier> findAllNotHavingProduct(Product product) {
+	public List<Supplier> findAllNotHavingProduct(Product2 product) {
 		return getJdbcTemplate().query(FIND_ALL_NOT_HAVING_PRODUCT_SQL, supplierRowMapper, product.getId());
 	}
 
@@ -185,7 +185,7 @@ public class SupplierDaoImpl extends MagicDao implements SupplierDao {
 			" delete from SUPPLIER_PRODUCT where SUPPLIER_ID = ? and PRODUCT_ID = ?";
 	
 	@Override
-	public void deleteSupplierProduct(Supplier supplier, Product product) {
+	public void deleteSupplierProduct(Supplier supplier, Product2 product) {
 		getJdbcTemplate().update(DELETE_SUPPLIER_PRODUCT_SQL, supplier.getId(), product.getId());
 	}
 
@@ -219,7 +219,7 @@ public class SupplierDaoImpl extends MagicDao implements SupplierDao {
 			"delete from SUPPLIER_PRODUCT where PRODUCT_ID = ?";
 	
 	@Override
-	public void deleteAllByProduct(Product product) {
+	public void deleteAllByProduct(Product2 product) {
 		getJdbcTemplate().update(DELETE_ALL_BY_PRODUCT_SQL, product.getId());
 	}
 	

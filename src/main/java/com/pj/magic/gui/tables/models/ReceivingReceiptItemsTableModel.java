@@ -45,7 +45,7 @@ public class ReceivingReceiptItemsTableModel extends AbstractTableModel {
 		ReceivingReceiptItem item = rowItem.getItem();
 		switch (columnIndex) {
 		case ReceivingReceiptItemsTable.PRODUCT_CODE_COLUMN_INDEX:
-			return item.getProduct().getCode();
+			return item.getCode();
 		case ReceivingReceiptItemsTable.PRODUCT_DESCRIPTION_COLUMN_INDEX:
 			return item.getProduct().getDescription();
 		case ReceivingReceiptItemsTable.UNIT_COLUMN_INDEX:

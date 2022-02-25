@@ -16,6 +16,7 @@ import org.springframework.stereotype.Repository;
 
 import com.pj.magic.dao.impl.MagicDao;
 import com.pj.magic.model.Product;
+import com.pj.magic.model.Product2;
 import com.pj.magic.model.Unit;
 import com.pj.magic.model.UnitConversion;
 import com.pj.magic.model.UnitCost;
@@ -51,11 +52,11 @@ public class Product2RepositoryImpl extends MagicDao implements Product2Reposito
 //			+ "		on e.ID = a.SUBCATEGORY_ID"
 			+ " where 1 = 1";
 	
-	private RowMapper<Product> rowMapper = new RowMapper<Product>() {
+	private RowMapper<Product2> rowMapper = new RowMapper<Product2>() {
 
 		@Override
-		public Product mapRow(ResultSet rs, int rowNum) throws SQLException {
-			Product product = new Product();
+		public Product2 mapRow(ResultSet rs, int rowNum) throws SQLException {
+			Product2 product = new Product2();
 			product.setId(rs.getLong("ID"));
 			product.setDescription(rs.getString("DESCRIPTION"));
 			product.setMaximumStockLevel(rs.getInt("MAX_STOCK_LEVEL"));
@@ -216,7 +217,7 @@ public class Product2RepositoryImpl extends MagicDao implements Product2Reposito
 	private static final String FIND_BY_DESCRIPTION_SQL = BASE_SELECT_SQL + " and a.DESCRIPTION = ?";
 	
 	@Override
-	public Product findByDescription(String description) {
+	public Product2 findByDescription(String description) {
 		try {
 			return getJdbcTemplate().queryForObject(FIND_BY_DESCRIPTION_SQL, rowMapper, description);
 		} catch (IncorrectResultSizeDataAccessException e) {
@@ -235,7 +236,7 @@ public class Product2RepositoryImpl extends MagicDao implements Product2Reposito
 			+ " where ID = ?";
 	
 	@Override
-	public void updateFromTrisys(Product product) {
+	public void updateFromTrisys(Product2 product) {
 		getJdbcTemplate().update(UPDATE_FROM_TRISYS_SQL, 
 				product.getDescription(),
 				product.isActive() ? "Y" : "N",
@@ -260,7 +261,7 @@ public class Product2RepositoryImpl extends MagicDao implements Product2Reposito
 	private static final String GET_SQL = BASE_SELECT_SQL + " and a.ID = ?";
 	
 	@Override
-	public Product get(Long id) {
+	public Product2 get(Long id) {
 		return getJdbcTemplate().queryForObject(GET_SQL, rowMapper, id);
 	}
 
@@ -270,7 +271,7 @@ public class Product2RepositoryImpl extends MagicDao implements Product2Reposito
 			+ " where ID = ?";
 	
 	@Override
-	public void update(Product product) {
+	public void update(Product2 product) {
 		getJdbcTemplate().update(UPDATE_SQL, 
 				product.getMaximumStockLevel(),
 				product.getMinimumStockLevel(),
@@ -295,55 +296,56 @@ public class Product2RepositoryImpl extends MagicDao implements Product2Reposito
 	};
 	
 	@Override
-	public List<UnitSku> getUnitSkus(Product product) {
+	public List<UnitSku> getUnitSkus(Product2 product) {
 		return getJdbcTemplate().query(GET_UNIT_SKUS_SQL, unitSkuRowMapper, product.getId());
 	}
 
-	/*
+	private static final String UPDATE_COSTS_SQL =
+			"update PRODUCT2"
+			+ " set GROSS_COST_CASE = ?, GROSS_COST_TIES = ?, GROSS_COST_PACK = ?, GROSS_COST_HDZN = ?, GROSS_COST_PCS = ?,"
+			+ " FINAL_COST_CASE = ?, FINAL_COST_TIES = ?, FINAL_COST_PACK = ?, FINAL_COST_HDZN = ?, FINAL_COST_PCS = ?"
+			+ " where ID = ?"; 
+	
 	@Override
-	public List<Product> search(ProductSearchCriteria criteria) {
-		StringBuilder sql = new StringBuilder(BASE_SELECT_SQL);
-		List<Object> params = new ArrayList<>();
-		
-		if (criteria.getActive() != null) {
-			sql.append(" and ACTIVE_IND = ?");
-			params.add(criteria.getActive() ? "Y" : "N");
-		}
-		
-		sql.append(" and b.PRICING_SCHEME_ID = ?");
-		params.add(criteria.getPricingScheme().getId());
-		
-		if (criteria.getCodeOrDescriptionLike() != null) {
-			sql.append(" and (CODE like ? or DESCRIPTION like ?)");
-			params.add(criteria.getCodeOrDescriptionLike() + "%");
-			params.add("%" + criteria.getCodeOrDescriptionLike() + "%");
-		}
-		
-		if (criteria.getManufacturer() != null) {
-			sql.append(" and MANUFACTURER_ID = ?");
-			params.add(criteria.getManufacturer().getId());
-		}
-		
-		if (criteria.getCategory() != null) {
-			sql.append(" and CATEGORY_ID = ?");
-			params.add(criteria.getCategory().getId());
-		}
-		
-		if (criteria.getSubcategory() != null) {
-			sql.append(" and SUBCATEGORY_ID = ?");
-			params.add(criteria.getSubcategory().getId());
-		}
-		
-		if (criteria.getSupplier() != null) {
-			sql.append(" and exists(select 1 from SUPPLIER_PRODUCT sp where sp.PRODUCT_ID = a.ID and sp.SUPPLIER_ID = ?)");
-			params.add(criteria.getSupplier().getId());
-		}
-		
-		sql.append(" order by a.CODE");
-		
-		return getJdbcTemplate().query(sql.toString(), productRowMapper, params.toArray());
+	public void updateCosts(Product2 product) {
+		getJdbcTemplate().update(UPDATE_COSTS_SQL,
+				product.getGrossCost(Unit.CASE),
+				product.getGrossCost(Unit.TIES),
+				product.getGrossCost(Unit.PACK),
+				product.getGrossCost(Unit.HDZN),
+				product.getGrossCost(Unit.PIECES),
+				product.getFinalCost(Unit.CASE),
+				product.getFinalCost(Unit.TIES),
+				product.getFinalCost(Unit.PACK),
+				product.getFinalCost(Unit.HDZN),
+				product.getFinalCost(Unit.PIECES),
+				product.getId());
 	}
 
+	@Override
+	public void addAvailableQuantity(Product2 product, String unit, Integer quantity) {
+		switch (unit) {
+		case Unit.CASE:
+			getJdbcTemplate().update("update PRODUCT2 set AVAIL_QTY_CASE = AVAIL_QTY_CASE + ? where ID = ?", quantity, product.getId());
+			break;
+		case Unit.TIES:
+			getJdbcTemplate().update("update PRODUCT2 set AVAIL_QTY_TIES = AVAIL_QTY_TIES + ? where ID = ?", quantity, product.getId());
+			break;
+		case Unit.PACK:
+			getJdbcTemplate().update("update PRODUCT2 set AVAIL_QTY_PACK = AVAIL_QTY_PACK + ? where ID = ?", quantity, product.getId());
+			break;
+		case Unit.HDZN:
+			getJdbcTemplate().update("update PRODUCT2 set AVAIL_QTY_HDZN = AVAIL_QTY_HDZN + ? where ID = ?", quantity, product.getId());
+			break;
+		case Unit.PIECES:
+			getJdbcTemplate().update("update PRODUCT2 set AVAIL_QTY_PCS = AVAIL_QTY_PCS + ? where ID = ?", quantity, product.getId());
+			break;
+		default:
+			throw new RuntimeException("Unrecognized unit: " + unit);
+		}
+	}
+
+	/*
 	private static final String FIND_ALL_WITH_PRICING_SCHEME_SQL = BASE_SELECT_SQL +
 			" and b.PRICING_SCHEME_ID = ? order by a.CODE";
 	

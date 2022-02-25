@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.pj.magic.model.PricingScheme;
 import com.pj.magic.model.Product;
+import com.pj.magic.model.Product2;
 import com.pj.magic.model.ProductPriceHistory;
 import com.pj.magic.model.Supplier;
 import com.pj.magic.model.search.ProductSearchCriteria;
@@ -27,7 +28,7 @@ public interface ProductService {
 
 	void save(Product product);
 	
-	List<Supplier> getAvailableSuppliers(Product product);
+	List<Supplier> getAvailableSuppliers(Product2 product);
 
 	void saveUnitCostsAndPrices(Product product, PricingScheme pricingScheme);
 

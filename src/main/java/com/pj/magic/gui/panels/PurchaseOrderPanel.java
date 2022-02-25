@@ -55,6 +55,7 @@ import com.pj.magic.gui.tables.ProductInfoTable;
 import com.pj.magic.gui.tables.PurchaseOrderItemsTable;
 import com.pj.magic.model.PaymentTerm;
 import com.pj.magic.model.Product;
+import com.pj.magic.model.Product2;
 import com.pj.magic.model.PurchaseOrder;
 import com.pj.magic.model.ReceivingReceipt;
 import com.pj.magic.model.Supplier;
@@ -746,12 +747,12 @@ public class PurchaseOrderPanel extends StandardMagicPanel {
 			return;
 		}
 		
-		Product product = itemsTable.getCurrentlySelectedRowItem().getProduct();
-		if (product != null) {
-			productInfoTable.setProduct(productService.getProduct(product.getId()));
-		} else {
-			productInfoTable.setProduct(null);
-		}
+//		Product2 product = itemsTable.getCurrentlySelectedRowItem().getProduct();
+//		if (product != null) {
+//			productInfoTable.setProduct(productService.getProduct(product.getId()));
+//		} else {
+//			productInfoTable.setProduct(null);
+//		}
 	}
 	
 	private void markPurchaseOrderAsDelivered() {

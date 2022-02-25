@@ -54,6 +54,7 @@ import com.pj.magic.model.PaymentTerm;
 import com.pj.magic.model.PaymentTerminalAssignment;
 import com.pj.magic.model.PricingScheme;
 import com.pj.magic.model.Product;
+import com.pj.magic.model.Product2;
 import com.pj.magic.model.ProductCategory;
 import com.pj.magic.model.Promo;
 import com.pj.magic.model.PromoRedemption;
@@ -576,19 +577,19 @@ public class MagicFrame extends JFrame {
 		((CardLayout)panelHolder.getLayout()).show(panelHolder, PRODUCT_LIST_PANEL);
 	}
 	
-	public void switchToEditProductPanel(Product product) {
+	public void switchToEditProductPanel(Product2 product) {
 		addPanelNameToTitle("Edit Product");
 		switchToMaintainProductPanel(product);
 	}
 
-	private void switchToMaintainProductPanel(Product product) {
+	private void switchToMaintainProductPanel(Product2 product) {
 		maintainProductPanel.updateDisplay(product);
 		((CardLayout)panelHolder.getLayout()).show(panelHolder, MAINTAIN_PRODUCT_PANEL);
 	}
 
 	public void switchToAddNewProductPanel() {
 		addPanelNameToTitle("Add New Product");
-		switchToMaintainProductPanel(new Product());
+		switchToMaintainProductPanel(new Product2());
 	}
 
 	public void switchToManufacturerListPanel() {

@@ -105,7 +105,7 @@ public class ReceivingReceiptExcelGenerator {
         for (ReceivingReceiptItem item : receivingReceipt.getItems()) {
             currentRow++;
             row = sheet.createRow(currentRow);
-            row.createCell(0).setCellValue(item.getProduct().getCode());
+            row.createCell(0).setCellValue(item.getCode());
             row.createCell(1).setCellValue(item.getProduct().getDescription());
             row.createCell(5).setCellValue(item.getUnit());
             row.createCell(6).setCellValue(item.getQuantity());

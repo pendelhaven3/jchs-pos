@@ -30,6 +30,7 @@ import com.pj.magic.model.Product;
 import com.pj.magic.model.Supplier;
 import com.pj.magic.model.Unit;
 import com.pj.magic.model.search.ProductSearchCriteria;
+import com.pj.magic.service.Product2Service;
 import com.pj.magic.service.ProductService;
 import com.pj.magic.util.ComponentUtil;
 import com.pj.magic.util.FormatterUtil;
@@ -55,7 +56,7 @@ public class SelectProductDialog extends MagicDialog {
 	private Product selectedProduct;
 	
 	public SelectProductDialog() {
-		setSize(500, 450);
+		setSize(600, 450);
 		setLocationRelativeTo(null);
 		setTitle("Select Product");
 		
@@ -68,6 +69,8 @@ public class SelectProductDialog extends MagicDialog {
 			.setPreferredWidth(150);
 		productsTable.getColumnModel().getColumn(ProductsTableModel.DESCRIPTION_COLUMN_INDEX)
 			.setPreferredWidth(300);
+		productsTable.getColumnModel().getColumn(ProductsTableModel.UNIT_COLUMN_INDEX)
+			.setPreferredWidth(100);
 		
 		unitPricesAndQuantitiesTableModel = new UnitPricesAndQuantitiesTableModel();
 		unitPricesAndQuantitiesTable = new MagicListTable(unitPricesAndQuantitiesTableModel);

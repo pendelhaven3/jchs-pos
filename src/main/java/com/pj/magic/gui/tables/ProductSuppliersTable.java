@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.pj.magic.gui.tables.models.ProductSuppliersTableModel;
-import com.pj.magic.model.Product;
+import com.pj.magic.model.Product2;
 import com.pj.magic.model.Supplier;
 import com.pj.magic.service.Product2Service;
 
@@ -41,7 +41,7 @@ public class ProductSuppliersTable extends MagicListTable {
 		buttonColumn.setPreferredWidth(80);
 	}
 
-	public void updateDisplay(Product product) {
+	public void updateDisplay(Product2 product) {
 		tableModel.setSuppliers(product2Service.getProductSuppliers(product));
 	}
 	

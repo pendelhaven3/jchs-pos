@@ -42,7 +42,7 @@ public class SearchProductsDialog extends MagicDialog {
 
 	private void initializeComponents() {
 		codeOrDescriptionField = new MagicTextField();
-		codeOrDescriptionField.setMaximumLength(Constants.PRODUCT_CODE_MAXIMUM_LENGTH);
+		codeOrDescriptionField.setMaximumLength(14);
 		
 		activeIndicatorComboBox = new MagicComboBox<>();
 		activeIndicatorComboBox.setModel(new DefaultComboBoxModel<>(new String[] {"All", "Active", "Not Active"}));

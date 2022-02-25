@@ -462,8 +462,8 @@ public class PurchaseReturnItemsTable extends MagicTable {
 					showErrorMessage("Product does not have unit specified");
 				} else if (hasDuplicate(unit, rowItem)) {
 					showErrorMessage("Duplicate item");
-				} else if (!salesReturn.getReceivingReceipt().hasProductAndUnit(rowItem.getProduct(), unit)) {
-					showErrorMessage("Receiving Receipt does not have specified product and unit");
+//				} else if (!salesReturn.getReceivingReceipt().hasProductAndUnit(rowItem.getProduct(), unit)) {
+//					showErrorMessage("Receiving Receipt does not have specified product and unit");
 				} else {
 					valid = true;
 				}
@@ -489,8 +489,9 @@ public class PurchaseReturnItemsTable extends MagicTable {
 				showErrorMessage("Quantity must be greater than 0");
 			} else {
 				PurchaseReturnItemRowItem rowItem = getCurrentlySelectedRowItem();
-				ReceivingReceiptItem item = salesReturn.getReceivingReceipt()
-						.findItemByProductAndUnit(rowItem.getProduct(), rowItem.getUnit());
+				ReceivingReceiptItem item = null;
+//				ReceivingReceiptItem item = salesReturn.getReceivingReceipt()
+//						.findItemByProductAndUnit(rowItem.getProduct(), rowItem.getUnit());
 				if (Integer.parseInt(quantity) > item.getQuantity()) {
 					showErrorMessage("Quantity cannot be more than Receiving Receipt item quantity");
 				} else {

@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 
 import com.pj.magic.gui.tables.PurchaseReturnItemsTable;
 import com.pj.magic.gui.tables.rowitems.PurchaseReturnItemRowItem;
+import com.pj.magic.model.Product;
+import com.pj.magic.model.Product2;
 import com.pj.magic.model.PurchaseReturn;
 import com.pj.magic.model.PurchaseReturnItem;
 import com.pj.magic.service.ProductService;
@@ -101,11 +103,12 @@ public class PurchaseReturnItemsTableModel extends AbstractTableModel {
 		String val = (String)value;
 		switch (columnIndex) {
 		case PurchaseReturnItemsTable.PRODUCT_CODE_COLUMN_INDEX:
-			if (rowItem.getProduct() != null && rowItem.getProduct().getCode().equals(val)) {
+			if (rowItem.getProduct() != null && rowItem.getItem().getCode().equals(val)) {
 				return;
 			}
-			rowItem.setProduct(productService.findProductByCode(val));
-			rowItem.setUnit(null);
+			Product product1 = productService.findProductByCode(val);
+			rowItem.setProduct(new Product2(product1.getProduct2Id()));
+			rowItem.setUnit(product1.getUnits().get(0));
 			break;
 		case PurchaseReturnItemsTable.UNIT_COLUMN_INDEX:
 			rowItem.setUnit(val);
@@ -116,8 +119,8 @@ public class PurchaseReturnItemsTableModel extends AbstractTableModel {
 		}
 		if (rowItem.isValid()) {
 			PurchaseReturnItem item = rowItem.getItem();
-			item.setReceivingReceiptItem(
-					purchaseReturn.getReceivingReceipt().findItemByProductAndUnit(rowItem.getProduct(), rowItem.getUnit()));
+//			item.setReceivingReceiptItem(
+//					purchaseReturn.getReceivingReceipt().findItemByProductAndUnit(rowItem.getProduct(), rowItem.getUnit()));
 			item.setQuantity(rowItem.getQuantity());
 			
 			boolean newItem = (item.getId() == null);

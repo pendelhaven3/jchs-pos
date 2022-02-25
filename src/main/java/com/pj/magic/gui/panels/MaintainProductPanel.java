@@ -36,7 +36,7 @@ import com.pj.magic.gui.component.MagicToolBar;
 import com.pj.magic.gui.dialog.SelectSupplierDialog;
 import com.pj.magic.gui.tables.ProductSuppliersTable;
 import com.pj.magic.model.Manufacturer;
-import com.pj.magic.model.Product;
+import com.pj.magic.model.Product2;
 import com.pj.magic.model.ProductCategory;
 import com.pj.magic.model.ProductSubcategory;
 import com.pj.magic.model.Supplier;
@@ -57,7 +57,7 @@ public class MaintainProductPanel extends StandardMagicPanel {
 	@Autowired private ProductSuppliersTable productSuppliersTable;
 	@Autowired private SelectSupplierDialog selectSupplierDialog;
 	
-	private Product product;
+	private Product2 product;
 	private JTextField idField;
 	private JTextField descriptionField;
 	private MagicTextField maximumStockLevelField;
@@ -844,7 +844,7 @@ public class MaintainProductPanel extends StandardMagicPanel {
 		});
 	}
 
-	public void updateDisplay(Product product) {
+	public void updateDisplay(Product2 product) {
 //		updateComboBoxes();
 		
 		this.product = product;
@@ -853,11 +853,7 @@ public class MaintainProductPanel extends StandardMagicPanel {
 			return;
 		}
 		
-		if (product.getProduct2Id() != null) {
-			this.product = product = product2Service.getProduct(product.getProduct2Id());
-		} else {
-			this.product = product = product2Service.getProduct(product.getId());
-		}
+		this.product = product = product2Service.getProduct(product.getId());
 		
 		idField.setText(product.getId().toString());
 		descriptionField.setText(product.getDescription());

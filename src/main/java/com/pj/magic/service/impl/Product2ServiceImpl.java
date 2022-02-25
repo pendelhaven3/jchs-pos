@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.pj.magic.dao.SupplierDao;
 import com.pj.magic.model.Product;
+import com.pj.magic.model.Product2;
 import com.pj.magic.model.Supplier;
 import com.pj.magic.model.Unit;
 import com.pj.magic.repository.Product2Repository;
@@ -24,7 +25,7 @@ public class Product2ServiceImpl implements Product2Service {
 	
 	@Override
 	public Long saveFromTrisys(Product product) {
-		Product existing = null;
+		Product2 existing = null;
 		
 		if (product.getProduct2Id() != null) {
 			existing = product2Repository.get(product.getProduct2Id());
@@ -52,31 +53,31 @@ public class Product2ServiceImpl implements Product2Service {
 	}
 
 	@Override
-	public Product getProduct(Long id) {
-		Product product = product2Repository.get(id);
+	public Product2 getProduct(Long id) {
+		Product2 product = product2Repository.get(id);
 		product.setUnitSkus(product2Repository.getUnitSkus(product));
 		return product;
 	}
 
 	@Override
-	public void save(Product product) {
+	public void save(Product2 product) {
 		product2Repository.update(product);
 	}
 
 	@Transactional
 	@Override
-	public void addProductSupplier(Product product, Supplier supplier) {
+	public void addProductSupplier(Product2 product, Supplier supplier) {
 		supplierDao.saveSupplierProduct(supplier, product);
 	}
 
 	@Transactional
 	@Override
-	public void deleteProductSupplier(Product product, Supplier supplier) {
+	public void deleteProductSupplier(Product2 product, Supplier supplier) {
 		supplierDao.deleteSupplierProduct(supplier, product);
 	}
 
 	@Override
-	public List<Supplier> getProductSuppliers(Product product) {
+	public List<Supplier> getProductSuppliers(Product2 product) {
 		return supplierDao.findAllByProduct(product);
 	}
 

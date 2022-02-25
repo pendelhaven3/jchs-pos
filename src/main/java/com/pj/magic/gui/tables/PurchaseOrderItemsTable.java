@@ -59,7 +59,6 @@ public class PurchaseOrderItemsTable extends MagicTable {
 	private static final String F4_ACTION_NAME = "f4";
 
 	@Autowired private SelectProductDialog selectProductDialog;
-	@Autowired private SelectUnitDialog selectUnitDialog;
 	@Autowired private ProductService productService;
 	@Autowired private PurchaseOrderItemsTableModel tableModel;
 	
@@ -96,9 +95,6 @@ public class PurchaseOrderItemsTable extends MagicTable {
 		
 		MagicTextField productCodeTextField = new MagicTextField();
 		columnModel.getColumn(PRODUCT_CODE_COLUMN_INDEX).setCellEditor(new ProductCodeCellEditor(productCodeTextField));
-		
-		MagicTextField unitTextField = new MagicTextField();
-		columnModel.getColumn(UNIT_COLUMN_INDEX).setCellEditor(new UnitCellEditor(unitTextField));
 		
 		MagicTextField quantityTextField = new MagicTextField();
 		quantityTextField.setMaximumLength(Constants.QUANTITY_MAXIMUM_LENGTH);
@@ -192,14 +188,13 @@ public class PurchaseOrderItemsTable extends MagicTable {
 		return tableModel.getRowItem(getSelectedRow());
 	}
 	
-	private boolean hasDuplicate(String unit, PurchaseOrderItemRowItem rowItem) {
+	private boolean hasDuplicate(String code, PurchaseOrderItemRowItem rowItem) {
 		for (PurchaseOrderItem item : purchaseOrder.getItems()) {
-			if (item.getProduct().equals(rowItem.getProduct()) 
-					&& item.getUnit().equals(unit) && item != rowItem.getItem()) {
+			if (item.getCode().equals(code) && item != rowItem.getItem()) {
 				return true;
 			}
 		}
-		return tableModel.hasDuplicate(unit, rowItem);
+		return tableModel.hasDuplicate(code, rowItem);
 	}
 	
 	public void setPurchaseOrder(PurchaseOrder purchaseOrder) {
@@ -353,20 +348,6 @@ public class PurchaseOrderItemsTable extends MagicTable {
 			}
 			String criteria = (String)getCellEditor().getCellEditorValue();
 			openSelectProductDialog(criteria, criteria);
-		} else if (isUnitFieldSelected()) {
-			if (!isEditing()) {
-				editCellAt(getSelectedRow(), UNIT_COLUMN_INDEX);
-			}
-			
-			selectUnitDialog.setUnits(getCurrentlySelectedRowItem().getProduct().getUnits());
-			selectUnitDialog.searchUnits((String)getCellEditor().getCellEditorValue());
-			selectUnitDialog.setVisible(true);
-			
-			String unit = selectUnitDialog.getSelectedUnit();
-			if (unit != null) {
-				((JTextField)getEditorComponent()).setText(unit);
-				getCellEditor().stopCellEditing();
-			}
 		}
 	}
 
@@ -408,10 +389,6 @@ public class PurchaseOrderItemsTable extends MagicTable {
 						switch (column) {
 						case PRODUCT_CODE_COLUMN_INDEX:
 							// Fire entire row. Firing single cells causes this listener to be re-triggered.
-							model.fireTableRowsUpdated(row, row);
-							selectAndEditCellAt(row, UNIT_COLUMN_INDEX);
-							break;
-						case UNIT_COLUMN_INDEX:
 							model.fireTableRowsUpdated(row, row);
 							int nextField = QUANTITY_COLUMN_INDEX;
 							if (purchaseOrder.isDelivered()) {
@@ -483,7 +460,12 @@ public class PurchaseOrderItemsTable extends MagicTable {
 			} else if (productService.findProductByCode(code) == null) {
 				showErrorMessage("No product matching code specified");
 			} else {
-				valid = true;
+				PurchaseOrderItemRowItem rowItem = getCurrentlySelectedRowItem();
+				if (hasDuplicate(code, rowItem)) {
+					showErrorMessage("Duplicate item");
+				} else {
+					valid = true;
+				}
 			}
 			return (valid) ? super.stopCellEditing() : false;
 		}

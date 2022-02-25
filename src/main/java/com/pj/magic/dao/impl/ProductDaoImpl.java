@@ -212,7 +212,7 @@ public class ProductDaoImpl extends MagicDao implements ProductDao {
 		}
 		
 		if (criteria.getSupplier() != null) {
-			sql.append(" and exists(select 1 from SUPPLIER_PRODUCT sp where sp.PRODUCT_ID = a.ID and sp.SUPPLIER_ID = ?)");
+			sql.append(" and exists(select 1 from SUPPLIER_PRODUCT sp where sp.PRODUCT_ID = a.PRODUCT2_ID and sp.SUPPLIER_ID = ?)");
 			params.add(criteria.getSupplier().getId());
 		}
 		
@@ -239,22 +239,6 @@ public class ProductDaoImpl extends MagicDao implements ProductDao {
 	@Override
 	public List<Product> findAllActiveBySupplier(Supplier supplier) {
 		return getJdbcTemplate().query(FIND_ALL_ACTIVE_BY_SUPPLIER_SQL, productRowMapper, supplier.getId());
-	}
-
-	private static final String UPDATE_COSTS_SQL =
-			"update PRODUCT set GROSS_COST = ?, GROSS_COST1 = ?, FINAL_COST = ?, FINAL_COST1 = ? where ID = ?"; 
-	
-	@Override
-	public void updateCosts(Product product) {
-	    UnitCost unitCost1 = product.getUnitCosts().get(0);
-        UnitCost unitCost2 = product.getUnitCosts().size() > 1 ? product.getUnitCosts().get(1) : null;
-	    
-		getJdbcTemplate().update(UPDATE_COSTS_SQL,
-				unitCost1.getGrossCost(),
-				(unitCost2 != null) ? unitCost2.getGrossCost() : null,
-                unitCost1.getFinalCost(),
-                (unitCost2 != null) ? unitCost2.getFinalCost() : null,
-				product.getId());
 	}
 
 	private static final String FIND_BY_ID_AND_PRICING_SCHEME_SQL = BASE_SELECT_SQL

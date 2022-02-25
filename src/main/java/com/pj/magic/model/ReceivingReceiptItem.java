@@ -6,11 +6,16 @@ import java.math.RoundingMode;
 import com.pj.magic.Constants;
 import com.pj.magic.model.util.Percentage;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class ReceivingReceiptItem implements Comparable<ReceivingReceiptItem> {
 
 	private Long id;
 	private ReceivingReceipt parent;
-	private Product product;
+	private Product2 product;
 	private String unit;
 	private Integer quantity;
 	private BigDecimal cost;
@@ -19,6 +24,8 @@ public class ReceivingReceiptItem implements Comparable<ReceivingReceiptItem> {
 	private BigDecimal discount3 = BigDecimal.ZERO;
 	private BigDecimal flatRateDiscount = BigDecimal.ZERO;
 	private BigDecimal currentCost;
+	
+	private String code; // derived field
 
 	public Long getId() {
 		return id;
@@ -34,14 +41,6 @@ public class ReceivingReceiptItem implements Comparable<ReceivingReceiptItem> {
 
 	public void setParent(ReceivingReceipt parent) {
 		this.parent = parent;
-	}
-
-	public Product getProduct() {
-		return product;
-	}
-
-	public void setProduct(Product product) {
-		this.product = product;
 	}
 
 	public String getUnit() {
