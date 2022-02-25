@@ -176,7 +176,48 @@ public class ReportDaoImpl extends MagicDao implements ReportDao {
 	}
 
 	private static final String GET_ALL_INVENTORY_REPORT_ITEMS_SQL =
-			" select ID, CODE, DESCRIPTION, UOM_CODE as UNIT, AVAIL_QTY as QUANTITY, 0 as COST from PRODUCT";
+			" select CODE, DESCRIPTION, UNIT, QUANTITY, COST"
+			+ " from ("
+			+ "   select b.CODE, a.DESCRIPTION, 'CASE' as UNIT, a.AVAIL_QTY_CASE as QUANTITY, a.FINAL_COST_CASE as COST"
+			+ "   from PRODUCT2 a"
+			+ "   join PRODUCT b"
+			+ "     on b.PRODUCT2_ID = a.ID"
+			+ "     and b.UOM_CODE = 'CASE'"
+			+ "   where a.UNIT_IND_CASE = 'Y'"
+			+ "   and a.AVAIL_QTY_CASE > 0"
+			+ "   union all"
+			+ "   select b.CODE, a.DESCRIPTION, 'TIES' as UNIT, a.AVAIL_QTY_TIES as QUANTITY, a.FINAL_COST_TIES as COST"
+			+ "   from PRODUCT2 a"
+			+ "   join PRODUCT b"
+			+ "     on b.PRODUCT2_ID = a.ID"
+			+ "     and b.UOM_CODE = 'TIES'"
+			+ "   where a.UNIT_IND_TIES = 'Y'"
+			+ "   and a.AVAIL_QTY_TIES > 0"
+			+ "   union all"
+			+ "   select b.CODE, a.DESCRIPTION, 'PACK' as UNIT, a.AVAIL_QTY_PACK as QUANTITY, a.FINAL_COST_PACK as COST"
+			+ "   from PRODUCT2 a"
+			+ "   join PRODUCT b"
+			+ "     on b.PRODUCT2_ID = a.ID"
+			+ "     and b.UOM_CODE = 'PACK'"
+			+ "   where a.UNIT_IND_PACK = 'Y'"
+			+ "   and a.AVAIL_QTY_PACK > 0"
+			+ "   union all"
+			+ "   select b.CODE, a.DESCRIPTION, 'HDZN' as UNIT, a.AVAIL_QTY_HDZN as QUANTITY, a.FINAL_COST_HDZN as COST"
+			+ "   from PRODUCT2 a"
+			+ "   join PRODUCT b"
+			+ "     on b.PRODUCT2_ID = a.ID"
+			+ "     and b.UOM_CODE = 'HDZN'"
+			+ "   where a.UNIT_IND_HDZN = 'Y'"
+			+ "   and a.AVAIL_QTY_HDZN > 0"
+			+ "   union all"
+			+ "   select b.CODE, a.DESCRIPTION, 'PCS' as UNIT, a.AVAIL_QTY_PCS as QUANTITY, a.FINAL_COST_PCS as COST"
+			+ "   from PRODUCT2 a"
+			+ "   join PRODUCT b"
+			+ "     on b.PRODUCT2_ID = a.ID"
+			+ "     and b.UOM_CODE = 'PCS'"
+			+ "   where a.UNIT_IND_PCS = 'Y'"
+			+ "   and a.AVAIL_QTY_PCS > 0"
+			+ " ) a";
 	
 	@Override
 	public List<InventoryReportItem> getInventoryReportItems(InventoryReportCriteria criteria) {
@@ -187,7 +228,7 @@ public class ReportDaoImpl extends MagicDao implements ReportDao {
 			sql.append(" where a.MANUFACTURER_ID = ?");
 			params.add(criteria.getManufacturer().getId());
 		}
-		sql.append(" order by CODE");
+		sql.append(" order by DESCRIPTION");
 		
 		return getJdbcTemplate().query(sql.toString(), params.toArray(), new RowMapper<InventoryReportItem>() {
 
