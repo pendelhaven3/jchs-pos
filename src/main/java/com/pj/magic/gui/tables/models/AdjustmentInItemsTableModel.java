@@ -14,7 +14,9 @@ import com.pj.magic.gui.tables.SalesRequisitionItemsTable;
 import com.pj.magic.gui.tables.rowitems.AdjustmentInItemRowItem;
 import com.pj.magic.model.AdjustmentIn;
 import com.pj.magic.model.AdjustmentInItem;
+import com.pj.magic.model.Product;
 import com.pj.magic.service.AdjustmentInService;
+import com.pj.magic.service.Product2Service;
 import com.pj.magic.service.ProductService;
 import com.pj.magic.util.FormatterUtil;
 
@@ -24,6 +26,7 @@ public class AdjustmentInItemsTableModel extends AbstractTableModel {
 	private static final String[] columnNames = {"Code", "Description", "Unit", "Qty", "Cost", "Amount"};
 	
 	@Autowired private ProductService productService;
+	@Autowired private Product2Service product2Service;
 	@Autowired private AdjustmentInService adjustmentInService;
 	
 	private List<AdjustmentInItemRowItem> rowItems = new ArrayList<>();
@@ -96,11 +99,13 @@ public class AdjustmentInItemsTableModel extends AbstractTableModel {
 		String val = (String)value;
 		switch (columnIndex) {
 		case AdjustmentInItemsTable.PRODUCT_CODE_COLUMN_INDEX:
-			if (rowItem.getProduct() != null && rowItem.getProduct().getCode().equals(val)) {
+			if (rowItem.getProduct() != null && rowItem.getItem().getCode().equals(val)) {
 				return;
 			}
-			rowItem.setProduct(productService.findProductByCode(val));
-			rowItem.setUnit(null);
+			Product product1 = productService.findProductByCode(val);
+			rowItem.setProduct(product2Service.getProduct(product1.getProduct2Id()));
+			rowItem.setUnit(product1.getUnits().get(0));
+			rowItem.getItem().setCode(product1.getCode());
 			break;
 		case AdjustmentInItemsTable.UNIT_COLUMN_INDEX:
 			rowItem.setUnit(val);
@@ -134,8 +139,6 @@ public class AdjustmentInItemsTableModel extends AbstractTableModel {
 			switch (columnIndex) {
 			case SalesRequisitionItemsTable.PRODUCT_CODE_COLUMN_INDEX:
 				return true;
-			case SalesRequisitionItemsTable.UNIT_COLUMN_INDEX:
-				return rowItem.hasValidProduct();
 			case SalesRequisitionItemsTable.QUANTITY_COLUMN_INDEX:
 				return rowItem.hasValidProduct() && rowItem.hasValidUnit();
 			default:
@@ -186,10 +189,9 @@ public class AdjustmentInItemsTableModel extends AbstractTableModel {
 		}
 	}
 
-	public boolean hasDuplicate(String unit, AdjustmentInItemRowItem checkRowItem) {
+	public boolean hasDuplicate(String code, AdjustmentInItemRowItem checkRowItem) {
 		for (AdjustmentInItemRowItem rowItem : rowItems) {
-			if (checkRowItem.getProduct().equals(rowItem.getProduct()) 
-					&& unit.equals(rowItem.getUnit()) && rowItem != checkRowItem) {
+			if (rowItem != checkRowItem && code.equals(rowItem.getItem().getCode())) {
 				return true;
 			}
 		}

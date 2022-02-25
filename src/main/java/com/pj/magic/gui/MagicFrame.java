@@ -53,7 +53,6 @@ import com.pj.magic.model.PaymentAdjustment;
 import com.pj.magic.model.PaymentTerm;
 import com.pj.magic.model.PaymentTerminalAssignment;
 import com.pj.magic.model.PricingScheme;
-import com.pj.magic.model.Product;
 import com.pj.magic.model.Product2;
 import com.pj.magic.model.ProductCategory;
 import com.pj.magic.model.Promo;

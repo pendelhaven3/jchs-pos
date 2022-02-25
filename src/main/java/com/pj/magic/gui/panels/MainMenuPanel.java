@@ -246,7 +246,7 @@ public class MainMenuPanel extends StandardMagicPanel {
 				PURCHASE_PAYMENT,
 //				PROMO,
 //				PROMO_REDEMPTION,
-//				STOCK_MOVEMENT,
+				STOCK_MOVEMENT,
 				REPORTS,
 				INVENTORY_CHECK,
 				RECORDS_MAINTENANCE,

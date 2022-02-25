@@ -35,11 +35,11 @@ import com.pj.magic.gui.dialog.PrintPreviewDialog;
 import com.pj.magic.gui.tables.AdjustmentInItemsTable;
 import com.pj.magic.gui.tables.ProductInfoTable;
 import com.pj.magic.model.AdjustmentIn;
-import com.pj.magic.model.Product;
+import com.pj.magic.model.Product2;
 import com.pj.magic.service.AdjustmentInService;
 import com.pj.magic.service.LoginService;
 import com.pj.magic.service.PrintService;
-import com.pj.magic.service.ProductService;
+import com.pj.magic.service.Product2Service;
 import com.pj.magic.util.ComponentUtil;
 import com.pj.magic.util.FormatterUtil;
 
@@ -49,11 +49,11 @@ public class AdjustmentInPanel extends StandardMagicPanel {
 	private static final Logger logger = LoggerFactory.getLogger(AdjustmentInPanel.class);
 	
 	@Autowired private AdjustmentInItemsTable itemsTable;
-	@Autowired private ProductService productService;
 	@Autowired private AdjustmentInService adjustmentInService;
 	@Autowired private PrintPreviewDialog printPreviewDialog;
 	@Autowired private PrintService printService;
 	@Autowired private LoginService loginService;
+	@Autowired private Product2Service product2Service;
 	
 	private AdjustmentIn adjustmentIn;
 	private JLabel adjustmentInNumberLabel;
@@ -443,17 +443,17 @@ public class AdjustmentInPanel extends StandardMagicPanel {
 	}
 	
 	private void updateUnitPricesAndQuantitiesTable() {
-//		if (itemsTable.getSelectedRow() == -1) {
-//			productInfoTable.setProduct(null);
-//			return;
-//		}
-//		
-//		Product product = itemsTable.getCurrentlySelectedRowItem().getProduct();
-//		if (product != null) {
-//			productInfoTable.setProduct(productService.getProduct(product.getId()));
-//		} else {
-//			productInfoTable.setProduct(null);
-//		}
+		if (itemsTable.getSelectedRow() == -1) {
+			productInfoTable.setProduct(null);
+			return;
+		}
+		
+		Product2 product = itemsTable.getCurrentlySelectedRowItem().getProduct();
+		if (product != null) {
+			productInfoTable.setProduct(product2Service.getProduct(product.getId()));
+		} else {
+			productInfoTable.setProduct(null);
+		}
 	}
 	
 	private void postAdjustmentIn() {

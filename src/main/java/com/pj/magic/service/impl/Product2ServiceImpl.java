@@ -55,7 +55,9 @@ public class Product2ServiceImpl implements Product2Service {
 	@Override
 	public Product2 getProduct(Long id) {
 		Product2 product = product2Repository.get(id);
-		product.setUnitSkus(product2Repository.getUnitSkus(product));
+		if (product != null) {
+			product.setUnitSkus(product2Repository.getUnitSkus(product));
+		}
 		return product;
 	}
 

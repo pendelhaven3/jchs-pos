@@ -1,54 +1,95 @@
-alter table PRODUCT add SKU_CASE varchar(14) null;
-alter table PRODUCT add SKU_TIES varchar(14) null;
-alter table PRODUCT add SKU_PACK varchar(14) null;
-alter table PRODUCT add SKU_HDZN varchar(14) null;
-alter table PRODUCT add SKU_PCS varchar(14) null;
+create table PRODUCT2 (
+  ID integer auto_increment,
+  DESCRIPTION varchar(50) not null,
+  MAX_STOCK_LEVEL integer(4) default 0,
+  MIN_STOCK_LEVEL integer(4) default 0,
+  ACTIVE_IND char(1) default 'Y',
+  UNIT_IND_CASE char(1) null,
+  UNIT_IND_TIES char(1) null,
+  UNIT_IND_PACK char(1) null,
+  UNIT_IND_HDZN char(1) null,
+  UNIT_IND_PCS char(1) null,
+  ACTIVE_UNIT_IND_CASE char(1) default 'N' not null,
+  ACTIVE_UNIT_IND_TIES char(1) default 'N' not null,
+  ACTIVE_UNIT_IND_PACK char(1) default 'N' not null,
+  ACTIVE_UNIT_IND_HDZN char(1) default 'N' not null,
+  ACTIVE_UNIT_IND_PCS char(1) default 'N' not null,
+  AVAIL_QTY_CASE integer(4) default 0 not null,
+  AVAIL_QTY_TIES integer(4) default 0 not null,
+  AVAIL_QTY_PACK integer(4) default 0 not null,
+  AVAIL_QTY_HDZN integer(4) default 0 not null,
+  AVAIL_QTY_PCS integer(4) default 0 not null,
+  UNIT_CONV_CASE integer(5) null,
+  UNIT_CONV_TIES integer(5) null,
+  UNIT_CONV_PACK integer(5) null,
+  UNIT_CONV_HDZN integer(5) null,
+  UNIT_CONV_PCS integer(5) null,
+  GROSS_COST_CASE numeric(10, 2) default 0 not null,
+  GROSS_COST_TIES numeric(10, 2) default 0 not null,
+  GROSS_COST_PACK numeric(10, 2) default 0 not null,
+  GROSS_COST_HDZN numeric(10, 2) default 0 not null,
+  GROSS_COST_PCS numeric(10, 2) default 0 not null,
+  FINAL_COST_CASE numeric(10, 2) default 0 not null,
+  FINAL_COST_TIES numeric(10, 2) default 0 not null,
+  FINAL_COST_PACK numeric(10, 2) default 0 not null,
+  FINAL_COST_HDZN numeric(10, 2) default 0 not null,
+  FINAL_COST_PCS numeric(10, 2) default 0 not null,
+  constraint PRODUCT2$PK primary key (ID)
+);
 
-create index PRODUCT$IDX on PRODUCT (SKU_CASE);
-create index PRODUCT$IDX2 on PRODUCT (SKU_TIES);
-create index PRODUCT$IDX3 on PRODUCT (SKU_PACK);
-create index PRODUCT$IDX4 on PRODUCT (SKU_HDZN);
-create index PRODUCT$IDX5 on PRODUCT (SKU_PCS);
+alter table PRODUCT add PRODUCT2_ID integer null;
+alter table PRODUCT add constraint PRODUCT$FK foreign key (PRODUCT2_ID) references PRODUCT2 (ID);
 
-alter table PRODUCT add UNIT_IND_CASE char(1) default 'N' not null;
-alter table PRODUCT add UNIT_IND_TIES char(1) default 'N' not null;
-alter table PRODUCT add UNIT_IND_PACK char(1) default 'N' not null;
-alter table PRODUCT add UNIT_IND_HDZN char(1) default 'N' not null;
-alter table PRODUCT add UNIT_IND_PCS char(1) default 'N' not null;
+-- SUPPLIER_PRODUCT
 
-alter table PRODUCT add ACTIVE_UNIT_IND_CASE char(1) default 'N' not null;
-alter table PRODUCT add ACTIVE_UNIT_IND_TIES char(1) default 'N' not null;
-alter table PRODUCT add ACTIVE_UNIT_IND_PACK char(1) default 'N' not null;
-alter table PRODUCT add ACTIVE_UNIT_IND_HDZN char(1) default 'N' not null;
-alter table PRODUCT add ACTIVE_UNIT_IND_PCS char(1) default 'N' not null;
+alter table SUPPLIER_PRODUCT drop foreign key SUPPLIER_PRODUCT$FK2;
 
-alter table PRODUCT add AVAIL_QTY_CASE integer(4) default 0 not null;
-alter table PRODUCT add AVAIL_QTY_TIES integer(4) default 0 not null;
-alter table PRODUCT add AVAIL_QTY_PACK integer(4) default 0 not null;
-alter table PRODUCT add AVAIL_QTY_HDZN integer(4) default 0 not null;
-alter table PRODUCT add AVAIL_QTY_PCS integer(4) default 0 not null;
+update SUPPLIER_PRODUCT a
+set a.PRODUCT_ID = (select b.PRODUCT2_ID from PRODUCT b where b.ID = a.PRODUCT_ID) 
 
-alter table PRODUCT add UNIT_CONV_CASE integer(5) null;
-alter table PRODUCT add UNIT_CONV_TIES integer(5) null;
-alter table PRODUCT add UNIT_CONV_PACK integer(5) null;
-alter table PRODUCT add UNIT_CONV_HDZN integer(5) null;
-alter table PRODUCT add UNIT_CONV_PCS integer(5) null;
+alter table SUPPLIER_PRODUCT add constraint SUPPLIER_PRODUCT$FK2 foreign key (PRODUCT_ID) references PRODUCT2 (ID);
 
-alter table PRODUCT add GROSS_COST_CASE numeric(10, 2) default 0 not null;
-alter table PRODUCT add GROSS_COST_TIES numeric(10, 2) default 0 not null;
-alter table PRODUCT add GROSS_COST_PACK numeric(10, 2) default 0 not null;
-alter table PRODUCT add GROSS_COST_HDZN numeric(10, 2) default 0 not null;
-alter table PRODUCT add GROSS_COST_PCS numeric(10, 2) default 0 not null;
+-- Purchase Order migration
+-- Receiving Receipt migration
 
-alter table PRODUCT add FINAL_COST_CASE numeric(10, 2) default 0 not null;
-alter table PRODUCT add FINAL_COST_TIES numeric(10, 2) default 0 not pj	donull;
-alter table PRODUCT add FINAL_COST_PACK numeric(10, 2) default 0 not null;
-alter table PRODUCT add FINAL_COST_HDZN numeric(10, 2) default 0 not null;
-alter table PRODUCT add FINAL_COST_PCS numeric(10, 2) default 0 not null;
+alter table PURCHASE_ORDER_ITEM drop foreign key PURCHASE_ORDER_ITEM$FK2;
+alter table RECEIVING_RECEIPT_ITEM drop foreign key RECEIVING_RECEIPT_ITEM$FK2;
+
+-- TODO: update scripts
+
+alter table PURCHASE_ORDER_ITEM add constraint PURCHASE_ORDER_ITEM$FK2 foreign key (PRODUCT_ID) references PRODUCT2 (ID);
+alter table RECEIVING_RECEIPT_ITEM add constraint RECEIVING_RECEIPT_ITEM$FK2 foreign key (PRODUCT_ID) references PRODUCT2 (ID);
+
+--
 
 alter table PRODUCT drop column AVAIL_QTY;
 
-update PRODUCT set UNIT_IND_CASE = 'Y', SKU_CASE = CODE, ACTIVE_UNIT_IND_CASE = ACTIVE_IND where UOM_CODE = 'CASE';
-update PRODUCT set UNIT_IND_PACK = 'Y', SKU_PACK = CODE, ACTIVE_UNIT_IND_PACK = ACTIVE_IND where UOM_CODE = 'PACK';
-update PRODUCT set UNIT_IND_HDZN = 'Y', SKU_HDZN = CODE, ACTIVE_UNIT_IND_HDZN = ACTIVE_IND where UOM_CODE = 'HDZN';
-update PRODUCT set UNIT_IND_PCS = 'Y', SKU_PCS = CODE, ACTIVE_UNIT_IND_PCS = ACTIVE_IND where UOM_CODE = 'PCS';
+--
+
+insert into SEQUENCE (NAME) values ('ADJUSTMENT_OUT_NO_SEQ');
+insert into SEQUENCE (NAME) values ('ADJUSTMENT_IN_NO_SEQ');
+
+create table ADJUSTMENT_IN (
+  ID integer auto_increment,
+  ADJUSTMENT_IN_NO integer not null,
+  POST_IND char(1) default 'N' not null,
+  REMARKS varchar(100) null,
+  POST_DT datetime null,
+  POSTED_BY integer null,
+  PILFERAGE_IND char(1) default 'N' not null,
+  constraint ADJUSTMENT_IN$PK primary key (ID),
+  constraint ADJUSTMENT_IN$UK unique (ADJUSTMENT_IN_NO),
+  constraint ADJUSTMENT_IN$FK foreign key (POSTED_BY) references USER (ID)
+);
+
+create table ADJUSTMENT_IN_ITEM (
+  ID integer auto_increment,
+  ADJUSTMENT_IN_ID integer not null,
+  PRODUCT_ID integer not null,
+  UNIT char(4) not null,
+  QUANTITY integer not null,
+  COST numeric(10, 2) null,
+  constraint ADJUSTMENT_IN_ITEM$PK primary key (ID),
+  constraint ADJUSTMENT_IN_ITEM$FK foreign key (ADJUSTMENT_IN_ID) references ADJUSTMENT_IN (ID),
+  constraint ADJUSTMENT_IN_ITEM$FK2 foreign key (PRODUCT_ID) references PRODUCT2 (ID)
+);
