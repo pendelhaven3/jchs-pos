@@ -112,7 +112,7 @@ public class ReceivingReceiptServiceImpl implements ReceivingReceiptService {
 			}
 			product2Repository.updateCosts(product);
 			
-			product2Repository.addAvailableQuantity(product, item.getUnit(), item.getQuantity());
+			product2Repository.addAvailableQuantity(product.getId(), item.getUnit(), item.getQuantity());
 			
 			item.setCurrentCost(currentCost);
 			receivingReceiptItemDao.save(item);

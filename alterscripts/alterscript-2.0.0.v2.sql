@@ -40,6 +40,8 @@ create table PRODUCT2 (
 alter table PRODUCT add PRODUCT2_ID integer null;
 alter table PRODUCT add constraint PRODUCT$FK foreign key (PRODUCT2_ID) references PRODUCT2 (ID);
 
+-- SUPPLIER_PRODUCT
+
 alter table SUPPLIER_PRODUCT drop foreign key SUPPLIER_PRODUCT$FK2;
 
 update SUPPLIER_PRODUCT a
@@ -53,4 +55,13 @@ alter table SUPPLIER_PRODUCT add constraint SUPPLIER_PRODUCT$FK2 foreign key (PR
 alter table PURCHASE_ORDER_ITEM drop foreign key PURCHASE_ORDER_ITEM$FK2;
 alter table RECEIVING_RECEIPT_ITEM drop foreign key RECEIVING_RECEIPT_ITEM$FK2;
 
+-- TODO: update scripts
+
 alter table PURCHASE_ORDER_ITEM add constraint PURCHASE_ORDER_ITEM$FK2 foreign key (PRODUCT_ID) references PRODUCT2 (ID);
+alter table RECEIVING_RECEIPT_ITEM add constraint RECEIVING_RECEIPT_ITEM$FK2 foreign key (PRODUCT_ID) references PRODUCT2 (ID);
+
+--
+
+alter table PRODUCT drop column AVAIL_QTY;
+
+

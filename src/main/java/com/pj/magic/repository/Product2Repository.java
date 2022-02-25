@@ -22,6 +22,8 @@ public interface Product2Repository {
 
 	void updateCosts(Product2 product);
 
-	void addAvailableQuantity(Product2 product, String unit, Integer quantity);
+	void addAvailableQuantity(Long id, String unit, Integer quantity);
+
+	void subtractAvailableQuantity(Long id, String unit, int quantity);
 
 }

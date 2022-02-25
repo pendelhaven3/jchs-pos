@@ -20,4 +20,8 @@ public interface Product2Service {
 
 	List<Supplier> getProductSuppliers(Product2 product);
 
+	void subtractAvailableQuantity(Long id, String unit, int quantity);
+
+	void addAvailableQuantity(Long id, String unit, int quantity);
+
 }

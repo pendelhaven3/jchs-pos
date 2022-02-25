@@ -53,10 +53,4 @@ public interface ProductService {
 
 	void updateProductsAsInactive(List<String> activeProductCodes);
 
-	void subtractAvailableQuantity(Product product, int quantity);
-
-	void addAvailableQuantity(Product product, int quantity);
-
-	void subtractAvailableQuantity(Product product, int quantity, boolean allowNegative);
-	
 }

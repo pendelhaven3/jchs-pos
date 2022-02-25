@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
@@ -262,7 +263,11 @@ public class Product2RepositoryImpl extends MagicDao implements Product2Reposito
 	
 	@Override
 	public Product2 get(Long id) {
-		return getJdbcTemplate().queryForObject(GET_SQL, rowMapper, id);
+		try {
+			return getJdbcTemplate().queryForObject(GET_SQL, rowMapper, id);
+		} catch (IncorrectResultSizeDataAccessException e) {
+			return null;
+		}
 	}
 
 	private static final String UPDATE_SQL =
@@ -323,22 +328,45 @@ public class Product2RepositoryImpl extends MagicDao implements Product2Reposito
 	}
 
 	@Override
-	public void addAvailableQuantity(Product2 product, String unit, Integer quantity) {
+	public void addAvailableQuantity(Long id, String unit, Integer quantity) {
 		switch (unit) {
 		case Unit.CASE:
-			getJdbcTemplate().update("update PRODUCT2 set AVAIL_QTY_CASE = AVAIL_QTY_CASE + ? where ID = ?", quantity, product.getId());
+			getJdbcTemplate().update("update PRODUCT2 set AVAIL_QTY_CASE = AVAIL_QTY_CASE + ? where ID = ?", quantity, id);
 			break;
 		case Unit.TIES:
-			getJdbcTemplate().update("update PRODUCT2 set AVAIL_QTY_TIES = AVAIL_QTY_TIES + ? where ID = ?", quantity, product.getId());
+			getJdbcTemplate().update("update PRODUCT2 set AVAIL_QTY_TIES = AVAIL_QTY_TIES + ? where ID = ?", quantity, id);
 			break;
 		case Unit.PACK:
-			getJdbcTemplate().update("update PRODUCT2 set AVAIL_QTY_PACK = AVAIL_QTY_PACK + ? where ID = ?", quantity, product.getId());
+			getJdbcTemplate().update("update PRODUCT2 set AVAIL_QTY_PACK = AVAIL_QTY_PACK + ? where ID = ?", quantity, id);
 			break;
 		case Unit.HDZN:
-			getJdbcTemplate().update("update PRODUCT2 set AVAIL_QTY_HDZN = AVAIL_QTY_HDZN + ? where ID = ?", quantity, product.getId());
+			getJdbcTemplate().update("update PRODUCT2 set AVAIL_QTY_HDZN = AVAIL_QTY_HDZN + ? where ID = ?", quantity, id);
 			break;
 		case Unit.PIECES:
-			getJdbcTemplate().update("update PRODUCT2 set AVAIL_QTY_PCS = AVAIL_QTY_PCS + ? where ID = ?", quantity, product.getId());
+			getJdbcTemplate().update("update PRODUCT2 set AVAIL_QTY_PCS = AVAIL_QTY_PCS + ? where ID = ?", quantity, id);
+			break;
+		default:
+			throw new RuntimeException("Unrecognized unit: " + unit);
+		}
+	}
+
+	@Override
+	public void subtractAvailableQuantity(Long id, String unit, int quantity) {
+		switch (unit) {
+		case Unit.CASE:
+			getJdbcTemplate().update("update PRODUCT2 set AVAIL_QTY_CASE = AVAIL_QTY_CASE - ? where ID = ?", quantity, id);
+			break;
+		case Unit.TIES:
+			getJdbcTemplate().update("update PRODUCT2 set AVAIL_QTY_TIES = AVAIL_QTY_TIES - ? where ID = ?", quantity, id);
+			break;
+		case Unit.PACK:
+			getJdbcTemplate().update("update PRODUCT2 set AVAIL_QTY_PACK = AVAIL_QTY_PACK - ? where ID = ?", quantity, id);
+			break;
+		case Unit.HDZN:
+			getJdbcTemplate().update("update PRODUCT2 set AVAIL_QTY_HDZN = AVAIL_QTY_HDZN - ? where ID = ?", quantity, id);
+			break;
+		case Unit.PIECES:
+			getJdbcTemplate().update("update PRODUCT2 set AVAIL_QTY_PCS = AVAIL_QTY_PCS - ? where ID = ?", quantity, id);
 			break;
 		default:
 			throw new RuntimeException("Unrecognized unit: " + unit);
@@ -366,30 +394,6 @@ public class Product2RepositoryImpl extends MagicDao implements Product2Reposito
 		return getJdbcTemplate().query(FIND_ALL_ACTIVE_BY_SUPPLIER_SQL, productRowMapper, supplier.getId());
 	}
 
-	private static final String UPDATE_COSTS_SQL =
-			"update PRODUCT"
-			+ " set GROSS_COST_CASE = ?, GROSS_COST_TIE = ?, GROSS_COST_PACK = ?, "
-			+ " GROSS_COST_HDZN = ?, GROSS_COST_PCS = ?, FINAL_COST_CASE = ?, "
-			+ " FINAL_COST_TIE = ?, FINAL_COST_PACK = ?, FINAL_COST_HDZN = ?, "
-			+ " FINAL_COST_PCS = ?"
-			+ " where ID = ?"; 
-	
-	@Override
-	public void updateCosts(Product product) {
-		getJdbcTemplate().update(UPDATE_COSTS_SQL,
-				product.getGrossCost(Unit.CASE),
-				product.getGrossCost(Unit.TIES),
-				product.getGrossCost(Unit.PACK),
-				product.getGrossCost(Unit.HDZN),
-				product.getGrossCost(Unit.PIECES),
-				product.getFinalCost(Unit.CASE),
-				product.getFinalCost(Unit.TIES),
-				product.getFinalCost(Unit.PACK),
-				product.getFinalCost(Unit.HDZN),
-				product.getFinalCost(Unit.PIECES),
-				product.getId());
-	}
-
 	private static final String FIND_BY_ID_AND_PRICING_SCHEME_SQL = BASE_SELECT_SQL
 			+ " and a.ID = ? and b.PRICING_SCHEME_ID = ?";
 	
@@ -414,13 +418,6 @@ public class Product2RepositoryImpl extends MagicDao implements Product2Reposito
 		} catch (IncorrectResultSizeDataAccessException e) {
 			return null;
 		}
-	}
-
-	private static final String DELETE_SQL = "delete from PRODUCT where ID = ?";
-	
-	@Override
-	public void delete(Product product) {
-		getJdbcTemplate().update(DELETE_SQL, product.getId());
 	}
 
 	private static final String UPDATE_MAXIMUM_STOCK_LEVEL_SQL = 

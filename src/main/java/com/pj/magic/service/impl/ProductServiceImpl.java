@@ -209,27 +209,4 @@ public class ProductServiceImpl implements ProductService {
 		}
 	}
 
-	@Transactional(noRollbackFor = NotEnoughStocksException.class)
-	@Override
-	public void subtractAvailableQuantity(Product product, int quantity) {
-		subtractAvailableQuantity(product, quantity, true);
-	}
-
-	@Transactional
-	@Override
-	public void addAvailableQuantity(Product product, int quantity) {
-		productDao.addAvailableQuantity(product, quantity);
-	}
-
-	@Override
-	public void subtractAvailableQuantity(Product product, int quantity, boolean validateAvailability) {
-		if (validateAvailability) {
-			Product fromDb = productDao.get(product.getId());
-			if (fromDb.getAvailableQuantity() < quantity) {
-				throw new NotEnoughStocksException(product.getCode());
-			}
-		}
-		productDao.subtractAvailableQuantity(product, quantity);
-	}
-
 }

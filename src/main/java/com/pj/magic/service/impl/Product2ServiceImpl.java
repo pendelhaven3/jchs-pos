@@ -81,4 +81,14 @@ public class Product2ServiceImpl implements Product2Service {
 		return supplierDao.findAllByProduct(product);
 	}
 
+	@Override
+	public void subtractAvailableQuantity(Long id, String unit, int quantity) {
+		product2Repository.subtractAvailableQuantity(id, unit, quantity);
+	}
+
+	@Override
+	public void addAvailableQuantity(Long id, String unit, int quantity) {
+		product2Repository.addAvailableQuantity(id, unit, quantity);
+	}
+
 }

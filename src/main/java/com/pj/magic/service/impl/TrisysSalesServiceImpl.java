@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.StringJoiner;
@@ -22,13 +23,14 @@ import com.pj.magic.model.TrisysSalesItem;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.pj.magic.exception.FileAlreadyImportedException;
-import com.pj.magic.exception.NotEnoughStocksException;
 import com.pj.magic.model.Product;
+import com.pj.magic.model.Product2;
 import com.pj.magic.model.TrisysSales;
 import com.pj.magic.repository.TrisysSalesImportRepository;
 import com.pj.magic.repository.TrisysSalesItemRepository;
 import com.pj.magic.repository.TrisysSalesRepository;
 import com.pj.magic.service.LoginService;
+import com.pj.magic.service.Product2Service;
 import com.pj.magic.service.ProductService;
 import com.pj.magic.service.SystemService;
 import com.pj.magic.service.TrisysSalesService;
@@ -46,6 +48,7 @@ public class TrisysSalesServiceImpl implements TrisysSalesService {
 	@Autowired private LoginService loginService;
 	@Autowired private SystemService systemService;
 	@Autowired private ProductService productService;
+	@Autowired private Product2Service product2Service;
 	
 	@Override
 	public List<TrisysSalesImport> getAllTrisysSalesImports() {
@@ -89,7 +92,7 @@ public class TrisysSalesServiceImpl implements TrisysSalesService {
 		trisysSalesItemRepository.save(item);
 	}
 
-	@Transactional()
+	@Transactional
 	@Override
 	public void importTrisysSales(File file) throws Exception {
         String filename = FilenameUtils.getBaseName(file.getName());
@@ -132,38 +135,55 @@ public class TrisysSalesServiceImpl implements TrisysSalesService {
             	}
             	
             	String productCode = nextLine[2];
+            	String unit = nextLine[6];
             	BigDecimal unitCost = new BigDecimal(nextLine[7]);
             	BigDecimal sellPrice = new BigDecimal(nextLine[8]);
             	BigDecimal total = new BigDecimal(nextLine[10]);
             	
-            	TrisysSalesItem item = new TrisysSalesItem();
-            	item.setSales(sales);
-            	item.setProductCode(productCode);
-            	item.setQuantity(total.divide(sellPrice, 2, RoundingMode.HALF_EVEN).intValue());
-            	item.setUnitCost(unitCost);
-            	item.setSellPrice(sellPrice);
-            	saveSalesItem(item);
+            	List<String> allowedUnits = Arrays.asList("CASE", "TIES", "PACK", "HDZN", "PCS");
+            	if (!allowedUnits.contains(unit)) {
+            		continue;
+            	}
             	
             	Product product = productService.findProductByCode(productCode);
             	if (product != null) {
-            		try {
-                    	productService.subtractAvailableQuantity(product, item.getQuantity(), !product.isWholesale());
-            		} catch (NotEnoughStocksException e) {
-        				Product wholesaleProduct = productService.findProductByCode(product.getCode() + "01");
-        				if (wholesaleProduct != null && wholesaleProduct.getAvailableQuantity() > 0) {
-        					Product fromDb = productService.findProductByCode(product.getCode());
-        					int quantityToConvert = 1;
-        					while (item.getQuantity() > (fromDb.getAvailableQuantity() + product.getUnitConversions().get(1).getQuantity() * quantityToConvert)
-        							&& wholesaleProduct.getAvailableQuantity() > quantityToConvert) {
-        						quantityToConvert++;
-        					}
-        					productService.subtractAvailableQuantity(wholesaleProduct, quantityToConvert, false);
-        					productService.addAvailableQuantity(product, product.getUnitConversions().get(1).getQuantity() * quantityToConvert);
-        					productService.subtractAvailableQuantity(product, item.getQuantity(), false);
-        				} else {
-                        	productService.subtractAvailableQuantity(product, item.getQuantity(), false);
-        				}
-            		}
+                	if (product.getUnits().size() > 1 && !allowedUnits.contains(product.getUnits().get(1))) { // debug line
+                		continue;
+                	}
+            		
+                	TrisysSalesItem item = new TrisysSalesItem();
+                	item.setSales(sales);
+                	item.setProductCode(productCode);
+                	item.setQuantity(total.divide(sellPrice, 2, RoundingMode.HALF_EVEN).intValue());
+                	item.setUnit(unit);
+                	item.setUnitCost(unitCost);
+                	item.setSellPrice(sellPrice);
+                	saveSalesItem(item);
+            		
+                	product2Service.subtractAvailableQuantity(product.getProduct2Id(), item.getUnit(), item.getQuantity());
+                	
+                	// auto conversion
+    				Product2 product2 = product2Service.getProduct(product.getProduct2Id());
+    				int availableQuantity = product2.getUnitQuantity(item.getUnit());
+    				if (availableQuantity < 0 && !product.isWholesale()) {
+    	            	Product wholesaleProduct = productService.findProductByCode(productCode + "01");
+    	            	if (wholesaleProduct != null) {
+    	            		String wholesaleUnit = wholesaleProduct.getUnits().get(0);
+    	            		int availableWholesaleQuantity = product2.getUnitQuantity(wholesaleUnit);
+    	            		if (availableWholesaleQuantity > 0) {
+    	            			int unitConversion = product2.getUnitConversion(wholesaleUnit);
+            					int quantityToConvert = 1;
+            					while (quantityToConvert >= availableWholesaleQuantity &&
+            							availableQuantity + (unitConversion * quantityToConvert) < 0) {
+            						quantityToConvert++;
+            					}
+            					product2Service.subtractAvailableQuantity(product.getProduct2Id(), wholesaleUnit, quantityToConvert);
+            					product2Service.addAvailableQuantity(product.getProduct2Id(), item.getUnit(), quantityToConvert * unitConversion);
+    	            		}
+    	            	}
+    				}
+            	} else {
+//            		throw new RuntimeException("Product code not found: " + productCode);
             	}
             }
         }
