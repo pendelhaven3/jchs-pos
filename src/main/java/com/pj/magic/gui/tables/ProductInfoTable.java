@@ -7,7 +7,7 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 
-import com.pj.magic.model.Product;
+import com.pj.magic.model.Product2;
 import com.pj.magic.model.Unit;
 import com.pj.magic.util.FormatterUtil;
 
@@ -38,7 +38,7 @@ public class ProductInfoTable extends JTable {
 		});
 	}
 	
-	public void setProduct(Product product) {
+	public void setProduct(Product2 product) {
 		tableModel.setProduct(product);
 	}
 	
@@ -48,9 +48,9 @@ public class ProductInfoTable extends JTable {
 	
 	private class ProductInfoTableModel extends AbstractTableModel {
 
-		private Product product = new Product();
+		private Product2 product = new Product2();
 		
-		public void setProduct(Product product) {
+		public void setProduct(Product2 product) {
 			this.product = product;
 			fireTableDataChanged();
 		}

@@ -27,6 +27,7 @@ import com.pj.magic.gui.tables.MagicListTable;
 import com.pj.magic.gui.tables.models.ProductsTableModel;
 import com.pj.magic.model.PricingScheme;
 import com.pj.magic.model.Product;
+import com.pj.magic.model.Product2;
 import com.pj.magic.model.Supplier;
 import com.pj.magic.model.Unit;
 import com.pj.magic.model.search.ProductSearchCriteria;
@@ -45,6 +46,7 @@ public class SelectProductDialog extends MagicDialog {
 	private static final String UNIT_COST_INFO_TABLE = "unitCostInfoTable";
 
 	@Autowired private ProductService productService;
+	@Autowired private Product2Service product2Service;
 
 	private ProductsTableModel productsTableModel = new ProductsTableModel();
 	private UnitPricesAndQuantitiesTableModel unitPricesAndQuantitiesTableModel;
@@ -88,8 +90,9 @@ public class SelectProductDialog extends MagicDialog {
 				int selectedRow = productsTable.getSelectedRow();
 				if (selectedRow != -1) {
 					Product product = productsTableModel.getProduct(selectedRow);
-					unitPricesAndQuantitiesTableModel.setProduct(product);
-					unitCostsAndQuantitiesTableModel.setProduct(product);
+					Product2 product2 = product2Service.getProduct(product.getProduct2Id());
+					unitPricesAndQuantitiesTableModel.setProduct(product2);
+					unitCostsAndQuantitiesTableModel.setProduct(product2);
 				}
 			}
 		});
@@ -264,9 +267,9 @@ public class SelectProductDialog extends MagicDialog {
 		private final String[] columnNames = {"Unit", "Quantity", "Price"};
 		private final String[] units = {Unit.CASE, Unit.TIES, Unit.PACK, Unit.HDZN, Unit.PIECES};
 		
-		private Product product;
+		private Product2 product;
 		
-		public void setProduct(Product product) {
+		public void setProduct(Product2 product) {
 			this.product = product;
 			fireTableDataChanged();
 		}
@@ -325,9 +328,9 @@ public class SelectProductDialog extends MagicDialog {
 		private final String[] columnNames = {"Unit", "Quantity", "Cost"};
 		private final String[] units = {Unit.CASE, Unit.TIES, Unit.PACK, Unit.HDZN, Unit.PIECES};
 		
-		private Product product;
+		private Product2 product;
 		
-		public void setProduct(Product product) {
+		public void setProduct(Product2 product) {
 			this.product = product;
 			fireTableDataChanged();
 		}

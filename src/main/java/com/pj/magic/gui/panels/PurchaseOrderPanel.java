@@ -54,7 +54,6 @@ import com.pj.magic.gui.dialog.SelectSupplierDialog;
 import com.pj.magic.gui.tables.ProductInfoTable;
 import com.pj.magic.gui.tables.PurchaseOrderItemsTable;
 import com.pj.magic.model.PaymentTerm;
-import com.pj.magic.model.Product;
 import com.pj.magic.model.Product2;
 import com.pj.magic.model.PurchaseOrder;
 import com.pj.magic.model.ReceivingReceipt;
@@ -62,6 +61,7 @@ import com.pj.magic.model.Supplier;
 import com.pj.magic.service.ExcelService;
 import com.pj.magic.service.PaymentTermService;
 import com.pj.magic.service.PrintService;
+import com.pj.magic.service.Product2Service;
 import com.pj.magic.service.ProductService;
 import com.pj.magic.service.PurchaseOrderService;
 import com.pj.magic.service.SupplierService;
@@ -80,7 +80,7 @@ public class PurchaseOrderPanel extends StandardMagicPanel {
 	private static final Logger logger = LoggerFactory.getLogger(PurchaseOrderPanel.class);
 	
 	@Autowired private PurchaseOrderItemsTable itemsTable;
-	@Autowired private ProductService productService;
+	@Autowired private Product2Service product2Service;
 	@Autowired private PurchaseOrderService purchaseOrderService;
 	@Autowired private SupplierService supplierService;
 	@Autowired private PaymentTermService paymentTermService;
@@ -747,12 +747,12 @@ public class PurchaseOrderPanel extends StandardMagicPanel {
 			return;
 		}
 		
-//		Product2 product = itemsTable.getCurrentlySelectedRowItem().getProduct();
-//		if (product != null) {
-//			productInfoTable.setProduct(productService.getProduct(product.getId()));
-//		} else {
-//			productInfoTable.setProduct(null);
-//		}
+		Product2 product = itemsTable.getCurrentlySelectedRowItem().getProduct();
+		if (product != null) {
+			productInfoTable.setProduct(product2Service.getProduct(product.getId()));
+		} else {
+			productInfoTable.setProduct(null);
+		}
 	}
 	
 	private void markPurchaseOrderAsDelivered() {

@@ -21,7 +21,6 @@ import com.pj.magic.util.ComponentUtil;
 import com.pj.magic.util.KeyUtil;
 
 @Component
-@SuppressWarnings("serial")
 public class SearchProductsDialog extends MagicDialog {
 
 	private MagicTextField codeOrDescriptionField;

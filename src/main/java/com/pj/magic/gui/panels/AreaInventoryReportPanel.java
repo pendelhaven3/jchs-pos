@@ -580,18 +580,18 @@ public class AreaInventoryReportPanel extends StandardMagicPanel {
 	}
 
 	private void updateUnitPricesAndQuantitiesTable() {
-		if (itemsTable.getSelectedRow() == -1) {
-			productInfoTable.setProduct(null);
-			return;
-		}
-		
-		Product product = itemsTable.getCurrentlySelectedRowItem().getProduct();
-		if (product != null) {
-			product = productService.findProductByCode(product.getCode());
-			productInfoTable.setProduct(product);
-		} else {
-			productInfoTable.setProduct(null);
-		}
+//		if (itemsTable.getSelectedRow() == -1) {
+//			productInfoTable.setProduct(null);
+//			return;
+//		}
+//		
+//		Product product = itemsTable.getCurrentlySelectedRowItem().getProduct();
+//		if (product != null) {
+//			product = productService.findProductByCode(product.getCode());
+//			productInfoTable.setProduct(product);
+//		} else {
+//			productInfoTable.setProduct(null);
+//		}
 	}
 	
 }
