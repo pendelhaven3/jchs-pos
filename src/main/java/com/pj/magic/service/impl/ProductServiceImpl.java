@@ -27,7 +27,6 @@ import com.pj.magic.model.Product2;
 import com.pj.magic.model.ProductPriceHistory;
 import com.pj.magic.model.Supplier;
 import com.pj.magic.model.search.ProductSearchCriteria;
-import com.pj.magic.repository.DailyProductStartingQuantityRepository;
 import com.pj.magic.repository.Product2Repository;
 import com.pj.magic.service.LoginService;
 import com.pj.magic.service.Product2Service;
@@ -49,7 +48,6 @@ public class ProductServiceImpl implements ProductService {
 	@Autowired private AreaInventoryReportItemDao areaInventoryReportItemDao;
 	@Autowired private ProductPriceHistoryDao productPriceHistoryDao;
 	@Autowired private LoginService loginService;
-	@Autowired private DailyProductStartingQuantityRepository dailyProductStartingQuantityRepository;
 	@Autowired private SystemDao systemDao;
 	@Autowired private Product2Service product2Service;
 	@Autowired private Product2Repository product2Repository;
@@ -157,17 +155,6 @@ public class ProductServiceImpl implements ProductService {
 	@Override
 	public void updateMaximumStockLevel(List<Product> products) {
 		productDao.updateMaximumStockLevel(products);
-	}
-
-	@Transactional
-	@Override
-	public boolean saveDailyProductStartingQuantities() {
-		Date today = systemDao.getCurrentDateTime();
-		if (dailyProductStartingQuantityRepository.getCountByDate(today) == 0) {
-			dailyProductStartingQuantityRepository.saveQuantities(today);
-			return true;
-		}
-		return false;
 	}
 
 	@Transactional

@@ -42,11 +42,6 @@ public interface ProductService {
 
 	void updateMaximumStockLevel(List<Product> products);
 
-	/**
-	 * @return true if quantities are saved, false if not (probably existing already)
-	 */
-	boolean saveDailyProductStartingQuantities();
-
     void updateProduct(Product product);
 
 	List<String> getAllActiveProductCodes();
