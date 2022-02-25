@@ -31,14 +31,12 @@ import com.pj.magic.gui.component.MagicCheckBox;
 import com.pj.magic.gui.component.MagicTextField;
 import com.pj.magic.gui.component.MagicToolBar;
 import com.pj.magic.gui.component.MagicToolBarButton;
-import com.pj.magic.gui.dialog.PrintPreviewDialog;
 import com.pj.magic.gui.tables.AdjustmentInItemsTable;
 import com.pj.magic.gui.tables.ProductInfoTable;
 import com.pj.magic.model.AdjustmentIn;
 import com.pj.magic.model.Product2;
 import com.pj.magic.service.AdjustmentInService;
 import com.pj.magic.service.LoginService;
-import com.pj.magic.service.PrintService;
 import com.pj.magic.service.Product2Service;
 import com.pj.magic.util.ComponentUtil;
 import com.pj.magic.util.FormatterUtil;
@@ -50,8 +48,8 @@ public class AdjustmentInPanel extends StandardMagicPanel {
 	
 	@Autowired private AdjustmentInItemsTable itemsTable;
 	@Autowired private AdjustmentInService adjustmentInService;
-	@Autowired private PrintPreviewDialog printPreviewDialog;
-	@Autowired private PrintService printService;
+//	@Autowired private PrintPreviewDialog printPreviewDialog;
+//	@Autowired private PrintService printService;
 	@Autowired private LoginService loginService;
 	@Autowired private Product2Service product2Service;
 	
@@ -182,7 +180,7 @@ public class AdjustmentInPanel extends StandardMagicPanel {
 		}
 		remarksField.setEnabled(!adjustmentIn.isPosted());
 		remarksField.setText(adjustmentIn.getRemarks());
-		pilferageCheckBox.setEnabled(loginService.getLoggedInUser().isSupervisor());
+		pilferageCheckBox.setEnabled(loginService.getLoggedInUser().isSupervisor() && !adjustmentIn.isPosted());
 		pilferageCheckBox.setSelected(adjustmentIn.getPilferageFlag(), false);
 		totalItemsField.setText(String.valueOf(adjustmentIn.getTotalItems()));
 		totalAmountField.setText(adjustmentIn.getTotalAmount().toString());
@@ -491,26 +489,26 @@ public class AdjustmentInPanel extends StandardMagicPanel {
 		});
 		toolBar.add(postButton);
 		
-		printPreviewButton = new MagicToolBarButton("print_preview", "Print Preview");
-		printPreviewButton.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				printPreviewDialog.updateDisplay(printService.generateReportAsString(adjustmentIn));
-				printPreviewDialog.setVisible(true);
-			}
-		});
-		toolBar.add(printPreviewButton);
-		
-		printButton = new MagicToolBarButton("print", "Print");
-		printButton.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				printService.print(adjustmentIn);
-			}
-		});
-		toolBar.add(printButton);
+//		printPreviewButton = new MagicToolBarButton("print_preview", "Print Preview");
+//		printPreviewButton.addActionListener(new ActionListener() {
+//			
+//			@Override
+//			public void actionPerformed(ActionEvent e) {
+//				printPreviewDialog.updateDisplay(printService.generateReportAsString(adjustmentIn));
+//				printPreviewDialog.setVisible(true);
+//			}
+//		});
+//		toolBar.add(printPreviewButton);
+//		
+//		printButton = new MagicToolBarButton("print", "Print");
+//		printButton.addActionListener(new ActionListener() {
+//			
+//			@Override
+//			public void actionPerformed(ActionEvent e) {
+//				printService.print(adjustmentIn);
+//			}
+//		});
+//		toolBar.add(printButton);
 	}
 
 }

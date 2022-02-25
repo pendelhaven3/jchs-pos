@@ -93,3 +93,28 @@ create table ADJUSTMENT_IN_ITEM (
   constraint ADJUSTMENT_IN_ITEM$FK foreign key (ADJUSTMENT_IN_ID) references ADJUSTMENT_IN (ID),
   constraint ADJUSTMENT_IN_ITEM$FK2 foreign key (PRODUCT_ID) references PRODUCT2 (ID)
 );
+
+create table ADJUSTMENT_OUT (
+  ID integer auto_increment,
+  ADJUSTMENT_OUT_NO integer not null,
+  POST_IND char(1) default 'N' not null,
+  REMARKS varchar(100) null,
+  POST_DT datetime null,
+  POSTED_BY integer null,
+  PILFERAGE_IND char(1) default 'N' not null,
+  constraint ADJUSTMENT_OUT$PK primary key (ID),
+  constraint ADJUSTMENT_OUT$UK unique (ADJUSTMENT_OUT_NO),
+  constraint ADJUSTMENT_OUT$FK foreign key (POSTED_BY) references USER (ID)
+);
+
+create table ADJUSTMENT_OUT_ITEM (
+  ID integer auto_increment,
+  ADJUSTMENT_OUT_ID integer not null,
+  PRODUCT_ID integer not null,
+  UNIT char(4) not null,
+  QUANTITY integer not null,
+  UNIT_PRICE numeric(10, 2) null,
+  constraint ADJUSTMENT_OUT_ITEM$PK primary key (ID),
+  constraint ADJUSTMENT_OUT_ITEM$FK foreign key (ADJUSTMENT_OUT_ID) references ADJUSTMENT_OUT (ID),
+  constraint ADJUSTMENT_OUT_ITEM$FK2 foreign key (PRODUCT_ID) references PRODUCT2 (ID)
+);

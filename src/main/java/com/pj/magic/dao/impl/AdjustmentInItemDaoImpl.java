@@ -28,7 +28,8 @@ public class AdjustmentInItemDaoImpl extends MagicDao implements AdjustmentInIte
 			+ " from ADJUSTMENT_IN_ITEM a"
 			+ " join PRODUCT b"
 			+ "   on b.PRODUCT2_ID = a.PRODUCT_ID"
-			+ "   and b.UOM_CODE = a.UNIT";	
+			+ "   and b.UOM_CODE = a.UNIT";
+	
 	private RowMapper<AdjustmentInItem> rowMapper = new RowMapper<AdjustmentInItem>() {
 
 		@Override

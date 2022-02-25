@@ -50,8 +50,6 @@ public class AdjustmentInItemsTableModel extends AbstractTableModel {
 			return rowItem.getProductCode();
 		case AdjustmentInItemsTable.PRODUCT_DESCRIPTION_COLUMN_INDEX:
 			return (rowItem.getProduct() != null) ? rowItem.getProduct().getDescription() : null;
-		case AdjustmentInItemsTable.UNIT_COLUMN_INDEX:
-			return rowItem.getUnit();
 		case AdjustmentInItemsTable.QUANTITY_COLUMN_INDEX:
 			return rowItem.getQuantity();
 		case AdjustmentInItemsTable.COST_COLUMN_INDEX:

@@ -127,10 +127,6 @@ public class AdjustmentInItemsTable extends MagicTable {
 		return getSelectedColumn() == PRODUCT_CODE_COLUMN_INDEX;
 	}
 
-	public boolean isUnitFieldSelected() {
-		return getSelectedColumn() == UNIT_COLUMN_INDEX;
-	}
-	
 	public boolean isLastRowSelected() {
 		return getSelectedRow() + 1 == tableModel.getRowCount();
 	}
@@ -259,7 +255,7 @@ public class AdjustmentInItemsTable extends MagicTable {
 			public void actionPerformed(ActionEvent e) {
 				if (isProductCodeFieldSelected()) {
 					openSelectProductDialogUsingPreviousCriteria();
-				} else if (isUnitFieldSelected() || isQuantityFieldSelected()) {
+				} else if (isQuantityFieldSelected()) {
 					copyValueFromPreviousRow();
 				}
 			}

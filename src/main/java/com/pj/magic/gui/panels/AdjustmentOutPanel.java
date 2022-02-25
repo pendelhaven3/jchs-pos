@@ -32,15 +32,13 @@ import com.pj.magic.gui.component.MagicCheckBox;
 import com.pj.magic.gui.component.MagicTextField;
 import com.pj.magic.gui.component.MagicToolBar;
 import com.pj.magic.gui.component.MagicToolBarButton;
-import com.pj.magic.gui.dialog.PrintPreviewDialog;
 import com.pj.magic.gui.tables.AdjustmentOutItemsTable;
 import com.pj.magic.gui.tables.ProductInfoTable;
 import com.pj.magic.model.AdjustmentOut;
-import com.pj.magic.model.Product;
+import com.pj.magic.model.Product2;
 import com.pj.magic.service.AdjustmentOutService;
 import com.pj.magic.service.LoginService;
-import com.pj.magic.service.PrintService;
-import com.pj.magic.service.ProductService;
+import com.pj.magic.service.Product2Service;
 import com.pj.magic.util.ComponentUtil;
 import com.pj.magic.util.FormatterUtil;
 
@@ -50,11 +48,11 @@ public class AdjustmentOutPanel extends StandardMagicPanel {
 	private static final Logger logger = LoggerFactory.getLogger(AdjustmentOutPanel.class);
 	
 	@Autowired private AdjustmentOutItemsTable itemsTable;
-	@Autowired private ProductService productService;
 	@Autowired private AdjustmentOutService adjustmentOutService;
-	@Autowired private PrintPreviewDialog printPreviewDialog;
-	@Autowired private PrintService printService;
+//	@Autowired private PrintPreviewDialog printPreviewDialog;
+//	@Autowired private PrintService printService;
 	@Autowired private LoginService loginService;
+	@Autowired private Product2Service product2Service;
 	
 	private AdjustmentOut adjustmentOut;
 	private JLabel adjustmentOutNumberLabel;
@@ -68,8 +66,8 @@ public class AdjustmentOutPanel extends StandardMagicPanel {
 	private JButton postButton;
 	private JButton addItemButton;
 	private JButton deleteItemButton;
-	private JButton printPreviewButton;
-	private JButton printButton;
+//	private JButton printPreviewButton;
+//	private JButton printButton;
 	private ProductInfoTable productInfoTable;
 	
 	@Override
@@ -172,7 +170,7 @@ public class AdjustmentOutPanel extends StandardMagicPanel {
 		remarksField.setEnabled(!adjustmentOut.isPosted());
 		remarksField.setText(adjustmentOut.getRemarks());
 		pilferageCheckBox.setSelected(adjustmentOut.getPilferageFlag(), false);
-		pilferageCheckBox.setEnabled(loginService.getLoggedInUser().isSupervisor());
+		pilferageCheckBox.setEnabled(loginService.getLoggedInUser().isSupervisor() && !adjustmentOut.isPosted());
 		if (adjustmentOut.getPostDate() != null) {
 			postDateField.setText(FormatterUtil.formatDateTime(adjustmentOut.getPostDate()));
 		} else {
@@ -441,17 +439,17 @@ public class AdjustmentOutPanel extends StandardMagicPanel {
 	}
 	
 	private void updateUnitPricesAndQuantitiesTable() {
-//		if (itemsTable.getSelectedRow() == -1) {
-//			productInfoTable.setProduct(null);
-//			return;
-//		}
-//		
-//		Product product = itemsTable.getCurrentlySelectedRowItem().getProduct();
-//		if (product != null) {
-//			productInfoTable.setProduct(productService.getProduct(product.getId()));
-//		} else {
-//			productInfoTable.setProduct(null);
-//		}
+		if (itemsTable.getSelectedRow() == -1) {
+			productInfoTable.setProduct(null);
+			return;
+		}
+		
+		Product2 product = itemsTable.getCurrentlySelectedRowItem().getProduct();
+		if (product != null) {
+			productInfoTable.setProduct(product2Service.getProduct(product.getId()));
+		} else {
+			productInfoTable.setProduct(null);
+		}
 	}
 	
 	private void postAdjustmentOut() {
@@ -494,26 +492,26 @@ public class AdjustmentOutPanel extends StandardMagicPanel {
 		});
 		toolBar.add(postButton);
 		
-		printPreviewButton = new MagicToolBarButton("print_preview", "Print Preview");
-		printPreviewButton.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				printPreviewDialog.updateDisplay(printService.generateReportAsString(adjustmentOut));
-				printPreviewDialog.setVisible(true);
-			}
-		});
-		toolBar.add(printPreviewButton);
-		
-		printButton = new MagicToolBarButton("print", "Print");
-		printButton.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				printService.print(adjustmentOut);
-			}
-		});
-		toolBar.add(printButton);
+//		printPreviewButton = new MagicToolBarButton("print_preview", "Print Preview");
+//		printPreviewButton.addActionListener(new ActionListener() {
+//			
+//			@Override
+//			public void actionPerformed(ActionEvent e) {
+//				printPreviewDialog.updateDisplay(printService.generateReportAsString(adjustmentOut));
+//				printPreviewDialog.setVisible(true);
+//			}
+//		});
+//		toolBar.add(printPreviewButton);
+//		
+//		printButton = new MagicToolBarButton("print", "Print");
+//		printButton.addActionListener(new ActionListener() {
+//			
+//			@Override
+//			public void actionPerformed(ActionEvent e) {
+//				printService.print(adjustmentOut);
+//			}
+//		});
+//		toolBar.add(printButton);
 	}
 
 }
