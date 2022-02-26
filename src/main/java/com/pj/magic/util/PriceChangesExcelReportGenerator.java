@@ -145,15 +145,15 @@ public class PriceChangesExcelReportGenerator {
 				cell.setCellStyle(borderedStyle);
 				
 				createAmountCell(row, 2, item.getActiveUnitPrice(Unit.PIECES), amountStyle, borderedStyle);
-				createAmountCell(row, 3, item.getActiveUnitPrice(Unit.DOZEN), amountStyle, borderedStyle);
-				createAmountCell(row, 4, item.getActiveUnitPrice(Unit.CARTON), amountStyle, borderedStyle);
-				createAmountCell(row, 5, item.getActiveUnitPrice(Unit.TIE), amountStyle, borderedStyle);
+				createAmountCell(row, 3, item.getActiveUnitPrice(Unit.HDZN), amountStyle, borderedStyle);
+				createAmountCell(row, 4, item.getActiveUnitPrice(Unit.PACK), amountStyle, borderedStyle);
+				createAmountCell(row, 5, item.getActiveUnitPrice(Unit.TIES), amountStyle, borderedStyle);
 				createAmountCell(row, 6, item.getUnitPrice(Unit.CASE), amountStyle, borderedStyle);
 				
 				createAmountCell(row, 7, item.getPreviousActiveUnitPrice(Unit.PIECES), amountStyle, borderedStyle);
-				createAmountCell(row, 8, item.getPreviousActiveUnitPrice(Unit.DOZEN), amountStyle, borderedStyle);
-				createAmountCell(row, 9, item.getPreviousActiveUnitPrice(Unit.CARTON), amountStyle, borderedStyle);
-				createAmountCell(row, 10, item.getPreviousActiveUnitPrice(Unit.TIE), amountStyle, borderedStyle);
+				createAmountCell(row, 8, item.getPreviousActiveUnitPrice(Unit.HDZN), amountStyle, borderedStyle);
+				createAmountCell(row, 9, item.getPreviousActiveUnitPrice(Unit.PACK), amountStyle, borderedStyle);
+				createAmountCell(row, 10, item.getPreviousActiveUnitPrice(Unit.TIES), amountStyle, borderedStyle);
 				createAmountCell(row, 11, item.getPreviousUnitPrice(Unit.CASE), amountStyle, borderedStyle);
 				
 				BigDecimal percentIncrease = item.getPercentIncrease();

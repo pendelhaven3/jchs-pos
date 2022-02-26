@@ -19,12 +19,11 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class Product implements Comparable<Product>, Serializable {
+public class Product2 implements Comparable<Product2>, Serializable {
 
     private static final long serialVersionUID = -6522062463737148407L;
     
     private Long id;
-	private String code;
 	private String description;
 	private List<String> units = new ArrayList<>();
 	private List<String> activeUnits = new ArrayList<>();
@@ -39,13 +38,13 @@ public class Product implements Comparable<Product>, Serializable {
 	private List<UnitConversion> unitConversions = new ArrayList<>();
 	private List<UnitCost> unitCosts = new ArrayList<>();
 	private BigDecimal companyListPrice;
-	private Long product2Id;
+	private int availableQuantity;
 	private List<UnitSku> unitSkus = new ArrayList<>();
 
-	public Product() {
+	public Product2() {
 	}
 	
-	public Product(Long id) {
+	public Product2(Long id) {
 		this.id = id;
 	}
 	
@@ -85,7 +84,7 @@ public class Product implements Comparable<Product>, Serializable {
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder()
-			.append(code)
+			.append(id)
 			.hashCode();
 	}
 	
@@ -94,23 +93,15 @@ public class Product implements Comparable<Product>, Serializable {
 		if (obj == null) {
 			return false;
 		}
-        if (!(obj instanceof Product)) {
+        if (!(obj instanceof Product2)) {
             return false;
         }
-        Product other = (Product)obj;		
+        Product2 other = (Product2)obj;		
 		return new EqualsBuilder()
-			.append(code, other.getCode())
+			.append(id, other.getId())
 			.isEquals();
 	}
 	
-	public String getCode() {
-		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
-	}
-
 	public String getDescription() {
 		return description;
 	}
@@ -180,8 +171,8 @@ public class Product implements Comparable<Product>, Serializable {
 	}
 
 	@Override
-	public int compareTo(Product o) {
-		return code.compareTo(o.getCode());
+	public int compareTo(Product2 o) {
+		return id.compareTo(o.getId());
 	}
 
 	public boolean isActive() {
@@ -396,22 +387,27 @@ public class Product implements Comparable<Product>, Serializable {
     }
     
 	public void autoCalculateCostsOfSmallerUnits(String referenceUnit) {
-	    if (units.size() == 2) {
-            BigDecimal grossCost = getGrossCost(referenceUnit);
-            BigDecimal finalCost = getFinalCost(referenceUnit);
-            
-	        if (referenceUnit.equals(units.get(1))) {
-	            setGrossCost(units.get(0), grossCost.divide(new BigDecimal(getUnitConversion(referenceUnit)), 
-	                    2, RoundingMode.HALF_UP));
-	            setFinalCost(units.get(0), finalCost.divide(new BigDecimal(getUnitConversion(referenceUnit)), 
-                        2, RoundingMode.HALF_UP));
-	        } else {
-                setGrossCost(units.get(1), grossCost.multiply(new BigDecimal(getUnitConversion(units.get(1))))
-                        .setScale(2, RoundingMode.HALF_UP));
-                setFinalCost(units.get(1), finalCost.multiply(new BigDecimal(getUnitConversion(units.get(1))))
-                        .setScale(2, RoundingMode.HALF_UP));
-	        }
-	    }
+		Collections.sort(units, new Comparator<String>() {
+
+			@Override
+			public int compare(String unit1, String unit2) {
+				return Unit.compare(unit1, unit2) * -1;
+			}
+		});
+		
+		String maxUnit = referenceUnit;
+		BigDecimal grossCostOfMaxUnit = getGrossCost(maxUnit);
+		BigDecimal finalCostOfMaxUnit = getFinalCost(maxUnit);
+		int conversionOfMaxUnit = getUnitConversion(maxUnit);
+		for (int i = (units.indexOf(referenceUnit) + 1); i < units.size(); i++) {
+			String unit = units.get(i);
+			BigDecimal grossCost = grossCostOfMaxUnit.divide(new BigDecimal(conversionOfMaxUnit / getUnitConversion(unit)), 
+					2, RoundingMode.HALF_UP);
+			BigDecimal finalCost = finalCostOfMaxUnit.divide(new BigDecimal(conversionOfMaxUnit / getUnitConversion(unit)), 
+					2, RoundingMode.HALF_UP);
+			setGrossCost(unit, grossCost);
+			setFinalCost(unit, finalCost);
+		}
 	}
 	
 	public boolean hasNoSellingPrice(String unit) {
@@ -474,7 +470,7 @@ public class Product implements Comparable<Product>, Serializable {
 		}
 	}
 
-    public boolean areFieldsEqual(Product other) {
+    public boolean areFieldsEqual(Product2 other) {
         if (units.size() != other.getUnits().size()) {
             return false;
         }
@@ -500,10 +496,6 @@ public class Product implements Comparable<Product>, Serializable {
         }
     }
 
-	public boolean isWholesale() {
-		return code.length() == 14 && code.endsWith("01");
-	}
-    
 	public void addUnitSku(String unit, String sku) {
 		for (UnitSku unitSku : unitSkus) {
 			if (unit.equals(unitSku.getUnit())) {
@@ -521,13 +513,6 @@ public class Product implements Comparable<Product>, Serializable {
 			}
 		}
 		return null;
-	}
-	
-	public Product2 toProduct2() {
-		Product2 product2 = new Product2(product2Id);
-		product2.setDescription(description);
-		product2.setUnits(units);
-		return product2;
 	}
 	
 }

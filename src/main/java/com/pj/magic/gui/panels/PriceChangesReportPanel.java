@@ -434,13 +434,13 @@ public class PriceChangesReportPanel extends StandardMagicPanel {
 				BigDecimal unitPriceCase = item.getUnitPrice(Unit.CASE);
 				return (unitPriceCase != null) ? FormatterUtil.formatAmount(unitPriceCase) : null;
 			case UNIT_PRICE_TIE_COLUMN_INDEX:
-				BigDecimal unitPriceTie = item.getActiveUnitPrice(Unit.TIE);
+				BigDecimal unitPriceTie = item.getActiveUnitPrice(Unit.TIES);
 				return (unitPriceTie != null) ? FormatterUtil.formatAmount(unitPriceTie) : null;
 			case UNIT_PRICE_CARTON_COLUMN_INDEX:
-				BigDecimal unitPriceCarton = item.getActiveUnitPrice(Unit.CARTON);
+				BigDecimal unitPriceCarton = item.getActiveUnitPrice(Unit.PACK);
 				return (unitPriceCarton != null) ? FormatterUtil.formatAmount(unitPriceCarton) : null;
 			case UNIT_PRICE_DOZEN_COLUMN_INDEX:
-				BigDecimal unitPriceDozen = item.getActiveUnitPrice(Unit.DOZEN);
+				BigDecimal unitPriceDozen = item.getActiveUnitPrice(Unit.HDZN);
 				return (unitPriceDozen != null) ? FormatterUtil.formatAmount(unitPriceDozen) : null;
 			case UNIT_PRICE_PIECES_COLUMN_INDEX:
 				BigDecimal unitPricePieces = item.getActiveUnitPrice(Unit.PIECES);

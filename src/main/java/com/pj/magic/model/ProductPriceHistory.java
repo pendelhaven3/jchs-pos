@@ -121,14 +121,14 @@ public class ProductPriceHistory {
 		if (getUnitPrice(Unit.CASE) != null) {
 			return Unit.CASE;
 		}
-		if (getActiveUnitPrice(Unit.TIE) != null) {
-			return Unit.TIE;
+		if (getActiveUnitPrice(Unit.TIES) != null) {
+			return Unit.TIES;
 		}
-		if (getActiveUnitPrice(Unit.CARTON) != null) {
-			return Unit.CARTON;
+		if (getActiveUnitPrice(Unit.PACK) != null) {
+			return Unit.PACK;
 		}
-		if (getActiveUnitPrice(Unit.DOZEN) != null) {
-			return Unit.DOZEN;
+		if (getActiveUnitPrice(Unit.HDZN) != null) {
+			return Unit.HDZN;
 		}
 		return Unit.PIECES;
 	}

@@ -20,9 +20,9 @@ public class ProductPriceDaoImpl extends MagicDao implements ProductPriceDao {
 	public void updateUnitPrices(Product product, PricingScheme pricingScheme) {
 		getJdbcTemplate().update(UPDATE_UNIT_PRICES_SQL,
 				product.getUnitPrice(Unit.CASE),
-				product.getUnitPrice(Unit.TIE),
-				product.getUnitPrice(Unit.CARTON),
-				product.getUnitPrice(Unit.DOZEN),
+				product.getUnitPrice(Unit.TIES),
+				product.getUnitPrice(Unit.PACK),
+				product.getUnitPrice(Unit.HDZN),
 				product.getUnitPrice(Unit.PIECES),
 				product.getId(),
 				pricingScheme.getId()

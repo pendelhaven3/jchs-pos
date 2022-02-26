@@ -18,15 +18,34 @@ import com.pj.magic.dao.AdjustmentInItemDao;
 import com.pj.magic.model.AdjustmentIn;
 import com.pj.magic.model.AdjustmentInItem;
 import com.pj.magic.model.Product;
+import com.pj.magic.model.Product2;
 
 @Repository
 public class AdjustmentInItemDaoImpl extends MagicDao implements AdjustmentInItemDao {
 
 	private static final String BASE_SELECT_SQL =
-			"select ID, ADJUSTMENT_IN_ID, PRODUCT_ID, UNIT, QUANTITY, COST from ADJUSTMENT_IN_ITEM";
+			"select a.ID, a.ADJUSTMENT_IN_ID, a.PRODUCT_ID, a.UNIT, a.QUANTITY, a.COST, b.CODE"
+			+ " from ADJUSTMENT_IN_ITEM a"
+			+ " join PRODUCT b"
+			+ "   on b.PRODUCT2_ID = a.PRODUCT_ID"
+			+ "   and b.UOM_CODE = a.UNIT";
 	
-	private AdjustmentInItemRowMapper adjustmentInItemRowMapper =
-			new AdjustmentInItemRowMapper();
+	private RowMapper<AdjustmentInItem> rowMapper = new RowMapper<AdjustmentInItem>() {
+
+		@Override
+		public AdjustmentInItem mapRow(ResultSet rs, int rowNum) throws SQLException {
+			AdjustmentInItem item = new AdjustmentInItem();
+			item.setId(rs.getLong("ID"));
+			item.setParent(new AdjustmentIn(rs.getLong("ADJUSTMENT_IN_ID")));
+			item.setProduct(new Product2(rs.getLong("PRODUCT_ID")));
+			item.setUnit(rs.getString("UNIT"));
+			item.setCode(rs.getString("CODE"));
+			item.setQuantity(rs.getInt("QUANTITY"));
+			item.setCost(rs.getBigDecimal("COST"));
+			return item;
+		}
+		
+	};
 	
 	@Override
 	public void save(AdjustmentInItem item) {
@@ -75,8 +94,7 @@ public class AdjustmentInItemDaoImpl extends MagicDao implements AdjustmentInIte
 	
 	@Override
 	public List<AdjustmentInItem> findAllByAdjustmentIn(AdjustmentIn adjustmentIn) {
-		List<AdjustmentInItem> items = getJdbcTemplate().query(FIND_ALL_BY_ADJUSTMENT_IN_SQL, 
-				adjustmentInItemRowMapper, adjustmentIn.getId());
+		List<AdjustmentInItem> items = getJdbcTemplate().query(FIND_ALL_BY_ADJUSTMENT_IN_SQL, rowMapper, adjustmentIn.getId());
 		for (AdjustmentInItem item : items) {
 			item.setParent(adjustmentIn);
 		}
@@ -98,30 +116,13 @@ public class AdjustmentInItemDaoImpl extends MagicDao implements AdjustmentInIte
 		getJdbcTemplate().update(DELETE_ALL_BY_ADJUSTMENT_IN_SQL, adjustmentIn.getId());
 	}
 	
-	private class AdjustmentInItemRowMapper implements RowMapper<AdjustmentInItem> {
-
-		@Override
-		public AdjustmentInItem mapRow(ResultSet rs, int rowNum) throws SQLException {
-			AdjustmentInItem item = new AdjustmentInItem();
-			item.setId(rs.getLong("ID"));
-			item.setParent(new AdjustmentIn(rs.getLong("ADJUSTMENT_IN_ID")));
-			item.setProduct(new Product(rs.getLong("PRODUCT_ID")));
-			item.setUnit(rs.getString("UNIT"));
-			item.setQuantity(rs.getInt("QUANTITY"));
-			item.setCost(rs.getBigDecimal("COST"));
-			return item;
-		}
-		
-	}
-
 	private static final String FIND_FIRST_BY_PRODUCT_SQL = BASE_SELECT_SQL
 			+ " where PRODUCT_ID = ? limit 1";
 	
 	@Override
 	public AdjustmentInItem findFirstByProduct(Product product) {
 		try {
-			return getJdbcTemplate().queryForObject(FIND_FIRST_BY_PRODUCT_SQL, 
-					adjustmentInItemRowMapper, product.getId());
+			return getJdbcTemplate().queryForObject(FIND_FIRST_BY_PRODUCT_SQL, rowMapper, product.getId());
 		} catch (IncorrectResultSizeDataAccessException e) {
 			return null;
 		}

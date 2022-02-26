@@ -8,15 +8,21 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import com.pj.magic.model.AdjustmentInItem;
 import com.pj.magic.model.Product;
+import com.pj.magic.model.Product2;
+
+import lombok.Getter;
+import lombok.Setter;
 
 /*
  * Wrapper class to separate table gui concerns of inputting adjustment in items
  * from the business logic of adjustment in item model.
  */
+@Getter
+@Setter
 public class AdjustmentInItemRowItem {
 
 	private AdjustmentInItem item;
-	private Product product;
+	private Product2 product;
 	private String unit;
 	private Integer quantity;
 
@@ -31,40 +37,8 @@ public class AdjustmentInItemRowItem {
 		}
 	}
 	
-	public AdjustmentInItem getItem() {
-		return item;
-	}
-
-	public void setItem(AdjustmentInItem item) {
-		this.item = item;
-	}
-
 	public String getProductCode() {
-		return (product != null) ? product.getCode() : null;
-	}
-
-	public String getUnit() {
-		return unit;
-	}
-
-	public void setUnit(String unit) {
-		this.unit = unit;
-	}
-
-	public Integer getQuantity() {
-		return quantity;
-	}
-
-	public void setQuantity(Integer quantity) {
-		this.quantity = quantity;
-	}
-
-	public Product getProduct() {
-		return product;
-	}
-
-	public void setProduct(Product product) {
-		this.product = product;
+		return item.getCode();
 	}
 
 	public boolean isValid() {

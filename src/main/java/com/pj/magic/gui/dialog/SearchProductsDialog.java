@@ -21,7 +21,6 @@ import com.pj.magic.util.ComponentUtil;
 import com.pj.magic.util.KeyUtil;
 
 @Component
-@SuppressWarnings("serial")
 public class SearchProductsDialog extends MagicDialog {
 
 	private MagicTextField codeOrDescriptionField;
@@ -42,7 +41,7 @@ public class SearchProductsDialog extends MagicDialog {
 
 	private void initializeComponents() {
 		codeOrDescriptionField = new MagicTextField();
-		codeOrDescriptionField.setMaximumLength(Constants.PRODUCT_CODE_MAXIMUM_LENGTH);
+		codeOrDescriptionField.setMaximumLength(14);
 		
 		activeIndicatorComboBox = new MagicComboBox<>();
 		activeIndicatorComboBox.setModel(new DefaultComboBoxModel<>(new String[] {"All", "Active", "Not Active"}));

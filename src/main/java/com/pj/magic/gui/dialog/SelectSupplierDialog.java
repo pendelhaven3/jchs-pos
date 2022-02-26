@@ -17,6 +17,7 @@ import com.pj.magic.gui.component.DoubleClickMouseAdapter;
 import com.pj.magic.gui.tables.MagicListTable;
 import com.pj.magic.gui.tables.models.SuppliersTableModel;
 import com.pj.magic.model.Product;
+import com.pj.magic.model.Product2;
 import com.pj.magic.model.Supplier;
 import com.pj.magic.service.ProductService;
 import com.pj.magic.service.SupplierService;
@@ -83,7 +84,7 @@ public class SelectSupplierDialog extends MagicDialog {
 		selectedSupplier = null; // TODO: necessary?
 	}
 	
-	public void searchAvailableSuppliers(Product product) {
+	public void searchAvailableSuppliers(Product2 product) {
 		selectedSupplier = null;
 		List<Supplier> suppliers = productService.getAvailableSuppliers(product);
 		tableModel.setSuppliers(suppliers);

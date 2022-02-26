@@ -155,7 +155,7 @@ public class PromoPanel extends StandardMagicPanel {
 		
 		freeUnitComboBox = new JComboBox<>();
 		freeUnitComboBox.setModel(ListUtil.toDefaultComboBoxModel(
-				Arrays.asList(Unit.CASE, Unit.TIE, Unit.CARTON, Unit.DOZEN, Unit.PIECES)));
+				Arrays.asList(Unit.CASE, Unit.TIES, Unit.PACK, Unit.HDZN, Unit.PIECES)));
 		
 		freeQuantityField = new MagicTextField();
 		freeQuantityField.setNumbersOnly(true);

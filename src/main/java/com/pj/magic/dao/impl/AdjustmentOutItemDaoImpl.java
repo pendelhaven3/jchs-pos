@@ -18,15 +18,34 @@ import com.pj.magic.dao.AdjustmentOutItemDao;
 import com.pj.magic.model.AdjustmentOut;
 import com.pj.magic.model.AdjustmentOutItem;
 import com.pj.magic.model.Product;
+import com.pj.magic.model.Product2;
 
 @Repository
 public class AdjustmentOutItemDaoImpl extends MagicDao implements AdjustmentOutItemDao {
 
 	private static final String BASE_SELECT_SQL =
-			"select ID, ADJUSTMENT_OUT_ID, PRODUCT_ID, UNIT, QUANTITY, UNIT_PRICE from ADJUSTMENT_OUT_ITEM";
+			"select a.ID, a.ADJUSTMENT_OUT_ID, a.PRODUCT_ID, a.UNIT, a.QUANTITY, a.UNIT_PRICE, b.CODE"
+			+ " from ADJUSTMENT_OUT_ITEM a"
+			+ " join PRODUCT b"
+			+ "   on b.PRODUCT2_ID = a.PRODUCT_ID"
+			+ "   and b.UOM_CODE = a.UNIT";
 	
-	private AdjustmentOutItemRowMapper adjustmentOutItemRowMapper =
-			new AdjustmentOutItemRowMapper();
+	private RowMapper<AdjustmentOutItem> rowMapper = new RowMapper<AdjustmentOutItem>() {
+
+		@Override
+		public AdjustmentOutItem mapRow(ResultSet rs, int rowNum) throws SQLException {
+			AdjustmentOutItem item = new AdjustmentOutItem();
+			item.setId(rs.getLong("ID"));
+			item.setParent(new AdjustmentOut(rs.getLong("ADJUSTMENT_OUT_ID")));
+			item.setProduct(new Product2(rs.getLong("PRODUCT_ID")));
+			item.setUnit(rs.getString("UNIT"));
+			item.setCode(rs.getString("CODE"));
+			item.setQuantity(rs.getInt("QUANTITY"));
+			item.setUnitPrice(rs.getBigDecimal("UNIT_PRICE"));
+			return item;
+		}
+		
+	};
 	
 	@Override
 	public void save(AdjustmentOutItem item) {
@@ -75,8 +94,7 @@ public class AdjustmentOutItemDaoImpl extends MagicDao implements AdjustmentOutI
 	
 	@Override
 	public List<AdjustmentOutItem> findAllByAdjustmentOut(AdjustmentOut adjustmentOut) {
-		List<AdjustmentOutItem> items = getJdbcTemplate().query(FIND_ALL_BY_ADJUSTMENT_OUT_SQL, 
-				adjustmentOutItemRowMapper, adjustmentOut.getId());
+		List<AdjustmentOutItem> items = getJdbcTemplate().query(FIND_ALL_BY_ADJUSTMENT_OUT_SQL, rowMapper, adjustmentOut.getId());
 		for (AdjustmentOutItem item : items) {
 			item.setParent(adjustmentOut);
 		}
@@ -104,27 +122,10 @@ public class AdjustmentOutItemDaoImpl extends MagicDao implements AdjustmentOutI
 	@Override
 	public AdjustmentOutItem findFirstByProduct(Product product) {
 		try {
-			return getJdbcTemplate().queryForObject(FIND_FIRST_BY_PRODUCT_SQL, 
-					adjustmentOutItemRowMapper, product.getId());
+			return getJdbcTemplate().queryForObject(FIND_FIRST_BY_PRODUCT_SQL, rowMapper, product.getId());
 		} catch (IncorrectResultSizeDataAccessException e) {
 			return null;
 		}
-	}
-	
-	private class AdjustmentOutItemRowMapper implements RowMapper<AdjustmentOutItem> {
-
-		@Override
-		public AdjustmentOutItem mapRow(ResultSet rs, int rowNum) throws SQLException {
-			AdjustmentOutItem item = new AdjustmentOutItem();
-			item.setId(rs.getLong("ID"));
-			item.setParent(new AdjustmentOut(rs.getLong("ADJUSTMENT_OUT_ID")));
-			item.setProduct(new Product(rs.getLong("PRODUCT_ID")));
-			item.setUnit(rs.getString("UNIT"));
-			item.setQuantity(rs.getInt("QUANTITY"));
-			item.setUnitPrice(rs.getBigDecimal("UNIT_PRICE"));
-			return item;
-		}
-		
 	}
 	
 }

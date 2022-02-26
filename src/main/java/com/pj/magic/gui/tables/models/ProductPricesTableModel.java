@@ -12,7 +12,7 @@ import com.pj.magic.util.FormatterUtil;
 public class ProductPricesTableModel extends AbstractTableModel {
 
 	private static final String[] columnNames = 
-		{"Code", "Description", Unit.CASE, Unit.TIE, Unit.CARTON, Unit.DOZEN, Unit.PIECES};
+		{"Code", "Description", Unit.CASE, Unit.TIES, Unit.PACK, Unit.HDZN, Unit.PIECES};
 	public static final int CODE_COLUMN_INDEX = 0;
 	public static final int DESCRIPTION_COLUMN_INDEX = 1;
 	public static final int CASE_UNIT_PRICE_COLUMN_INDEX = 2;
@@ -57,20 +57,20 @@ public class ProductPricesTableModel extends AbstractTableModel {
 				return "-";
 			}
 		case TIE_UNIT_PRICE_COLUMN_INDEX:
-			if (product.hasUnit(Unit.TIE)) {
-				return FormatterUtil.formatAmount(product.getUnitPrice(Unit.TIE));
+			if (product.hasUnit(Unit.TIES)) {
+				return FormatterUtil.formatAmount(product.getUnitPrice(Unit.TIES));
 			} else {
 				return "-";
 			}
 		case CARTON_UNIT_PRICE_COLUMN_INDEX:
-			if (product.hasUnit(Unit.CARTON)) {
-				return FormatterUtil.formatAmount(product.getUnitPrice(Unit.CARTON));
+			if (product.hasUnit(Unit.PACK)) {
+				return FormatterUtil.formatAmount(product.getUnitPrice(Unit.PACK));
 			} else {
 				return "-";
 			}
 		case DOZEN_UNIT_PRICE_COLUMN_INDEX:
-			if (product.hasUnit(Unit.DOZEN)) {
-				return FormatterUtil.formatAmount(product.getUnitPrice(Unit.DOZEN));
+			if (product.hasUnit(Unit.HDZN)) {
+				return FormatterUtil.formatAmount(product.getUnitPrice(Unit.HDZN));
 			} else {
 				return "-";
 			}

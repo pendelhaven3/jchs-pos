@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.pj.magic.model.PricingScheme;
 import com.pj.magic.model.Product;
+import com.pj.magic.model.Product2;
 import com.pj.magic.model.ProductPriceHistory;
 import com.pj.magic.model.Supplier;
 import com.pj.magic.model.search.ProductSearchCriteria;
@@ -27,14 +28,8 @@ public interface ProductService {
 
 	void save(Product product);
 	
-	void addProductSupplier(Product product, Supplier supplier);
+	List<Supplier> getAvailableSuppliers(Product2 product);
 
-	List<Supplier> getProductSuppliers(Product product);
-
-	List<Supplier> getAvailableSuppliers(Product product);
-
-	void deleteProductSupplier(Product product, Supplier supplier);
-	
 	void saveUnitCostsAndPrices(Product product, PricingScheme pricingScheme);
 
 	List<Product> getAllActiveProductsBySupplier(Supplier supplier);
@@ -43,16 +38,9 @@ public interface ProductService {
 
 	boolean canDeleteProduct(Product product);
 
-	void deleteProduct(Product product);
-
 	List<ProductPriceHistory> getProductPriceHistory(Product product, PricingScheme pricingScheme);
 
 	void updateMaximumStockLevel(List<Product> products);
-
-	/**
-	 * @return true if quantities are saved, false if not (probably existing already)
-	 */
-	boolean saveDailyProductStartingQuantities();
 
     void updateProduct(Product product);
 
@@ -60,10 +48,4 @@ public interface ProductService {
 
 	void updateProductsAsInactive(List<String> activeProductCodes);
 
-	void subtractAvailableQuantity(Product product, int quantity);
-
-	void addAvailableQuantity(Product product, int quantity);
-
-	void subtractAvailableQuantity(Product product, int quantity, boolean allowNegative);
-	
 }

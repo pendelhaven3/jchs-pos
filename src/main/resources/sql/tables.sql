@@ -35,9 +35,47 @@ create table PRODUCT (
   MAX_STOCK_LEVEL integer(4) default 0,
   MIN_STOCK_LEVEL integer(4) default 0,
   ACTIVE_IND char(1) default 'Y',
-  AVAIL_QTY integer(4) default 0 not null,
   constraint PRODUCT$PK primary key (ID),
   constraint PRODUCT$UK unique (CODE)
+);
+
+create table PRODUCT2 (
+  ID integer auto_increment,
+  DESCRIPTION varchar(50) not null,
+  MAX_STOCK_LEVEL integer(4) default 0,
+  MIN_STOCK_LEVEL integer(4) default 0,
+  ACTIVE_IND char(1) default 'Y',
+  UNIT_IND_CASE char(1) null,
+  UNIT_IND_TIES char(1) null,
+  UNIT_IND_PACK char(1) null,
+  UNIT_IND_HDZN char(1) null,
+  UNIT_IND_PCS char(1) null,
+  ACTIVE_UNIT_IND_CASE char(1) default 'N' not null,
+  ACTIVE_UNIT_IND_TIES char(1) default 'N' not null,
+  ACTIVE_UNIT_IND_PACK char(1) default 'N' not null,
+  ACTIVE_UNIT_IND_HDZN char(1) default 'N' not null,
+  ACTIVE_UNIT_IND_PCS char(1) default 'N' not null,
+  AVAIL_QTY_CASE integer(4) default 0 not null,
+  AVAIL_QTY_TIES integer(4) default 0 not null,
+  AVAIL_QTY_PACK integer(4) default 0 not null,
+  AVAIL_QTY_HDZN integer(4) default 0 not null,
+  AVAIL_QTY_PCS integer(4) default 0 not null,
+  UNIT_CONV_CASE integer(5) null,
+  UNIT_CONV_TIES integer(5) null,
+  UNIT_CONV_PACK integer(5) null,
+  UNIT_CONV_HDZN integer(5) null,
+  UNIT_CONV_PCS integer(5) null,
+  GROSS_COST_CASE numeric(10, 2) default 0 not null,
+  GROSS_COST_TIES numeric(10, 2) default 0 not null,
+  GROSS_COST_PACK numeric(10, 2) default 0 not null,
+  GROSS_COST_HDZN numeric(10, 2) default 0 not null,
+  GROSS_COST_PCS numeric(10, 2) default 0 not null,
+  FINAL_COST_CASE numeric(10, 2) default 0 not null,
+  FINAL_COST_TIES numeric(10, 2) default 0 not null,
+  FINAL_COST_PACK numeric(10, 2) default 0 not null,
+  FINAL_COST_HDZN numeric(10, 2) default 0 not null,
+  FINAL_COST_PCS numeric(10, 2) default 0 not null,
+  constraint PRODUCT2$PK primary key (ID)
 );
 
 create table PAYMENT_TERM (
@@ -73,7 +111,7 @@ create table SUPPLIER_PRODUCT (
   PRODUCT_ID integer not null,
   constraint SUPPLIER_PRODUCT$PK primary key (SUPPLIER_ID, PRODUCT_ID),
   constraint SUPPLIER_PRODUCT$FK foreign key (SUPPLIER_ID) references SUPPLIER (ID),
-  constraint SUPPLIER_PRODUCT$FK2 foreign key (PRODUCT_ID) references PRODUCT (ID)
+  constraint SUPPLIER_PRODUCT$FK2 foreign key (PRODUCT_ID) references PRODUCT2 (ID)
 );
 
 create table PURCHASE_ORDER (
@@ -106,7 +144,7 @@ create table PURCHASE_ORDER_ITEM (
   ORDER_IND char(1) default 'N' not null,
   constraint PURCHASE_ORDER_ITEM$PK primary key (ID),
   constraint PURCHASE_ORDER_ITEM$FK foreign key (PURCHASE_ORDER_ID) references PURCHASE_ORDER (ID),
-  constraint PURCHASE_ORDER_ITEM$FK2 foreign key (PRODUCT_ID) references PRODUCT (ID)
+  constraint PURCHASE_ORDER_ITEM$FK2 foreign key (PRODUCT_ID) references PRODUCT2 (ID)
 );
 
 create table RECEIVING_RECEIPT (
@@ -151,7 +189,7 @@ create table RECEIVING_RECEIPT_ITEM (
   CURRENT_COST numeric(10, 2) null,
   constraint RECEIVING_RECEIPT_ITEM$PK primary key (ID),
   constraint RECEIVING_RECEIPT_ITEM$FK foreign key (RECEIVING_RECEIPT_ID) references RECEIVING_RECEIPT (ID),
-  constraint RECEIVING_RECEIPT_ITEM$FK2 foreign key (PRODUCT_ID) references PRODUCT (ID)
+  constraint RECEIVING_RECEIPT_ITEM$FK2 foreign key (PRODUCT_ID) references PRODUCT2 (ID)
 );
 
 create table PURCHASE_RETURN (
@@ -201,7 +239,7 @@ create table PURCHASE_RETURN_BAD_STOCK_ITEM (
   UNIT_COST numeric(10, 2) not null,
   constraint PURCHASE_RETURN_BAD_STOCK_ITEM$PK primary key (ID),
   constraint PURCHASE_RETURN_BAD_STOCK_ITEM$FK foreign key (PURCHASE_RETURN_BAD_STOCK_ID) references PURCHASE_RETURN_BAD_STOCK (ID),
-  constraint PURCHASE_RETURN_BAD_STOCK_ITEM$FK2 foreign key (PRODUCT_ID) references PRODUCT (ID)
+  constraint PURCHASE_RETURN_BAD_STOCK_ITEM$FK2 foreign key (PRODUCT_ID) references PRODUCT2 (ID)
 );
 
 create table CREDIT_CARD (
@@ -402,7 +440,7 @@ create table AREA_INV_REPORT_ITEM (
   QUANTITY integer not null,
   constraint AREA_INV_REPORT_ITEM$PK primary key (ID),
   constraint AREA_INV_REPORT_ITEM$FK foreign key (AREA_INV_REPORT_ID) references AREA_INV_REPORT (ID),
-  constraint AREA_INV_REPORT_ITEM$FK2 foreign key (PRODUCT_ID) references PRODUCT (ID)
+  constraint AREA_INV_REPORT_ITEM$FK2 foreign key (PRODUCT_ID) references PRODUCT2 (ID)
 );
 
 create table INVENTORY_CHECK_SUMMARY_ITEM (
@@ -414,7 +452,7 @@ create table INVENTORY_CHECK_SUMMARY_ITEM (
   COST numeric(10, 2) not null,
   constraint INVENTORY_CHECK_SUMMARY_ITEM$PK primary key (ID),
   constraint INVENTORY_CHECK_SUMMARY_ITEM$FK foreign key (INVENTORY_CHECK_ID) references INVENTORY_CHECK (ID),
-  constraint INVENTORY_CHECK_SUMMARY_ITEM$FK2 foreign key (PRODUCT_ID) references PRODUCT (ID)
+  constraint INVENTORY_CHECK_SUMMARY_ITEM$FK2 foreign key (PRODUCT_ID) references PRODUCT2 (ID)
 );
 
 create table TRISYS_SALES_IMPORT (

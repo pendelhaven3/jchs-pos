@@ -23,11 +23,13 @@ import com.pj.magic.dao.SystemDao;
 import com.pj.magic.exception.NotEnoughStocksException;
 import com.pj.magic.model.PricingScheme;
 import com.pj.magic.model.Product;
+import com.pj.magic.model.Product2;
 import com.pj.magic.model.ProductPriceHistory;
 import com.pj.magic.model.Supplier;
 import com.pj.magic.model.search.ProductSearchCriteria;
-import com.pj.magic.repository.DailyProductStartingQuantityRepository;
+import com.pj.magic.repository.Product2Repository;
 import com.pj.magic.service.LoginService;
+import com.pj.magic.service.Product2Service;
 import com.pj.magic.service.ProductService;
 
 @Service
@@ -46,8 +48,9 @@ public class ProductServiceImpl implements ProductService {
 	@Autowired private AreaInventoryReportItemDao areaInventoryReportItemDao;
 	@Autowired private ProductPriceHistoryDao productPriceHistoryDao;
 	@Autowired private LoginService loginService;
-	@Autowired private DailyProductStartingQuantityRepository dailyProductStartingQuantityRepository;
 	@Autowired private SystemDao systemDao;
+	@Autowired private Product2Service product2Service;
+	@Autowired private Product2Repository product2Repository;
 	
 	@Override
 	public List<Product> getAllProducts() {
@@ -83,26 +86,9 @@ public class ProductServiceImpl implements ProductService {
 		return productDao.search(criteria);
 	}
 
-	@Transactional
 	@Override
-	public void addProductSupplier(Product product, Supplier supplier) {
-		supplierDao.saveSupplierProduct(supplier, product);
-	}
-	
-	@Override
-	public List<Supplier> getProductSuppliers(Product product) {
-		return supplierDao.findAllByProduct(product);
-	}
-
-	@Override
-	public List<Supplier> getAvailableSuppliers(Product product) {
+	public List<Supplier> getAvailableSuppliers(Product2 product) {
 		return supplierDao.findAllNotHavingProduct(product);
-	}
-
-	@Transactional
-	@Override
-	public void deleteProductSupplier(Product product, Supplier supplier) {
-		supplierDao.deleteSupplierProduct(supplier, product);
 	}
 
 	@Transactional
@@ -111,8 +97,8 @@ public class ProductServiceImpl implements ProductService {
 		Product productBeforeUpdate = productDao.findByIdAndPricingScheme(product.getId(), pricingScheme);
 		
 		productPriceDao.updateUnitPrices(product, pricingScheme);
-		productDao.updateCosts(product);
-		productPriceHistoryDao.save(createProductPriceHistory(product, pricingScheme, productBeforeUpdate));
+//		product2Repository.updateCosts(product);
+//		productPriceHistoryDao.save(createProductPriceHistory(product, pricingScheme, productBeforeUpdate));
 	}
 
 	private ProductPriceHistory createProductPriceHistory(Product product, PricingScheme pricingScheme,
@@ -160,14 +146,6 @@ public class ProductServiceImpl implements ProductService {
 				areaInventoryReportItemDao.findFirstByProduct(product) == null;
 	}
 
-	@Transactional
-	@Override
-	public void deleteProduct(Product product) {
-		supplierDao.deleteAllByProduct(product);
-		productPriceDao.deleteAllByProduct(product);
-		productDao.delete(product);
-	}
-
 	@Override
 	public List<ProductPriceHistory> getProductPriceHistory(Product product, PricingScheme pricingScheme) {
 		return productPriceHistoryDao.findAllByProductAndPricingScheme(product, pricingScheme);
@@ -180,28 +158,28 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Transactional
-	@Override
-	public boolean saveDailyProductStartingQuantities() {
-		Date today = systemDao.getCurrentDateTime();
-		if (dailyProductStartingQuantityRepository.getCountByDate(today) == 0) {
-			dailyProductStartingQuantityRepository.saveQuantities(today);
-			return true;
-		}
-		return false;
-	}
-
-	@Transactional
     @Override
     public void updateProduct(Product product) {
 	    Product existing = productDao.findByCode(product.getCode());
 	    if (existing == null) {
+	    	product.setProduct2Id(product2Service.saveFromTrisys(product));
 	        productDao.save(product);
-	    } else if (!existing.areFieldsEqual(product)) {
-            product.setId(existing.getId());
-            product.setMinimumStockLevel(existing.getMinimumStockLevel());
-            product.setMaximumStockLevel(existing.getMaximumStockLevel());
-            product.setActive(true);
-            productDao.save(product);
+	    } else {
+	    	boolean shouldUpdate = !existing.areFieldsEqual(product) 
+	    			|| existing.getProduct2Id() == null
+	    			|| !existing.hasActiveUnit(product.getUnits().get(0));
+	    		
+			if (shouldUpdate) {
+	            product.setId(existing.getId());
+	            product.setActiveUnits(product.getUnits());
+		    	product.setProduct2Id(product2Service.saveFromTrisys(product));
+	            productDao.save(product);
+			} else {
+				Product2 product2 = product2Service.getProduct(existing.getProduct2Id());
+				if (!product2.hasActiveUnit(product.getUnits().get(0))) {
+					productDao.updateActiveIndicator(product.getCode(), true);
+				}
+			}
 	    }
     }
 
@@ -216,29 +194,6 @@ public class ProductServiceImpl implements ProductService {
         	LOGGER.info("Update product as inactive: {}", productCode);
 			productDao.updateActiveIndicator(productCode, false);
 		}
-	}
-
-	@Transactional(noRollbackFor = NotEnoughStocksException.class)
-	@Override
-	public void subtractAvailableQuantity(Product product, int quantity) {
-		subtractAvailableQuantity(product, quantity, true);
-	}
-
-	@Transactional
-	@Override
-	public void addAvailableQuantity(Product product, int quantity) {
-		productDao.addAvailableQuantity(product, quantity);
-	}
-
-	@Override
-	public void subtractAvailableQuantity(Product product, int quantity, boolean validateAvailability) {
-		if (validateAvailability) {
-			Product fromDb = productDao.get(product.getId());
-			if (fromDb.getAvailableQuantity() < quantity) {
-				throw new NotEnoughStocksException(product.getCode());
-			}
-		}
-		productDao.subtractAvailableQuantity(product, quantity);
 	}
 
 }

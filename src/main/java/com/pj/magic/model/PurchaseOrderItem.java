@@ -5,17 +5,24 @@ import java.math.BigDecimal;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class PurchaseOrderItem implements Comparable<PurchaseOrderItem> {
 
 	private Long id;
 	private PurchaseOrder parent;
-	private Product product;
+	private Product2 product;
 	private String unit;
 	private Integer quantity;
 	private BigDecimal cost;
 	private BigDecimal vatInclusiveCost;
 	private Integer actualQuantity;
 	private boolean ordered;
+	
+	private String code; // derived field
 
 	public Long getId() {
 		return id;
@@ -31,14 +38,6 @@ public class PurchaseOrderItem implements Comparable<PurchaseOrderItem> {
 
 	public void setParent(PurchaseOrder parent) {
 		this.parent = parent;
-	}
-
-	public Product getProduct() {
-		return product;
-	}
-
-	public void setProduct(Product product) {
-		this.product = product;
 	}
 
 	public String getUnit() {

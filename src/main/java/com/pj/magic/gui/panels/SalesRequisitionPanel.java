@@ -521,19 +521,19 @@ public class SalesRequisitionPanel extends StandardMagicPanel {
 	}
 	
 	private void updateUnitPricesAndQuantitiesTable() {
-		if (itemsTable.getSelectedRow() == -1) {
-			productInfoTable.setProduct(null);
-			return;
-		}
-		
-		Product product = itemsTable.getCurrentlySelectedRowItem().getProduct();
-		if (product != null) {
-			product = productService.findProductByCodeAndPricingScheme(
-					product.getCode(), salesRequisition.getPricingScheme());
-			productInfoTable.setProduct(product);
-		} else {
-			productInfoTable.setProduct(null);
-		}
+//		if (itemsTable.getSelectedRow() == -1) {
+//			productInfoTable.setProduct(null);
+//			return;
+//		}
+//		
+//		Product product = itemsTable.getCurrentlySelectedRowItem().getProduct();
+//		if (product != null) {
+//			product = productService.findProductByCodeAndPricingScheme(
+//					product.getCode(), salesRequisition.getPricingScheme());
+//			productInfoTable.setProduct(product);
+//		} else {
+//			productInfoTable.setProduct(null);
+//		}
 	}
 	
 	private void postSalesRequisition() {

@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
@@ -34,6 +35,8 @@ import com.pj.magic.gui.dialog.SearchProductsDialog;
 import com.pj.magic.gui.tables.MagicListTable;
 import com.pj.magic.gui.tables.models.ListBackedTableModel;
 import com.pj.magic.model.Product;
+import com.pj.magic.model.Product2;
+import com.pj.magic.model.Unit;
 import com.pj.magic.model.UnitConversion;
 import com.pj.magic.model.search.ProductSearchCriteria;
 import com.pj.magic.service.ProductService;
@@ -44,7 +47,6 @@ import net.iryndin.jdbf.core.DbfRecord;
 import net.iryndin.jdbf.reader.DbfReader;
 
 @Component
-@SuppressWarnings("serial")
 public class ProductListPanel extends StandardMagicPanel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProductListPanel.class);
@@ -138,7 +140,7 @@ public class ProductListPanel extends StandardMagicPanel {
 
 	protected void selectProduct() {
 		Product product = tableModel.getItem(table.getSelectedRow());
-		getMagicFrame().switchToEditProductPanel(product);
+		getMagicFrame().switchToEditProductPanel(new Product2(product.getProduct2Id()));
 	}
 
 	@Override
@@ -187,6 +189,8 @@ public class ProductListPanel extends StandardMagicPanel {
 		table.requestFocusInWindow();
 		searchProductsDialog.updateDisplay();
 	}
+
+	private List<String> VALID_UNITS = Arrays.asList(Unit.values());
 	
     private void updateProductsFromDbf() {
         fileChooser.setFileFilter(new FileFilter() {
@@ -222,12 +226,22 @@ public class ProductListPanel extends StandardMagicPanel {
         ) {
             String[] nextLine = null;
             while ((nextLine = reader.readNext()) != null) {
-            	LOGGER.info("updating product code " + nextLine[0]);
+            	System.out.println("updating product code " + nextLine[0]);
             	
                 String unit1 = nextLine[8];
                 String unit2 = nextLine[9];
                 if ("null".equals(unit2)) {
                     unit2 = null;
+                }
+
+                if (!VALID_UNITS.contains(unit1)) { // TODO: Remove
+                	System.out.println("rejected1: " + nextLine[0] + " - " + unit1);
+                	continue;
+                }
+                
+                if (!StringUtils.isEmpty(unit2) && !VALID_UNITS.contains(unit2)) {  // TODO: Remove
+                	System.out.println("rejected2: " + nextLine[0] + " - " + unit2);
+                	continue;
                 }
                 
                 int unitConversion1 = (int)Float.parseFloat(nextLine[13]);
@@ -244,7 +258,7 @@ public class ProductListPanel extends StandardMagicPanel {
                     product.getUnits().add(unit2);
                 }
                 product.getUnitConversions().add(new UnitConversion(unit1, unitConversion1));
-                if (!StringUtils.isEmpty(nextLine[14])) {
+                if (!StringUtils.isEmpty(nextLine[9]) && !"null".equals(nextLine[9])) {
                     product.getUnitConversions().add(new UnitConversion(unit2, unitConversion2));
                 }
                 
@@ -302,8 +316,6 @@ public class ProductListPanel extends StandardMagicPanel {
 
     private class ProductsTableModel extends ListBackedTableModel<Product>{
 
-        private static final long serialVersionUID = -5447604347973015681L;
-        
         private final String[] columnNames = {"Code", "Description", "UOM 1", "UOM 2", "UOM Qty 1", "UOM Qty 2"};
 	    
         @Override

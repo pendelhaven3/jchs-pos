@@ -14,7 +14,9 @@ import com.pj.magic.gui.tables.SalesRequisitionItemsTable;
 import com.pj.magic.gui.tables.rowitems.AdjustmentOutItemRowItem;
 import com.pj.magic.model.AdjustmentOut;
 import com.pj.magic.model.AdjustmentOutItem;
+import com.pj.magic.model.Product;
 import com.pj.magic.service.AdjustmentOutService;
+import com.pj.magic.service.Product2Service;
 import com.pj.magic.service.ProductService;
 import com.pj.magic.util.FormatterUtil;
 
@@ -24,6 +26,7 @@ public class AdjustmentOutItemsTableModel extends AbstractTableModel {
 	private static final String[] columnNames = {"Code", "Description", "Unit", "Qty", "Unit Price", "Amount"};
 	
 	@Autowired private ProductService productService;
+	@Autowired private Product2Service product2Service;
 	@Autowired private AdjustmentOutService adjustmentOutService;
 	
 	private List<AdjustmentOutItemRowItem> rowItems = new ArrayList<>();
@@ -96,14 +99,13 @@ public class AdjustmentOutItemsTableModel extends AbstractTableModel {
 		String val = (String)value;
 		switch (columnIndex) {
 		case AdjustmentOutItemsTable.PRODUCT_CODE_COLUMN_INDEX:
-			if (rowItem.getProduct() != null && rowItem.getProduct().getCode().equals(val)) {
+			if (rowItem.getProduct() != null && rowItem.getItem().getCode().equals(val)) {
 				return;
 			}
-			rowItem.setProduct(productService.findProductByCode(val));
-			rowItem.setUnit(null);
-			break;
-		case AdjustmentOutItemsTable.UNIT_COLUMN_INDEX:
-			rowItem.setUnit(val);
+			Product product1 = productService.findProductByCode(val);
+			rowItem.setProduct(product2Service.getProduct(product1.getProduct2Id()));
+			rowItem.setUnit(product1.getUnits().get(0));
+			rowItem.getItem().setCode(product1.getCode());
 			break;
 		case AdjustmentOutItemsTable.QUANTITY_COLUMN_INDEX:
 			rowItem.setQuantity(Integer.valueOf(val));
@@ -134,8 +136,6 @@ public class AdjustmentOutItemsTableModel extends AbstractTableModel {
 			switch (columnIndex) {
 			case SalesRequisitionItemsTable.PRODUCT_CODE_COLUMN_INDEX:
 				return true;
-			case SalesRequisitionItemsTable.UNIT_COLUMN_INDEX:
-				return rowItem.hasValidProduct();
 			case SalesRequisitionItemsTable.QUANTITY_COLUMN_INDEX:
 				return rowItem.hasValidProduct() && rowItem.hasValidUnit();
 			default:
@@ -186,10 +186,9 @@ public class AdjustmentOutItemsTableModel extends AbstractTableModel {
 		}
 	}
 
-	public boolean hasDuplicate(String unit, AdjustmentOutItemRowItem checkRowItem) {
+	public boolean hasDuplicate(String code, AdjustmentOutItemRowItem checkRowItem) {
 		for (AdjustmentOutItemRowItem rowItem : rowItems) {
-			if (checkRowItem.getProduct().equals(rowItem.getProduct()) 
-					&& unit.equals(rowItem.getUnit()) && rowItem != checkRowItem) {
+			if (rowItem != checkRowItem && code.equals(rowItem.getItem().getCode())) {
 				return true;
 			}
 		}

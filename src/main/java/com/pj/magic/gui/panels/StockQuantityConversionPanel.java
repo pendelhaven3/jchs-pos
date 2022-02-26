@@ -323,17 +323,17 @@ public class StockQuantityConversionPanel extends StandardMagicPanel {
 	}
 	
 	private void updateUnitPricesAndQuantitiesTable() {
-		if (itemsTable.getSelectedRow() == -1) {
-			productInfoTable.setProduct(null);
-			return;
-		}
-		
-		Product product = itemsTable.getCurrentlySelectedRowItem().getProduct();
-		if (product != null) {
-			productInfoTable.setProduct(productService.getProduct(product.getId()));
-		} else {
-			productInfoTable.setProduct(null);
-		}
+//		if (itemsTable.getSelectedRow() == -1) {
+//			productInfoTable.setProduct(null);
+//			return;
+//		}
+//		
+//		Product product = itemsTable.getCurrentlySelectedRowItem().getProduct();
+//		if (product != null) {
+//			productInfoTable.setProduct(productService.getProduct(product.getId()));
+//		} else {
+//			productInfoTable.setProduct(null);
+//		}
 	}
 	
 	private void postStockQuantityConversion() {

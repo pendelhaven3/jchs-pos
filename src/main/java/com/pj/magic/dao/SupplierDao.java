@@ -2,7 +2,7 @@ package com.pj.magic.dao;
 
 import java.util.List;
 
-import com.pj.magic.model.Product;
+import com.pj.magic.model.Product2;
 import com.pj.magic.model.Supplier;
 
 public interface SupplierDao {
@@ -13,13 +13,13 @@ public interface SupplierDao {
 	
 	List<Supplier> getAll();
 
-	List<Supplier> findAllByProduct(Product product);
+	List<Supplier> findAllByProduct(Product2 product);
 
-	void saveSupplierProduct(Supplier supplier, Product product);
+	void saveSupplierProduct(Supplier supplier, Product2 product);
 	
-	List<Supplier> findAllNotHavingProduct(Product product);
+	List<Supplier> findAllNotHavingProduct(Product2 product);
 
-	void deleteSupplierProduct(Supplier supplier, Product product);
+	void deleteSupplierProduct(Supplier supplier, Product2 product);
 
 	Supplier findByCode(String code);
 
@@ -27,6 +27,6 @@ public interface SupplierDao {
 	
 	void removeAllProductsFromSupplier(Supplier supplier);
 
-	void deleteAllByProduct(Product product);
+	void deleteAllByProduct(Product2 product);
 	
 }

@@ -138,16 +138,16 @@ public class BadStockReturnItemDaoImpl extends MagicDao implements BadStockRetur
 				product.getUnitConversions().add(new UnitConversion(Unit.CASE, rs.getInt("UNIT_CONV_CSE")));
 			}
 			if ("Y".equals(rs.getString("UNIT_IND_TIE"))) {
-				product.addUnit(Unit.TIE);
-				product.getUnitConversions().add(new UnitConversion(Unit.TIE, rs.getInt("UNIT_CONV_TIE")));
+				product.addUnit(Unit.TIES);
+				product.getUnitConversions().add(new UnitConversion(Unit.TIES, rs.getInt("UNIT_CONV_TIE")));
 			}
 			if ("Y".equals(rs.getString("UNIT_IND_CTN"))) {
-				product.addUnit(Unit.CARTON);
-				product.getUnitConversions().add(new UnitConversion(Unit.CARTON, rs.getInt("UNIT_CONV_CTN")));
+				product.addUnit(Unit.PACK);
+				product.getUnitConversions().add(new UnitConversion(Unit.PACK, rs.getInt("UNIT_CONV_CTN")));
 			}
 			if ("Y".equals(rs.getString("UNIT_IND_DOZ"))) {
-				product.addUnit(Unit.DOZEN);
-				product.getUnitConversions().add(new UnitConversion(Unit.DOZEN, rs.getInt("UNIT_CONV_DOZ")));
+				product.addUnit(Unit.HDZN);
+				product.getUnitConversions().add(new UnitConversion(Unit.HDZN, rs.getInt("UNIT_CONV_DOZ")));
 			}
 			if ("Y".equals(rs.getString("UNIT_IND_PCS"))) {
 				product.addUnit(Unit.PIECES);

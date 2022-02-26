@@ -13,13 +13,13 @@ public class TrisysSalesItem {
 	private Long id;
 	private TrisysSales sales;
 	private String productCode;
+	private String unit;
 	private int quantity;
 	private BigDecimal unitCost;
 	private BigDecimal sellPrice;
 	
 	// derived fields
 	private String productDescription;
-	private String unit;
 	
 	public BigDecimal getTotal() {
 		return sellPrice.multiply(BigDecimal.valueOf(quantity)).setScale(2, RoundingMode.HALF_EVEN);

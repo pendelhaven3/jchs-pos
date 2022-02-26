@@ -7,7 +7,7 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 
-import com.pj.magic.model.Product;
+import com.pj.magic.model.Product2;
 import com.pj.magic.model.Unit;
 import com.pj.magic.util.FormatterUtil;
 
@@ -38,7 +38,7 @@ public class ProductInfoTable extends JTable {
 		});
 	}
 	
-	public void setProduct(Product product) {
+	public void setProduct(Product2 product) {
 		tableModel.setProduct(product);
 	}
 	
@@ -48,9 +48,9 @@ public class ProductInfoTable extends JTable {
 	
 	private class ProductInfoTableModel extends AbstractTableModel {
 
-		private Product product = new Product();
+		private Product2 product = new Product2();
 		
-		public void setProduct(Product product) {
+		public void setProduct(Product2 product) {
 			this.product = product;
 			fireTableDataChanged();
 		}
@@ -72,14 +72,14 @@ public class ProductInfoTable extends JTable {
 				if (columnIndex == 0) {
 					return Unit.CASE;
 				} else if (columnIndex == 3) {
-					return Unit.TIE;
+					return Unit.TIES;
 				}
 				break;
 			case 1:
 				if (columnIndex == 0) {
-					return Unit.CARTON;
+					return Unit.PACK;
 				} else if (columnIndex == 3) {
-					return Unit.DOZEN;
+					return Unit.HDZN;
 				}
 				break;
 			case 2:
@@ -116,9 +116,9 @@ public class ProductInfoTable extends JTable {
 					}
 					return FormatterUtil.formatAmount(displayValue);
 				case 4:
-					return String.valueOf(product.getUnitQuantity(Unit.TIE));
+					return String.valueOf(product.getUnitQuantity(Unit.TIES));
 				case 5:
-					displayValue = getDisplayValue(Unit.TIE);
+					displayValue = getDisplayValue(Unit.TIES);
 					if (displayValue == null) {
 						displayValue = BigDecimal.ZERO;
 					}
@@ -127,17 +127,17 @@ public class ProductInfoTable extends JTable {
 			} else if (rowIndex == 1) {
 				switch (columnIndex) {
 				case 1:
-					return String.valueOf(product.getUnitQuantity(Unit.CARTON));
+					return String.valueOf(product.getUnitQuantity(Unit.PACK));
 				case 2:
-					BigDecimal displayValue = getDisplayValue(Unit.CARTON);
+					BigDecimal displayValue = getDisplayValue(Unit.PACK);
 					if (displayValue == null) {
 						displayValue = BigDecimal.ZERO;
 					}
 					return FormatterUtil.formatAmount(displayValue);
 				case 4:
-					return String.valueOf(product.getUnitQuantity(Unit.DOZEN));
+					return String.valueOf(product.getUnitQuantity(Unit.HDZN));
 				case 5:
-					displayValue = getDisplayValue(Unit.DOZEN);
+					displayValue = getDisplayValue(Unit.HDZN);
 					if (displayValue == null) {
 						displayValue = BigDecimal.ZERO;
 					}

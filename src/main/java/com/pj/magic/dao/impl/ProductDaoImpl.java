@@ -36,7 +36,7 @@ public class ProductDaoImpl extends MagicDao implements ProductDao {
 			+ " a.UOM_CODE, a.UOM_CODE1, a.UOM_QTY, a.UOM_QTY1,"
 			+ " MAX_STOCK_LEVEL, MIN_STOCK_LEVEL,"
 			+ " a.GROSS_COST, a.GROSS_COST1, a.FINAL_COST, a.FINAL_COST1,"
-			+ " a.ACTIVE_IND, a.AVAIL_QTY"
+			+ " a.ACTIVE_IND, a.PRODUCT2_ID"
 			+ " from PRODUCT a"
 			+ " where 1 = 1";
 	
@@ -78,7 +78,6 @@ public class ProductDaoImpl extends MagicDao implements ProductDao {
 			product.setMaximumStockLevel(rs.getInt("MAX_STOCK_LEVEL"));
 			product.setMinimumStockLevel(rs.getInt("MIN_STOCK_LEVEL"));
 			product.setActive("Y".equals(rs.getString("ACTIVE_IND")));
-			product.setAvailableQuantity(rs.getInt("AVAIL_QTY"));
 			
 			String unit1 = rs.getString("UOM_CODE");
 			String unit2 = rs.getString("UOM_CODE1");
@@ -93,6 +92,11 @@ public class ProductDaoImpl extends MagicDao implements ProductDao {
                 product.getUnitConversions().add(new UnitConversion(unit2, rs.getInt("UOM_QTY1")));
                 product.getUnitCosts().add(new UnitCost(unit2, NumberUtil.nvl(rs.getBigDecimal("GROSS_COST1")), 
                         NumberUtil.nvl(rs.getBigDecimal("FINAL_COST1"))));
+            }
+            
+            String product2Id = rs.getString("PRODUCT2_ID");
+            if (!StringUtils.isEmpty(product2Id)) {
+            	product.setProduct2Id(Long.valueOf(product2Id));
             }
 			
 			return product;
@@ -109,9 +113,9 @@ public class ProductDaoImpl extends MagicDao implements ProductDao {
 	public void updateAvailableQuantities(Product product) {
 		getJdbcTemplate().update(UPDATE_AVAILABLE_QUANTITIES_SQL,
 				product.getUnitQuantity(Unit.CASE),
-				product.getUnitQuantity(Unit.CARTON),
-				product.getUnitQuantity(Unit.TIE),
-				product.getUnitQuantity(Unit.DOZEN),
+				product.getUnitQuantity(Unit.PACK),
+				product.getUnitQuantity(Unit.TIES),
+				product.getUnitQuantity(Unit.HDZN),
 				product.getUnitQuantity(Unit.PIECES),
 				product.getId());
 	}
@@ -127,7 +131,7 @@ public class ProductDaoImpl extends MagicDao implements ProductDao {
 
 	private static final String UPDATE_SQL =
 			"update PRODUCT set CODE = ?, DESCRIPTION = ?,"
-			+ " UOM_CODE = ?, UOM_CODE1 = ?, UOM_QTY = ?, UOM_QTY1 = ?, MAX_STOCK_LEVEL = ?, MIN_STOCK_LEVEL = ?, ACTIVE_IND = ?"
+			+ " UOM_CODE = ?, UOM_CODE1 = ?, UOM_QTY = ?, UOM_QTY1 = ?, PRODUCT2_ID = ?"
 			+ " where ID = ?";
 	
 	private void update(Product product) {
@@ -138,15 +142,13 @@ public class ProductDaoImpl extends MagicDao implements ProductDao {
 				product.getUnits().size() > 1 ? product.getUnits().get(1) : null,
                 product.getUnitConversions().get(0).getQuantity(),
                 product.getUnitConversions().size() > 1 ? product.getUnitConversions().get(1).getQuantity() : null,
-                product.getMaximumStockLevel(),
-                product.getMinimumStockLevel(),
-				product.isActive() ? "Y" : "N",
+                product.getProduct2Id(),
 				product.getId());
 	}
 
 	private static final String INSERT_SQL =
-			"insert into PRODUCT (CODE, DESCRIPTION, UOM_CODE, UOM_CODE1, UOM_QTY, UOM_QTY1)"
-			+ " values (?, ?, ?, ?, ?, ?)";
+			"insert into PRODUCT (CODE, DESCRIPTION, UOM_CODE, UOM_CODE1, UOM_QTY, UOM_QTY1, PRODUCT2_ID)"
+			+ " values (?, ?, ?, ?, ?, ?, ?)";
 	
 	private void insert(final Product product) {
 		KeyHolder holder = new GeneratedKeyHolder();
@@ -166,6 +168,7 @@ public class ProductDaoImpl extends MagicDao implements ProductDao {
                 } else {
                     ps.setNull(6, Types.NUMERIC);
                 }
+                ps.setLong(7, product.getProduct2Id());
 				return ps;
 			}
 		}, holder);
@@ -208,7 +211,7 @@ public class ProductDaoImpl extends MagicDao implements ProductDao {
 		}
 		
 		if (criteria.getSupplier() != null) {
-			sql.append(" and exists(select 1 from SUPPLIER_PRODUCT sp where sp.PRODUCT_ID = a.ID and sp.SUPPLIER_ID = ?)");
+			sql.append(" and exists(select 1 from SUPPLIER_PRODUCT sp where sp.PRODUCT_ID = a.PRODUCT2_ID and sp.SUPPLIER_ID = ?)");
 			params.add(criteria.getSupplier().getId());
 		}
 		
@@ -235,22 +238,6 @@ public class ProductDaoImpl extends MagicDao implements ProductDao {
 	@Override
 	public List<Product> findAllActiveBySupplier(Supplier supplier) {
 		return getJdbcTemplate().query(FIND_ALL_ACTIVE_BY_SUPPLIER_SQL, productRowMapper, supplier.getId());
-	}
-
-	private static final String UPDATE_COSTS_SQL =
-			"update PRODUCT set GROSS_COST = ?, GROSS_COST1 = ?, FINAL_COST = ?, FINAL_COST1 = ? where ID = ?"; 
-	
-	@Override
-	public void updateCosts(Product product) {
-	    UnitCost unitCost1 = product.getUnitCosts().get(0);
-        UnitCost unitCost2 = product.getUnitCosts().size() > 1 ? product.getUnitCosts().get(1) : null;
-	    
-		getJdbcTemplate().update(UPDATE_COSTS_SQL,
-				unitCost1.getGrossCost(),
-				(unitCost2 != null) ? unitCost2.getGrossCost() : null,
-                unitCost1.getFinalCost(),
-                (unitCost2 != null) ? unitCost2.getFinalCost() : null,
-				product.getId());
 	}
 
 	private static final String FIND_BY_ID_AND_PRICING_SCHEME_SQL = BASE_SELECT_SQL
@@ -281,11 +268,6 @@ public class ProductDaoImpl extends MagicDao implements ProductDao {
 
 	private static final String DELETE_SQL = "delete from PRODUCT where ID = ?";
 	
-	@Override
-	public void delete(Product product) {
-		getJdbcTemplate().update(DELETE_SQL, product.getId());
-	}
-
 	private static final String UPDATE_MAXIMUM_STOCK_LEVEL_SQL = 
 			"update PRODUCT set MAX_STOCK_LEVEL = ? where ID = ?";
 	
@@ -299,14 +281,53 @@ public class ProductDaoImpl extends MagicDao implements ProductDao {
 		getJdbcTemplate().batchUpdate(UPDATE_MAXIMUM_STOCK_LEVEL_SQL, params);
 	}
 
+	private static final String GET_ALL_ACTIVE_PRODUCT_CODES_SQL = 
+			"select CODE" + 
+			" from PRODUCT a" + 
+			" join PRODUCT2 b" + 
+			"   on b.id = a.product2_id" + 
+			" where b.ACTIVE_IND = 'Y'" + 
+			" and (" + 
+			"	(a.UOM_CODE = 'CASE' and b.ACTIVE_UNIT_IND_CASE = 'Y')" + 
+			"	or" + 
+			"	(a.UOM_CODE = 'TIES' and b.ACTIVE_UNIT_IND_TIES = 'Y')" + 
+			"	or" + 
+			"	(a.UOM_CODE = 'PACK' and b.ACTIVE_UNIT_IND_PACK = 'Y')" + 
+			"	or" + 
+			"	(a.UOM_CODE = 'HDZN' and b.ACTIVE_UNIT_IND_HDZN = 'Y')" + 
+			"	or" + 
+			"	(a.UOM_CODE = 'PCS' and b.ACTIVE_UNIT_IND_PCS = 'Y')" + 
+			")";
+	
 	@Override
 	public List<String> getAllActiveProductCodes() {
-		return getJdbcTemplate().queryForList("select CODE from PRODUCT where ACTIVE_IND = 'Y'", String.class);
+		return getJdbcTemplate().queryForList(GET_ALL_ACTIVE_PRODUCT_CODES_SQL, String.class);
 	}
+	
+	private static final String UPDATE_ACTIVE_INDICATOR_SQL = 
+			"update product2" + 
+			" set active_unit_ind_case = (case (select uom_code from product where code = ?) when 'CASE' then ? else active_unit_ind_case end)," + 
+			" active_unit_ind_ties = (case (select uom_code from product where code = ?) when 'TIES' then ? else active_unit_ind_ties end)," + 
+			" active_unit_ind_pack = (case (select uom_code from product where code = ?) when 'PACK' then ? else active_unit_ind_pack end)," + 
+			" active_unit_ind_hdzn = (case (select uom_code from product where code = ?) when 'HDZN' then ? else active_unit_ind_hdzn end)," + 
+			" active_unit_ind_pcs = (case (select uom_code from product where code = ?) when 'PCS' then ? else active_unit_ind_pcs end)" + 
+			" where id = (select product2_id from product where code = ?)";	
 
 	@Override
 	public void updateActiveIndicator(String productCode, boolean active) {
-		getJdbcTemplate().update("update PRODUCT set ACTIVE_IND = ? where CODE = ?", active ? "Y" : "N", productCode);
+		String activeInd = (active) ? "Y" : "N";
+		getJdbcTemplate().update(UPDATE_ACTIVE_INDICATOR_SQL,
+				productCode,
+				activeInd,
+				productCode,
+				activeInd,
+				productCode,
+				activeInd,
+				productCode,
+				activeInd,
+				productCode,
+				activeInd,
+				productCode);
 	}
 
 	@Override

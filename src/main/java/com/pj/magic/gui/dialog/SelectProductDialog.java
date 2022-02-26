@@ -27,9 +27,11 @@ import com.pj.magic.gui.tables.MagicListTable;
 import com.pj.magic.gui.tables.models.ProductsTableModel;
 import com.pj.magic.model.PricingScheme;
 import com.pj.magic.model.Product;
+import com.pj.magic.model.Product2;
 import com.pj.magic.model.Supplier;
 import com.pj.magic.model.Unit;
 import com.pj.magic.model.search.ProductSearchCriteria;
+import com.pj.magic.service.Product2Service;
 import com.pj.magic.service.ProductService;
 import com.pj.magic.util.ComponentUtil;
 import com.pj.magic.util.FormatterUtil;
@@ -44,6 +46,7 @@ public class SelectProductDialog extends MagicDialog {
 	private static final String UNIT_COST_INFO_TABLE = "unitCostInfoTable";
 
 	@Autowired private ProductService productService;
+	@Autowired private Product2Service product2Service;
 
 	private ProductsTableModel productsTableModel = new ProductsTableModel();
 	private UnitPricesAndQuantitiesTableModel unitPricesAndQuantitiesTableModel;
@@ -55,7 +58,7 @@ public class SelectProductDialog extends MagicDialog {
 	private Product selectedProduct;
 	
 	public SelectProductDialog() {
-		setSize(500, 450);
+		setSize(600, 450);
 		setLocationRelativeTo(null);
 		setTitle("Select Product");
 		
@@ -68,6 +71,8 @@ public class SelectProductDialog extends MagicDialog {
 			.setPreferredWidth(150);
 		productsTable.getColumnModel().getColumn(ProductsTableModel.DESCRIPTION_COLUMN_INDEX)
 			.setPreferredWidth(300);
+		productsTable.getColumnModel().getColumn(ProductsTableModel.UNIT_COLUMN_INDEX)
+			.setPreferredWidth(100);
 		
 		unitPricesAndQuantitiesTableModel = new UnitPricesAndQuantitiesTableModel();
 		unitPricesAndQuantitiesTable = new MagicListTable(unitPricesAndQuantitiesTableModel);
@@ -85,8 +90,9 @@ public class SelectProductDialog extends MagicDialog {
 				int selectedRow = productsTable.getSelectedRow();
 				if (selectedRow != -1) {
 					Product product = productsTableModel.getProduct(selectedRow);
-					unitPricesAndQuantitiesTableModel.setProduct(product);
-					unitCostsAndQuantitiesTableModel.setProduct(product);
+					Product2 product2 = product2Service.getProduct(product.getProduct2Id());
+					unitPricesAndQuantitiesTableModel.setProduct(product2);
+					unitCostsAndQuantitiesTableModel.setProduct(product2);
 				}
 			}
 		});
@@ -259,11 +265,11 @@ public class SelectProductDialog extends MagicDialog {
 		private static final int UNIT_PRICE_COLUMN_INDEX = 2;
 		
 		private final String[] columnNames = {"Unit", "Quantity", "Price"};
-		private final String[] units = {Unit.CASE, Unit.TIE, Unit.CARTON, Unit.DOZEN, Unit.PIECES};
+		private final String[] units = {Unit.CASE, Unit.TIES, Unit.PACK, Unit.HDZN, Unit.PIECES};
 		
-		private Product product;
+		private Product2 product;
 		
-		public void setProduct(Product product) {
+		public void setProduct(Product2 product) {
 			this.product = product;
 			fireTableDataChanged();
 		}
@@ -320,11 +326,11 @@ public class SelectProductDialog extends MagicDialog {
 		private static final int QUANTITY_COLUMN_INDEX = 1;
 		private static final int UNIT_COST_COLUMN_INDEX = 2;
 		private final String[] columnNames = {"Unit", "Quantity", "Cost"};
-		private final String[] units = {Unit.CASE, Unit.TIE, Unit.CARTON, Unit.DOZEN, Unit.PIECES};
+		private final String[] units = {Unit.CASE, Unit.TIES, Unit.PACK, Unit.HDZN, Unit.PIECES};
 		
-		private Product product;
+		private Product2 product;
 		
-		public void setProduct(Product product) {
+		public void setProduct(Product2 product) {
 			this.product = product;
 			fireTableDataChanged();
 		}

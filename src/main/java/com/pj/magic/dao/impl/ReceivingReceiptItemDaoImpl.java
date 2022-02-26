@@ -16,6 +16,7 @@ import org.springframework.stereotype.Repository;
 
 import com.pj.magic.dao.ReceivingReceiptItemDao;
 import com.pj.magic.model.Product;
+import com.pj.magic.model.Product2;
 import com.pj.magic.model.ReceivingReceipt;
 import com.pj.magic.model.ReceivingReceiptItem;
 import com.pj.magic.model.Supplier;
@@ -25,13 +26,34 @@ public class ReceivingReceiptItemDaoImpl extends MagicDao implements ReceivingRe
 
 	private static final String BASE_SELECT_SQL =
 			"select a.ID, RECEIVING_RECEIPT_ID, PRODUCT_ID, UNIT, QUANTITY, COST,"
-			+ " DISCOUNT_1, DISCOUNT_2, DISCOUNT_3, FLAT_RATE_DISCOUNT"
+			+ " DISCOUNT_1, DISCOUNT_2, DISCOUNT_3, FLAT_RATE_DISCOUNT, c.CODE"
 			+ " from RECEIVING_RECEIPT_ITEM a"
 			+ " join RECEIVING_RECEIPT b"
-			+ "   on b.ID = a.RECEIVING_RECEIPT_ID";
+			+ "   on b.ID = a.RECEIVING_RECEIPT_ID"
+			+ " join PRODUCT c"
+			+ "   on c.PRODUCT2_ID = a.PRODUCT_ID"
+			+ "   and c.UOM_CODE = a.UNIT";
 	
-	private ReceivingReceiptItemRowMapper receivingReceiptItemRowMapper = 
-			new ReceivingReceiptItemRowMapper();
+	private RowMapper<ReceivingReceiptItem> rowMapper = new RowMapper<ReceivingReceiptItem>() {
+
+		@Override
+		public ReceivingReceiptItem mapRow(ResultSet rs, int rowNum) throws SQLException {
+			ReceivingReceiptItem item = new ReceivingReceiptItem();
+			item.setId(rs.getLong("ID"));
+			item.setParent(new ReceivingReceipt(rs.getLong("RECEIVING_RECEIPT_ID")));
+			item.setProduct(new Product2(rs.getLong("PRODUCT_ID")));
+			item.setUnit(rs.getString("UNIT"));
+			item.setCode(rs.getString("CODE"));
+			item.setQuantity(rs.getInt("QUANTITY"));
+			item.setCost(rs.getBigDecimal("COST").setScale(2));
+			item.setDiscount1(rs.getBigDecimal("DISCOUNT_1").setScale(2));
+			item.setDiscount2(rs.getBigDecimal("DISCOUNT_2").setScale(2));
+			item.setDiscount3(rs.getBigDecimal("DISCOUNT_3").setScale(2));
+			item.setFlatRateDiscount(rs.getBigDecimal("FLAT_RATE_DISCOUNT").setScale(2));
+			return item;
+		}
+		
+	};
 	
 	@Override
 	public void save(ReceivingReceiptItem item) {
@@ -84,7 +106,7 @@ public class ReceivingReceiptItemDaoImpl extends MagicDao implements ReceivingRe
 	@Override
 	public List<ReceivingReceiptItem> findAllByReceivingReceipt(ReceivingReceipt receivingReceipt) {
 		List<ReceivingReceiptItem> items = getJdbcTemplate().query(
-				FIND_ALL_BY_RECEIVING_RECEIPT_SQL, receivingReceiptItemRowMapper, receivingReceipt.getId());
+				FIND_ALL_BY_RECEIVING_RECEIPT_SQL, rowMapper, receivingReceipt.getId());
 		for (ReceivingReceiptItem item : items) {
 			item.setParent(receivingReceipt);
 		}
@@ -98,7 +120,7 @@ public class ReceivingReceiptItemDaoImpl extends MagicDao implements ReceivingRe
 			ReceivingReceiptItem item = new ReceivingReceiptItem();
 			item.setId(rs.getLong("ID"));
 			item.setParent(new ReceivingReceipt(rs.getLong("RECEIVING_RECEIPT_ID")));
-			item.setProduct(new Product(rs.getLong("PRODUCT_ID")));
+			item.setProduct(new Product2(rs.getLong("PRODUCT_ID")));
 			item.setUnit(rs.getString("UNIT"));
 			item.setQuantity(rs.getInt("QUANTITY"));
 			item.setCost(rs.getBigDecimal("COST").setScale(2));
@@ -122,7 +144,7 @@ public class ReceivingReceiptItemDaoImpl extends MagicDao implements ReceivingRe
 	public ReceivingReceiptItem findMostRecentBySupplierAndProduct(Supplier supplier, Product product) {
 		try {
 			return getJdbcTemplate().queryForObject(FIND_MOST_RECENT_BY_SUPPLIER_AND_PRODUCT_SQL,
-					receivingReceiptItemRowMapper, product.getId(), product.getMaxUnit(), supplier.getId());
+					rowMapper, product.getId(), product.getMaxUnit(), supplier.getId());
 		} catch (IncorrectResultSizeDataAccessException e) {
 			return null;
 		}

@@ -102,8 +102,8 @@ public class StockMovementMenuPanel extends MenuPanel {
 
 		private final List<String> menuItems = Arrays.asList(
 				"Adjustment In",
-				"Adjustment Out",
-				"Stock Card Inventory Report"
+				"Adjustment Out"
+//				"Stock Card Inventory Report"
 		);
 		
 		@Override

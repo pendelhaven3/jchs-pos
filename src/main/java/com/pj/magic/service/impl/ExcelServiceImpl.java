@@ -351,57 +351,57 @@ public class ExcelServiceImpl implements ExcelService {
 				cell.setCellStyle(amountFormat);
 			}
 			
-			if (product.hasActiveUnit(Unit.TIE)) {
+			if (product.hasActiveUnit(Unit.TIES)) {
 				cell = row.createCell(3);
-				cell.setCellValue(product.getUnitPrice(Unit.TIE).doubleValue());
+				cell.setCellValue(product.getUnitPrice(Unit.TIES).doubleValue());
 				cell.setCellStyle(amountFormat);
 				
 				cell = row.createCell(8);
-				cell.setCellValue(product.getFinalCost(Unit.TIE).doubleValue());
+				cell.setCellValue(product.getFinalCost(Unit.TIES).doubleValue());
 				cell.setCellStyle(amountFormat);
 				
 				cell = row.createCell(13);
-				cell.setCellValue(product.getFlatProfit(Unit.TIE).doubleValue());
+				cell.setCellValue(product.getFlatProfit(Unit.TIES).doubleValue());
 				cell.setCellStyle(amountFormat);
 				
 				cell = row.createCell(18);
-				cell.setCellValue(product.getPercentProfit(Unit.TIE).doubleValue());
+				cell.setCellValue(product.getPercentProfit(Unit.TIES).doubleValue());
 				cell.setCellStyle(amountFormat);
 			}
 			
-			if (product.hasActiveUnit(Unit.CARTON)) {
+			if (product.hasActiveUnit(Unit.PACK)) {
 				cell = row.createCell(4);
-				cell.setCellValue(product.getUnitPrice(Unit.CARTON).doubleValue());
+				cell.setCellValue(product.getUnitPrice(Unit.PACK).doubleValue());
 				cell.setCellStyle(amountFormat);
 				
 				cell = row.createCell(9);
-				cell.setCellValue(product.getFinalCost(Unit.CARTON).doubleValue());
+				cell.setCellValue(product.getFinalCost(Unit.PACK).doubleValue());
 				cell.setCellStyle(amountFormat);
 				
 				cell = row.createCell(14);
-				cell.setCellValue(product.getFlatProfit(Unit.CARTON).doubleValue());
+				cell.setCellValue(product.getFlatProfit(Unit.PACK).doubleValue());
 				cell.setCellStyle(amountFormat);
 				
 				cell = row.createCell(19);
-				cell.setCellValue(product.getPercentProfit(Unit.CARTON).doubleValue());
+				cell.setCellValue(product.getPercentProfit(Unit.PACK).doubleValue());
 				cell.setCellStyle(amountFormat);
 			}
 			
-			if (product.hasActiveUnit(Unit.DOZEN)) {
+			if (product.hasActiveUnit(Unit.HDZN)) {
 				cell = row.createCell(5);
-				cell.setCellValue(product.getUnitPrice(Unit.DOZEN).doubleValue());
+				cell.setCellValue(product.getUnitPrice(Unit.HDZN).doubleValue());
 				cell.setCellStyle(amountFormat);
 				
 				cell = row.createCell(10);
-				cell.setCellValue(product.getFinalCost(Unit.DOZEN).doubleValue());
+				cell.setCellValue(product.getFinalCost(Unit.HDZN).doubleValue());
 				cell.setCellStyle(amountFormat);
 				
 				cell = row.createCell(15);
-				cell.setCellValue(product.getFlatProfit(Unit.DOZEN).doubleValue());
+				cell.setCellValue(product.getFlatProfit(Unit.HDZN).doubleValue());
 				cell.setCellStyle(amountFormat);
 				
 				cell = row.createCell(20);
-				cell.setCellValue(product.getPercentProfit(Unit.DOZEN).doubleValue());
+				cell.setCellValue(product.getPercentProfit(Unit.HDZN).doubleValue());
 				cell.setCellStyle(amountFormat);
 			}
 		
@@ -599,7 +599,7 @@ public class ExcelServiceImpl implements ExcelService {
         for (ReceivingReceiptItem item : receivingReceipt.getItems()) {
             currentRow++;
             row = sheet.createRow(currentRow);
-            row.createCell(0).setCellValue(item.getProduct().getCode());
+            row.createCell(0).setCellValue(item.getCode());
             row.createCell(1).setCellValue(item.getProduct().getDescription());
             row.createCell(5).setCellValue(item.getUnit());
             row.createCell(6).setCellValue(item.getQuantity());

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Repository;
 
 import com.pj.magic.dao.PurchaseOrderItemDao;
 import com.pj.magic.model.Product;
+import com.pj.magic.model.Product2;
 import com.pj.magic.model.PurchaseOrder;
 import com.pj.magic.model.PurchaseOrderItem;
 
@@ -23,10 +24,32 @@ import com.pj.magic.model.PurchaseOrderItem;
 public class PurchaseOrderItemDaoImpl extends MagicDao implements PurchaseOrderItemDao {
 
 	private static final String BASE_SELECT_SQL =
-			"select ID, PURCHASE_ORDER_ID, PRODUCT_ID, UNIT, QUANTITY, COST, ACTUAL_QUANTITY, ORDER_IND"
-			+ " from PURCHASE_ORDER_ITEM";
+			"select a.ID, PURCHASE_ORDER_ID, PRODUCT_ID, UNIT, QUANTITY, COST, ACTUAL_QUANTITY, ORDER_IND, b.CODE"
+			+ " from PURCHASE_ORDER_ITEM a"
+			+ " join PRODUCT b"
+			+ "   on b.PRODUCT2_ID = a.PRODUCT_ID"
+			+ "   and b.UOM_CODE = a.UNIT";
 	
-	private PurchaseOrderItemRowMapper purchaseOrderItemRowMapper = new PurchaseOrderItemRowMapper();
+	private RowMapper<PurchaseOrderItem> rowMapper = new RowMapper<PurchaseOrderItem>() {
+
+		@Override
+		public PurchaseOrderItem mapRow(ResultSet rs, int rowNum) throws SQLException {
+			PurchaseOrderItem item = new PurchaseOrderItem();
+			item.setId(rs.getLong("ID"));
+			item.setParent(new PurchaseOrder(rs.getLong("PURCHASE_ORDER_ID")));
+			item.setProduct(new Product2(rs.getLong("PRODUCT_ID")));
+			item.setUnit(rs.getString("UNIT"));
+			item.setCode(rs.getString("CODE"));
+			item.setQuantity(rs.getInt("QUANTITY"));
+			item.setCost(rs.getBigDecimal("COST").setScale(2));
+			if (rs.getObject("ACTUAL_QUANTITY") != null) {
+				item.setActualQuantity(rs.getInt("ACTUAL_QUANTITY"));
+			}
+			item.setOrdered("Y".equals(rs.getString("ORDER_IND")));
+			return item;
+		}
+		
+	};
 	
 	@Override
 	public void save(PurchaseOrderItem item) {
@@ -79,7 +102,7 @@ public class PurchaseOrderItemDaoImpl extends MagicDao implements PurchaseOrderI
 	@Override
 	public List<PurchaseOrderItem> findAllByPurchaseOrder(PurchaseOrder purchaseOrder) {
 		List<PurchaseOrderItem> items = getJdbcTemplate().query(FIND_ALL_BY_PURCHASE_ORDER_SQL, 
-				purchaseOrderItemRowMapper, purchaseOrder.getId());
+				rowMapper, purchaseOrder.getId());
 		for (PurchaseOrderItem item : items) {
 			item.setParent(purchaseOrder);
 		}
@@ -116,30 +139,10 @@ public class PurchaseOrderItemDaoImpl extends MagicDao implements PurchaseOrderI
 	public PurchaseOrderItem findFirstByProduct(Product product) {
 		try {
 			return getJdbcTemplate().queryForObject(FIND_FIRST_BY_PRODUCT_SQL, 
-					purchaseOrderItemRowMapper, product.getId());
+					rowMapper, product.getId());
 		} catch (IncorrectResultSizeDataAccessException e) {
 			return null;
 		}
 	}
 
-	private class PurchaseOrderItemRowMapper implements RowMapper<PurchaseOrderItem> {
-
-		@Override
-		public PurchaseOrderItem mapRow(ResultSet rs, int rowNum) throws SQLException {
-			PurchaseOrderItem item = new PurchaseOrderItem();
-			item.setId(rs.getLong("ID"));
-			item.setParent(new PurchaseOrder(rs.getLong("PURCHASE_ORDER_ID")));
-			item.setProduct(new Product(rs.getLong("PRODUCT_ID")));
-			item.setUnit(rs.getString("UNIT"));
-			item.setQuantity(rs.getInt("QUANTITY"));
-			item.setCost(rs.getBigDecimal("COST").setScale(2));
-			if (rs.getObject("ACTUAL_QUANTITY") != null) {
-				item.setActualQuantity(rs.getInt("ACTUAL_QUANTITY"));
-			}
-			item.setOrdered("Y".equals(rs.getString("ORDER_IND")));
-			return item;
-		}
-		
-	}
-	
 }

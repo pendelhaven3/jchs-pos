@@ -53,7 +53,7 @@ import com.pj.magic.model.PaymentAdjustment;
 import com.pj.magic.model.PaymentTerm;
 import com.pj.magic.model.PaymentTerminalAssignment;
 import com.pj.magic.model.PricingScheme;
-import com.pj.magic.model.Product;
+import com.pj.magic.model.Product2;
 import com.pj.magic.model.ProductCategory;
 import com.pj.magic.model.Promo;
 import com.pj.magic.model.PromoRedemption;
@@ -97,7 +97,6 @@ public class MagicFrame extends JFrame {
 	public static final String SALES_REQUISITION_PANEL = "SALES_REQUISITION_PANEL";
 	public static final String SALES_INVOICES_LIST_PANEL = "SALES_INVOICES_LIST_PANEL";
 	public static final String SALES_INVOICE_PANEL = "SALES_INVOICE_PANEL";
-	public static final String MARK_SALES_INVOICE_PANEL = "MARK_SALES_INVOICE_PANEL";
 	public static final String PRODUCT_LIST_PANEL = "PRODUCT_LIST_PANEL";
 	public static final String MAINTAIN_PRODUCT_PANEL = "MAINTAIN_PRODUCT_PANEL";
 	public static final String MANUFACTURER_LIST_PANEL = "MANUFACTURER_LIST_PANEL";
@@ -231,7 +230,6 @@ public class MagicFrame extends JFrame {
 	@Autowired private SalesRequisitionPanel salesRequisitionPanel;
 	@Autowired private SalesInvoiceListPanel salesInvoicesListPanel;
 	@Autowired private SalesInvoicePanel salesInvoicePanel;
-	@Autowired private MarkSalesInvoicePanel markSalesInvoicePanel;
 	@Autowired private ProductListPanel productListPanel;
 	@Autowired private MaintainProductPanel maintainProductPanel;
 	@Autowired private ManufacturerListPanel manufacturerListPanel;
@@ -404,7 +402,6 @@ public class MagicFrame extends JFrame {
 		panelHolder.add(salesRequisitionPanel, SALES_REQUISITION_PANEL);
 		panelHolder.add(salesInvoicesListPanel, SALES_INVOICES_LIST_PANEL);
 		panelHolder.add(salesInvoicePanel, SALES_INVOICE_PANEL);
-		panelHolder.add(markSalesInvoicePanel, MARK_SALES_INVOICE_PANEL);
 		panelHolder.add(productListPanel, PRODUCT_LIST_PANEL);
 		panelHolder.add(maintainProductPanel, MAINTAIN_PRODUCT_PANEL);
 		panelHolder.add(manufacturerListPanel, MANUFACTURER_LIST_PANEL);
@@ -579,19 +576,19 @@ public class MagicFrame extends JFrame {
 		((CardLayout)panelHolder.getLayout()).show(panelHolder, PRODUCT_LIST_PANEL);
 	}
 	
-	public void switchToEditProductPanel(Product product) {
+	public void switchToEditProductPanel(Product2 product) {
 		addPanelNameToTitle("Edit Product");
 		switchToMaintainProductPanel(product);
 	}
 
-	private void switchToMaintainProductPanel(Product product) {
+	private void switchToMaintainProductPanel(Product2 product) {
 		maintainProductPanel.updateDisplay(product);
 		((CardLayout)panelHolder.getLayout()).show(panelHolder, MAINTAIN_PRODUCT_PANEL);
 	}
 
 	public void switchToAddNewProductPanel() {
 		addPanelNameToTitle("Add New Product");
-		switchToMaintainProductPanel(new Product());
+		switchToMaintainProductPanel(new Product2());
 	}
 
 	public void switchToManufacturerListPanel() {
@@ -802,12 +799,6 @@ public class MagicFrame extends JFrame {
 		addPanelNameToTitle("Area Inventory Report");
 		areaInventoryReportPanel.updateDisplay(areaInventoryReport);
 		((CardLayout)panelHolder.getLayout()).show(panelHolder, AREA_INVENTORY_REPORT_PANEL);
-	}
-
-	public void switchToMarkSalesInvoicesPanel() {
-		addPanelNameToTitle("Mark Sales Invoice");
-		markSalesInvoicePanel.updateDisplay();
-		((CardLayout)panelHolder.getLayout()).show(panelHolder, MARK_SALES_INVOICE_PANEL);
 	}
 
 	public void switchToUserListPanel() {

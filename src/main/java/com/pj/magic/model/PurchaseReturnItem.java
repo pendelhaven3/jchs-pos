@@ -2,13 +2,20 @@ package com.pj.magic.model;
 
 import java.math.BigDecimal;
 
+import lombok.Getter;
+import lombok.Setter;
 
+
+@Getter
+@Setter
 public class PurchaseReturnItem {
 
 	private Long id;
 	private PurchaseReturn parent;
 	private ReceivingReceiptItem receivingReceiptItem;
 	private Integer quantity;
+	
+	private String code; // derived field
 
 	public Long getId() {
 		return id;

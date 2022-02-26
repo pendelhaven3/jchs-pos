@@ -16,6 +16,7 @@ import com.pj.magic.model.PurchaseOrderItem;
 import com.pj.magic.model.ReceivingReceipt;
 import com.pj.magic.model.Supplier;
 import com.pj.magic.model.search.PurchaseOrderSearchCriteria;
+import com.pj.magic.repository.Product2Repository;
 import com.pj.magic.service.LoginService;
 import com.pj.magic.service.PurchaseOrderService;
 import com.pj.magic.service.ReceivingReceiptService;
@@ -26,7 +27,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 
 	@Autowired private PurchaseOrderDao purchaseOrderDao;
 	@Autowired private PurchaseOrderItemDao purchaseOrderItemDao;
-	@Autowired private ProductDao productDao;
+	@Autowired private Product2Repository product2Repository;
 	@Autowired private SystemDao systemDao;
 	@Autowired private ReceivingReceiptService receivingReceiptService;
 	@Autowired private LoginService loginService;
@@ -52,7 +53,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 	private void loadPurchaseOrderDetails(PurchaseOrder purchaseOrder) {
 		purchaseOrder.setItems(purchaseOrderItemDao.findAllByPurchaseOrder(purchaseOrder));
 		for (PurchaseOrderItem item : purchaseOrder.getItems()) {
-			item.setProduct(productDao.get(item.getProduct().getId()));
+			item.setProduct(product2Repository.get(item.getProduct().getId()));
 		}
 		purchaseOrder.setVatRate(systemService.getVatRate());
 	}
