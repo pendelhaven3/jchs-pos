@@ -226,7 +226,7 @@ public class ProductListPanel extends StandardMagicPanel {
         ) {
             String[] nextLine = null;
             while ((nextLine = reader.readNext()) != null) {
-            	LOGGER.info("updating product code " + nextLine[0]);
+            	System.out.println("updating product code " + nextLine[0]);
             	
                 String unit1 = nextLine[8];
                 String unit2 = nextLine[9];
@@ -235,12 +235,12 @@ public class ProductListPanel extends StandardMagicPanel {
                 }
 
                 if (!VALID_UNITS.contains(unit1)) { // TODO: Remove
-                	System.out.println("rejected1: " + nextLine[0]);
+                	System.out.println("rejected1: " + nextLine[0] + " - " + unit1);
                 	continue;
                 }
                 
                 if (!StringUtils.isEmpty(unit2) && !VALID_UNITS.contains(unit2)) {  // TODO: Remove
-                	System.out.println("rejected2: " + nextLine[0]);
+                	System.out.println("rejected2: " + nextLine[0] + " - " + unit2);
                 	continue;
                 }
                 
