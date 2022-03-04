@@ -38,6 +38,7 @@ import com.pj.magic.gui.panels.promo.PromoRedemptionRebatesPanel;
 import com.pj.magic.model.AdjustmentIn;
 import com.pj.magic.model.AdjustmentOut;
 import com.pj.magic.model.AdjustmentType;
+import com.pj.magic.model.Area;
 import com.pj.magic.model.AreaInventoryReport;
 import com.pj.magic.model.BadStockReturn;
 import com.pj.magic.model.BirForm2307Report;
@@ -337,6 +338,8 @@ public class MagicFrame extends JFrame {
     @Autowired private TrisysSalesImportPanel trisysSalesImportPanel;
     @Autowired private TrisysSalesPanel trisysSalesPanel;
     @Autowired private AdminMiscellaneousPanel adminMiscellaneousPanel;
+    @Autowired private AreaListPanel areaListPanel;
+    @Autowired private MaintainAreaPanel maintainAreaPanel;
 	
 	@Autowired private SystemService systemParameterService;
 	@Autowired private DataSource dataSource;
@@ -512,6 +515,8 @@ public class MagicFrame extends JFrame {
         panelHolder.add(trisysSalesImportPanel, TRISYS_SALES_IMPORT_PANEL);
         panelHolder.add(trisysSalesPanel, TRISYS_SALES_PANEL);
         panelHolder.add(adminMiscellaneousPanel, ADMIN_MISCELLANEOUS_PANEL);
+		panelHolder.add(areaListPanel, AREA_LIST_PANEL);
+		panelHolder.add(maintainAreaPanel, MAINTAIN_AREA_PANEL);
         getContentPane().add(panelHolder);
 
         switchToLoginPanel();
@@ -1333,4 +1338,25 @@ public class MagicFrame extends JFrame {
         ((CardLayout)panelHolder.getLayout()).show(panelHolder, ADMIN_MISCELLANEOUS_PANEL);
 	}
     
+	public void switchToAreaListPanel() {
+		addPanelNameToTitle("Area List");
+		areaListPanel.updateDisplay();
+		((CardLayout)panelHolder.getLayout()).show(panelHolder, AREA_LIST_PANEL);
+	}
+
+	public void switchToEditAreaPanel(Area area) {
+		addPanelNameToTitle("Edit Area");
+		switchToMaintainAreaPanel(area);
+	}
+	
+	public void switchToAddNewAreaPanel() {
+		addPanelNameToTitle("Add New Area");
+		switchToMaintainAreaPanel(new Area());
+	}
+	
+	private void switchToMaintainAreaPanel(Area area) {
+		maintainAreaPanel.updateDisplay(area);
+		((CardLayout)panelHolder.getLayout()).show(panelHolder, MAINTAIN_AREA_PANEL);
+	}
+
 }

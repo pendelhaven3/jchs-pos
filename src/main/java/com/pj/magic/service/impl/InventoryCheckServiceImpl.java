@@ -9,12 +9,12 @@ import org.springframework.transaction.annotation.Transactional;
 import com.pj.magic.dao.AreaInventoryReportItemDao;
 import com.pj.magic.dao.InventoryCheckDao;
 import com.pj.magic.dao.InventoryCheckSummaryItemDao;
-import com.pj.magic.dao.ProductDao;
 import com.pj.magic.dao.SystemDao;
 import com.pj.magic.model.AreaInventoryReportItem;
 import com.pj.magic.model.InventoryCheck;
 import com.pj.magic.model.InventoryCheckSummaryItem;
 import com.pj.magic.model.search.AreaInventoryReportItemSearchCriteria;
+import com.pj.magic.repository.Product2Repository;
 import com.pj.magic.service.InventoryCheckService;
 
 @Service
@@ -24,7 +24,7 @@ public class InventoryCheckServiceImpl implements InventoryCheckService {
 	@Autowired private InventoryCheckSummaryItemDao inventoryCheckSummaryItemDao;
 	@Autowired private AreaInventoryReportItemDao areaInventoryReportItemDao;
 	@Autowired private SystemDao systemDao;
-	@Autowired private ProductDao productDao;
+	@Autowired private Product2Repository product2Repository;
 	
 	@Override
 	public List<InventoryCheck> getAllInventoryChecks() {
@@ -71,7 +71,7 @@ public class InventoryCheckServiceImpl implements InventoryCheckService {
 	public void post(InventoryCheck inventoryCheck) {
 		InventoryCheck updated = getInventoryCheck(inventoryCheck.getId());
 		for (InventoryCheckSummaryItem item : updated.getSummaryItems()) {
-			productDao.addAvailableQuantity(item.getProduct(), item.getQuantity());
+			product2Repository.addAvailableQuantity(item.getProduct().getId(), item.getUnit(), item.getQuantity());
 			item.setParent(inventoryCheck);
 			inventoryCheckSummaryItemDao.save(item);
 		}

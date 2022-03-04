@@ -113,7 +113,7 @@ public class ActualCountDetailsDialog extends MagicDialog {
 	}
 	
 	public void updateDisplay(InventoryCheck inventoryCheck, InventoryCheckSummaryItem item) {
-		productCodeLabel.setText(item.getProduct().getCode());
+		productCodeLabel.setText(item.getCode());
 		productDescriptionLabel.setText(item.getProduct().getDescription());
 		table.updateDisplay(item);
 	}

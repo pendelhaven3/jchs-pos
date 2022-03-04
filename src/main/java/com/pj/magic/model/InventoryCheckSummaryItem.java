@@ -2,47 +2,30 @@ package com.pj.magic.model;
 
 import java.math.BigDecimal;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class InventoryCheckSummaryItem implements Comparable<InventoryCheckSummaryItem> {
 
 	private InventoryCheck parent;
-	private Product product;
+	private Product2 product;
 	private String unit;
 	private int quantity;
+	
+	private String code; // derived field
 
-	public Product getProduct() {
-		return product;
+	public int getQuantityDifference() {
+		return quantity - getBeginningInventory();
 	}
 
-	public void setProduct(Product product) {
-		this.product = product;
+	public BigDecimal getBeginningValue() {
+		return product.getTotalValue(unit);
 	}
-
-	public String getUnit() {
-		return unit;
-	}
-
-	public void setUnit(String unit) {
-		this.unit = unit;
-	}
-
-	public int getQuantity() {
-		return quantity;
-	}
-
-	public void setQuantity(int quantity) {
-		this.quantity = quantity;
-	}
-
+	
 	public BigDecimal getActualValue() {
 		return product.getFinalCost(unit).multiply(new BigDecimal(quantity));
-	}
-
-	public InventoryCheck getParent() {
-		return parent;
-	}
-
-	public void setParent(InventoryCheck parent) {
-		this.parent = parent;
 	}
 
 	public BigDecimal getCost() {
@@ -59,4 +42,8 @@ public class InventoryCheckSummaryItem implements Comparable<InventoryCheckSumma
 		}
 	}
 
+	public int getBeginningInventory() {
+		return product.getUnitQuantity(unit);
+	}
+	
 }

@@ -124,6 +124,9 @@ public class RecordsMaintenanceMenuPanel extends MenuPanel {
 		case PURCHASE_PAYMENT_ADJUSTMENT_TYPE_LIST:
 			getMagicFrame().switchToPurchasePaymentAdjustmentTypeListPanel();
 			break;
+		case AREA_LIST:
+			getMagicFrame().switchToAreaListPanel();
+			break;
 		}
 	}
 
@@ -143,7 +146,7 @@ public class RecordsMaintenanceMenuPanel extends MenuPanel {
 				PAYMENT_TERM_LIST,
 //				PRODUCT_CATEGORY_LIST,
 //				ADJUSTMENT_TYPE_LIST,
-//				AREA_LIST,
+				AREA_LIST,
 				CREDIT_CARD_LIST,
 				PURCHASE_PAYMENT_ADJUSTMENT_TYPE_LIST
 		));

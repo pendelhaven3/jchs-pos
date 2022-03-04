@@ -39,7 +39,7 @@ public class InventoryCheckSummaryTableModel extends AbstractTableModel {
 		InventoryCheckSummaryItem item = items.get(rowIndex);
 		switch (columnIndex) {
 		case InventoryCheckSummaryTable.PRODUCT_CODE_COLUMN_INDEX:
-			return item.getProduct().getCode();
+			return item.getCode();
 		case InventoryCheckSummaryTable.PRODUCT_DESCRIPTION_COLUMN_INDEX:
 			return item.getProduct().getDescription();
 		case InventoryCheckSummaryTable.UNIT_COLUMN_INDEX:

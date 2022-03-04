@@ -17,23 +17,52 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import com.pj.magic.dao.AreaInventoryReportItemDao;
+import com.pj.magic.model.Area;
 import com.pj.magic.model.AreaInventoryReport;
 import com.pj.magic.model.AreaInventoryReportItem;
 import com.pj.magic.model.Product;
+import com.pj.magic.model.Product2;
 import com.pj.magic.model.search.AreaInventoryReportItemSearchCriteria;
 
 @Repository
 public class AreaInventoryReportItemDaoImpl extends MagicDao implements AreaInventoryReportItemDao {
 	
 	private static final String BASE_SELECT_SQL =
-			"select a.ID, AREA_INV_REPORT_ID, PRODUCT_ID, UNIT, QUANTITY,"
-			+ " b.REPORT_NO, b.AREA"
+			"select a.ID, AREA_INV_REPORT_ID, PRODUCT_ID, UNIT, QUANTITY, c.CODE, b.REPORT_NO,"
+			+ " d.ID as AREA_ID, d.NAME as AREA_NAME"
 			+ " from AREA_INV_REPORT_ITEM a"
 			+ " join AREA_INV_REPORT b"
 			+ "   on b.ID = a.AREA_INV_REPORT_ID"
+			+ " join PRODUCT c"
+			+ "   on c.PRODUCT2_ID = a.PRODUCT_ID"
+			+ "   and c.UOM_CODE = a.UNIT"
+			+ " join AREA d"
+			+ "   on d.ID = b.AREA_ID"
 			+ " where 1 = 1";
 
-	private AreaInventoryReportItemRowMapper rowMapper = new AreaInventoryReportItemRowMapper();
+	private RowMapper<AreaInventoryReportItem> rowMapper = new RowMapper<AreaInventoryReportItem>() {
+
+		@Override
+		public AreaInventoryReportItem mapRow(ResultSet rs, int rowNum) throws SQLException {
+			AreaInventoryReportItem item = new AreaInventoryReportItem();
+			item.setId(rs.getLong("ID"));
+			
+			AreaInventoryReport parent = new AreaInventoryReport();
+			parent.setId(rs.getLong("AREA_INV_REPORT_ID"));
+			parent.setReportNumber(rs.getInt("REPORT_NO"));
+			if (rs.getLong("AREA_ID") != 0) {
+				parent.setArea(new Area(rs.getLong("AREA_ID"), rs.getString("AREA_NAME")));
+			}
+			item.setParent(parent);
+			
+			item.setProduct(new Product2(rs.getLong("PRODUCT_ID")));
+			item.setUnit(rs.getString("UNIT"));
+			item.setCode(rs.getString("CODE"));
+			item.setQuantity(rs.getInt("QUANTITY"));
+			return item;
+		}
+		
+	};
 	
 	@Override
 	public void save(AreaInventoryReportItem item) {
@@ -123,27 +152,6 @@ public class AreaInventoryReportItemDaoImpl extends MagicDao implements AreaInve
 		return getJdbcTemplate().query(sb.toString(), rowMapper, params.toArray());
 	}
 	
-	private class AreaInventoryReportItemRowMapper implements RowMapper<AreaInventoryReportItem> {
-
-		@Override
-		public AreaInventoryReportItem mapRow(ResultSet rs, int rowNum) throws SQLException {
-			AreaInventoryReportItem item = new AreaInventoryReportItem();
-			item.setId(rs.getLong("ID"));
-			
-			AreaInventoryReport parent = new AreaInventoryReport();
-			parent.setId(rs.getLong("AREA_INV_REPORT_ID"));
-			parent.setReportNumber(rs.getInt("REPORT_NO"));
-			parent.setArea(rs.getString("AREA"));
-			item.setParent(parent);
-			
-			item.setProduct(new Product(rs.getLong("PRODUCT_ID")));
-			item.setUnit(rs.getString("UNIT"));
-			item.setQuantity(rs.getInt("QUANTITY"));
-			return item;
-		}
-		
-	}
-
 	private static final String FIND_FIRST_BY_PRODUCT_SQL = BASE_SELECT_SQL
 			+ " and a.PRODUCT_ID = ? limit 1";
 	

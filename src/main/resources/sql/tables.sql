@@ -417,11 +417,18 @@ create table INVENTORY_CHECK (
   constraint INVENTORY_CHECK$UK unique (INVENTORY_DT)
 );
 
+create table AREA (
+  ID integer auto_increment,
+  NAME varchar(50) not null,
+  constraint AREA$PK primary key (ID),
+  constraint AREA$UK unique (NAME)
+);
+
 create table AREA_INV_REPORT (
   ID integer auto_increment,
   INVENTORY_CHECK_ID integer not null,
   REPORT_NO integer not null,
-  AREA varchar(100) not null,
+  AREA_ID integer null,
   CHECKER varchar(50) null,
   DOUBLE_CHECKER varchar(50) null,
   CREATE_BY integer null,
@@ -429,7 +436,9 @@ create table AREA_INV_REPORT (
   REVIEWER varchar(50) null,
   constraint AREA_INV_REPORT$PK primary key (ID),
   constraint AREA_INV_REPORT$UK unique (INVENTORY_CHECK_ID, REPORT_NO),
-  constraint AREA_INV_REPORT$FK foreign key (INVENTORY_CHECK_ID) references INVENTORY_CHECK (ID)
+  constraint AREA_INV_REPORT$FK foreign key (INVENTORY_CHECK_ID) references INVENTORY_CHECK (ID),
+  constraint AREA_INV_REPORT$FK2 foreign key (AREA_ID) references AREA (ID),
+  constraint AREA_INV_REPORT$FK3 foreign key (CREATE_BY) references USER (ID)
 );
 
 create table AREA_INV_REPORT_ITEM (
@@ -448,7 +457,8 @@ create table INVENTORY_CHECK_SUMMARY_ITEM (
   INVENTORY_CHECK_ID integer not null,
   PRODUCT_ID integer not null,
   UNIT char(4) not null,
-  QUANTITY integer(6) not null,
+  BEGINNING_INV integer(6) not null,
+  ACTUAL_COUNT integer(6) not null,
   COST numeric(10, 2) not null,
   constraint INVENTORY_CHECK_SUMMARY_ITEM$PK primary key (ID),
   constraint INVENTORY_CHECK_SUMMARY_ITEM$FK foreign key (INVENTORY_CHECK_ID) references INVENTORY_CHECK (ID),

@@ -8,11 +8,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.pj.magic.dao.AreaInventoryReportDao;
 import com.pj.magic.dao.AreaInventoryReportItemDao;
-import com.pj.magic.dao.ProductDao;
 import com.pj.magic.model.AreaInventoryReport;
 import com.pj.magic.model.AreaInventoryReportItem;
 import com.pj.magic.model.InventoryCheck;
 import com.pj.magic.model.search.AreaInventoryReportSearchCriteria;
+import com.pj.magic.repository.Product2Repository;
 import com.pj.magic.service.AreaInventoryReportService;
 import com.pj.magic.service.LoginService;
 
@@ -21,8 +21,8 @@ public class AreaInventoryReportServiceImpl implements AreaInventoryReportServic
 
 	@Autowired private AreaInventoryReportDao areaInventoryReportDao;
 	@Autowired private AreaInventoryReportItemDao areaInventoryReportItemDao;
-	@Autowired private ProductDao productDao;
 	@Autowired private LoginService loginService;
+	@Autowired private Product2Repository product2Repository;
 	
 	@Override
 	public List<AreaInventoryReport> getAllAreaInventoryReports() {
@@ -47,7 +47,7 @@ public class AreaInventoryReportServiceImpl implements AreaInventoryReportServic
 	private void loadChildrenDetails(AreaInventoryReport areaInventoryReport) {
 		List<AreaInventoryReportItem> items = areaInventoryReportItemDao.findAllByAreaInventoryReport(areaInventoryReport);
 		for (AreaInventoryReportItem item : items) {
-			item.setProduct(productDao.get(item.getProduct().getId()));
+			item.setProduct(product2Repository.get(item.getProduct().getId()));
 		}
 		areaInventoryReport.setItems(items);
 	}

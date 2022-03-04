@@ -12,7 +12,9 @@ import com.pj.magic.gui.tables.AreaInventoryReportItemsTable;
 import com.pj.magic.gui.tables.rowitems.AreaInventoryReportItemRowItem;
 import com.pj.magic.model.AreaInventoryReport;
 import com.pj.magic.model.AreaInventoryReportItem;
+import com.pj.magic.model.Product;
 import com.pj.magic.service.AreaInventoryReportService;
+import com.pj.magic.service.Product2Service;
 import com.pj.magic.service.ProductService;
 
 @Component
@@ -22,6 +24,7 @@ public class AreaInventoryReportItemsTableModel extends AbstractTableModel {
 	
 	@Autowired private ProductService productService;
 	@Autowired private AreaInventoryReportService areaInventoryReportService;
+	@Autowired private Product2Service product2Service;
 	
 	private List<AreaInventoryReportItemRowItem> rowItems = new ArrayList<>();
 	private boolean editable;
@@ -92,14 +95,13 @@ public class AreaInventoryReportItemsTableModel extends AbstractTableModel {
 		String val = (String)value;
 		switch (columnIndex) {
 		case AreaInventoryReportItemsTable.PRODUCT_CODE_COLUMN_INDEX:
-			if (rowItem.getProduct() != null && rowItem.getProduct().getCode().equals(val)) {
+			if (rowItem.getProduct() != null && rowItem.getItem().getCode().equals(val)) {
 				return;
 			}
-			rowItem.setProduct(productService.findProductByCode(val));
-			rowItem.setUnit(null);
-			break;
-		case AreaInventoryReportItemsTable.UNIT_COLUMN_INDEX:
-			rowItem.setUnit(val);
+			Product product1 = productService.findProductByCode(val);
+			rowItem.setProduct(product2Service.getProduct(product1.getProduct2Id()));
+			rowItem.setUnit(product1.getUnits().get(0));
+			rowItem.getItem().setCode(product1.getCode());
 			break;
 		case AreaInventoryReportItemsTable.QUANTITY_COLUMN_INDEX:
 			rowItem.setQuantity(Integer.valueOf(val));
@@ -130,8 +132,6 @@ public class AreaInventoryReportItemsTableModel extends AbstractTableModel {
 		switch (columnIndex) {
 		case AreaInventoryReportItemsTable.PRODUCT_CODE_COLUMN_INDEX:
 			return true;
-		case AreaInventoryReportItemsTable.UNIT_COLUMN_INDEX:
-			return rowItem.hasValidProduct();
 		case AreaInventoryReportItemsTable.QUANTITY_COLUMN_INDEX:
 			return rowItem.hasValidUnit();
 		default:
@@ -166,10 +166,9 @@ public class AreaInventoryReportItemsTableModel extends AbstractTableModel {
 		return rowItems;
 	}
 
-	public boolean hasDuplicate(String unit, AreaInventoryReportItemRowItem checkRowItem) {
+	public boolean hasDuplicate(String code, AreaInventoryReportItemRowItem checkRowItem) {
 		for (AreaInventoryReportItemRowItem rowItem : rowItems) {
-			if (checkRowItem.getProduct().equals(rowItem.getProduct()) 
-					&& unit.equals(rowItem.getUnit()) && rowItem != checkRowItem) {
+			if (rowItem != checkRowItem && code.equals(rowItem.getItem().getCode())) {
 				return true;
 			}
 		}

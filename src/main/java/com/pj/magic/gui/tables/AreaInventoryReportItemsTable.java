@@ -16,6 +16,7 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 
 import org.apache.commons.lang.StringUtils;
@@ -26,7 +27,6 @@ import com.pj.magic.Constants;
 import com.pj.magic.gui.component.MagicCellEditor;
 import com.pj.magic.gui.component.MagicTextField;
 import com.pj.magic.gui.dialog.SelectProductDialog;
-import com.pj.magic.gui.dialog.SelectUnitDialog;
 import com.pj.magic.gui.tables.models.AreaInventoryReportItemsTableModel;
 import com.pj.magic.gui.tables.rowitems.AreaInventoryReportItemRowItem;
 import com.pj.magic.model.AreaInventoryReport;
@@ -48,7 +48,6 @@ public class AreaInventoryReportItemsTable extends MagicTable {
 	public static final int PRODUCT_DESCRIPTION_COLUMN_INDEX = 1;
 	public static final int UNIT_COLUMN_INDEX = 2;
 	public static final int QUANTITY_COLUMN_INDEX = 3;
-	private static final int UNIT_MAXIMUM_LENGTH = 3;
 	private static final String SHOW_SELECTION_DIALOG_ACTION_NAME = "showSelectionDialog";
 	private static final String F10_ACTION_NAME = "F10";
 	private static final String CANCEL_ACTION_NAME = "cancelAddMode";
@@ -56,7 +55,6 @@ public class AreaInventoryReportItemsTable extends MagicTable {
 	private static final String F4_ACTION_NAME = "F4";
 
 	@Autowired private SelectProductDialog selectProductDialog;
-	@Autowired private SelectUnitDialog selectUnitDialog;
 	@Autowired private ProductService productService;
 	@Autowired private AreaInventoryReportItemsTableModel tableModel;
 	
@@ -84,7 +82,7 @@ public class AreaInventoryReportItemsTable extends MagicTable {
 		columnModel.getColumn(QUANTITY_COLUMN_INDEX).setPreferredWidth(70);
 		
 		MagicTextField productCodeTextField = new MagicTextField();
-		productCodeTextField.setMaximumLength(Constants.PRODUCT_CODE_MAXIMUM_LENGTH);
+		productCodeTextField.setMaximumLength(14);
 		productCodeTextField.addKeyListener(new KeyAdapter() {
 			
 			@Override
@@ -99,9 +97,6 @@ public class AreaInventoryReportItemsTable extends MagicTable {
 		});
 		columnModel.getColumn(PRODUCT_CODE_COLUMN_INDEX).setCellEditor(new ProductCodeCellEditor(productCodeTextField));
 
-		MagicTextField unitTextField = new MagicTextField();
-		columnModel.getColumn(UNIT_COLUMN_INDEX).setCellEditor(new UnitCellEditor(unitTextField));
-		
 		MagicTextField quantityTextField = new MagicTextField();
 		quantityTextField.setMaximumLength(Constants.QUANTITY_MAXIMUM_LENGTH);
 		quantityTextField.setNumbersOnly(true);
@@ -138,10 +133,6 @@ public class AreaInventoryReportItemsTable extends MagicTable {
 		return getSelectedColumn() == PRODUCT_CODE_COLUMN_INDEX;
 	}
 
-	public boolean isUnitFieldSelected() {
-		return getSelectedColumn() == UNIT_COLUMN_INDEX;
-	}
-	
 	public boolean isLastRowSelected() {
 		return getSelectedRow() + 1 == tableModel.getRowCount();
 	}
@@ -191,14 +182,13 @@ public class AreaInventoryReportItemsTable extends MagicTable {
 		getEditorComponent().requestFocusInWindow();
 	}
 	
-	private boolean hasDuplicate(String unit, AreaInventoryReportItemRowItem rowItem) {
+	private boolean hasDuplicate(String code, AreaInventoryReportItemRowItem rowItem) {
 		for (AreaInventoryReportItem item : areaInventoryReport.getItems()) {
-			if (item.getProduct().equals(rowItem.getProduct()) 
-					&& item.getUnit().equals(unit) && item != rowItem.getItem()) {
+			if (item.getCode().equals(code) && item != rowItem.getItem()) {
 				return true;
 			}
 		}
-		return tableModel.hasDuplicate(unit, rowItem);
+		return tableModel.hasDuplicate(code, rowItem);
 	}
 	
 	public void setAreaInventoryReport(AreaInventoryReport areaInventoryReport) {
@@ -235,14 +225,12 @@ public class AreaInventoryReportItemsTable extends MagicTable {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (isProductCodeFieldSelected()) {
+				if (isProductCodeFieldSelected() && !areaInventoryReport.isReviewed()) {
 					if (!isEditing()) {
 						editCellAt(getSelectedRow(), PRODUCT_CODE_COLUMN_INDEX);
 					}
 					String criteria = (String)getCellEditor().getCellEditorValue();
 					openSelectProductDialog(criteria, criteria);
-				} else if (isUnitFieldSelected()) {
-					openSelectUnitDialog();
 				}
 			}
 		});
@@ -274,7 +262,7 @@ public class AreaInventoryReportItemsTable extends MagicTable {
 			public void actionPerformed(ActionEvent e) {
 				if (isProductCodeFieldSelected()) {
 					openSelectProductDialogUsingPreviousCriteria();
-				} else if (isUnitFieldSelected() || isQuantityFieldSelected()) {
+				} else if (isQuantityFieldSelected()) {
 					copyValueFromPreviousRow();
 				}
 			}
@@ -299,28 +287,12 @@ public class AreaInventoryReportItemsTable extends MagicTable {
 	}
 	
 	public void removeCurrentlySelectedItem() {
-		if (getSelectedRow() != -1) {
+		if (getSelectedRow() != -1 && !areaInventoryReport.isReviewed()) {
 			if (getCurrentlySelectedRowItem().isValid()) { // check valid row to prevent deleting the blank row
 				if (confirm("Do you wish to delete the selected item?")) {
 					doDeleteCurrentlySelectedItem();
 				}
 			}
-		}
-	}
-
-	protected void openSelectUnitDialog() {
-		if (!isEditing()) {
-			editCellAt(getSelectedRow(), UNIT_COLUMN_INDEX);
-		}
-		
-		selectUnitDialog.setUnits(getCurrentlySelectedRowItem().getProduct().getUnits());
-		selectUnitDialog.searchUnits((String)getCellEditor().getCellEditorValue());
-		selectUnitDialog.setVisible(true);
-		
-		String unit = selectUnitDialog.getSelectedUnit();
-		if (unit != null) {
-			((JTextField)getEditorComponent()).setText(unit);
-			getCellEditor().stopCellEditing();
 		}
 	}
 
@@ -338,6 +310,10 @@ public class AreaInventoryReportItemsTable extends MagicTable {
 	}
 	
 	private void openSelectProductDialogUsingPreviousCriteria() {
+		if (areaInventoryReport.isReviewed()) {
+			return;
+		}
+		
 		if (!(isAdding() && isLastRowSelected())) {
 			return;
 		}
@@ -371,6 +347,7 @@ public class AreaInventoryReportItemsTable extends MagicTable {
 			
 			@Override
 			public void tableChanged(TableModelEvent e) {
+				final AbstractTableModel model = (AbstractTableModel)e.getSource();
 				final int row = e.getFirstRow();
 				final int column = e.getColumn();
 				
@@ -380,12 +357,11 @@ public class AreaInventoryReportItemsTable extends MagicTable {
 					public void run() {
 						switch (column) {
 						case PRODUCT_CODE_COLUMN_INDEX:
-							selectAndEditCellAt(row, UNIT_COLUMN_INDEX);
-							break;
-						case UNIT_COLUMN_INDEX:
+							model.fireTableRowsUpdated(row, row);
 							selectAndEditCellAt(row, QUANTITY_COLUMN_INDEX);
 							break;
 						case QUANTITY_COLUMN_INDEX:
+							model.fireTableRowsUpdated(row, row);
 							if (isAdding() && isLastRowSelected() && getCurrentlySelectedRowItem().isValid()) {
 								addNewRow();
 							}
@@ -412,30 +388,8 @@ public class AreaInventoryReportItemsTable extends MagicTable {
 			} else if (productService.findProductByCode(code) == null) {
 				showErrorMessage("No product matching code specified");
 			} else {
-				valid = true;
-			}
-			return (valid) ? super.stopCellEditing() : false;
-		}
-
-	}
-	
-	private class UnitCellEditor extends MagicCellEditor {
-		
-		public UnitCellEditor(JTextField textField) {
-			super(textField);
-		}
-		
-		@Override
-		public boolean stopCellEditing() {
-			String unit = ((JTextField)getComponent()).getText();
-			boolean valid = false;
-			if (StringUtils.isEmpty(unit)) {
-				showErrorMessage("Unit must be specified");
-			} else {
 				AreaInventoryReportItemRowItem rowItem = getCurrentlySelectedRowItem();
-				if (!rowItem.getProduct().hasUnit(unit)) {
-					showErrorMessage("Product does not have unit specified");
-				} else if (hasDuplicate(unit, rowItem)) {
+				if (hasDuplicate(code, rowItem)) {
 					showErrorMessage("Duplicate item");
 				} else {
 					valid = true;
@@ -443,7 +397,7 @@ public class AreaInventoryReportItemsTable extends MagicTable {
 			}
 			return (valid) ? super.stopCellEditing() : false;
 		}
-		
+
 	}
 	
 	private class QuantityCellEditor extends MagicCellEditor {

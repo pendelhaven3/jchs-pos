@@ -8,12 +8,18 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Box;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -23,43 +29,46 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.pj.magic.gui.component.ExcelFileFilter;
 import com.pj.magic.gui.component.MagicTextField;
 import com.pj.magic.gui.component.MagicToolBar;
 import com.pj.magic.gui.component.MagicToolBarButton;
-import com.pj.magic.gui.dialog.PrintPreviewDialog;
 import com.pj.magic.gui.tables.AreaInventoryReportItemsTable;
 import com.pj.magic.gui.tables.ProductInfoTable;
 import com.pj.magic.gui.tables.SalesRequisitionItemsTable;
+import com.pj.magic.model.Area;
 import com.pj.magic.model.AreaInventoryReport;
-import com.pj.magic.model.Product;
+import com.pj.magic.model.Product2;
+import com.pj.magic.report.excel.AreaInventoryReportExcelGenerator;
 import com.pj.magic.service.AreaInventoryReportService;
-import com.pj.magic.service.PrintService;
-import com.pj.magic.service.ProductService;
+import com.pj.magic.service.AreaService;
+import com.pj.magic.service.Product2Service;
 import com.pj.magic.util.ComponentUtil;
+import com.pj.magic.util.ExcelUtil;
+import com.pj.magic.util.FileUtil;
 import com.pj.magic.util.FormatterUtil;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Component
+@Slf4j
 public class AreaInventoryReportPanel extends StandardMagicPanel {
 
-	private static final Logger logger = LoggerFactory.getLogger(AreaInventoryReportPanel.class);
-	
 	@Autowired private AreaInventoryReportItemsTable itemsTable;
 	@Autowired private AreaInventoryReportService areaInventoryReportService;
-	@Autowired private PrintPreviewDialog printPreviewDialog;
-	@Autowired private PrintService printService;
-	@Autowired private ProductService productService;
+	@Autowired private AreaService areaService;
+	@Autowired private Product2Service product2Service;
 	
 	private AreaInventoryReport areaInventoryReport;
 	private JLabel inventoryDateField;
 	private JLabel encoderLabel;
 	private JLabel statusLabel;
 	private MagicTextField reportNumberField;
-	private MagicTextField areaField = new MagicTextField();
+	private JComboBox<Area> areaComboBox;
 	private MagicTextField checkerField;
 	private MagicTextField doubleCheckerField;
 	private MagicTextField reviewerField;
@@ -68,6 +77,7 @@ public class AreaInventoryReportPanel extends StandardMagicPanel {
 	private JButton deleteItemButton;
 	private JButton markAsReviewedButton;
 	private ProductInfoTable productInfoTable;
+    private JFileChooser excelFileChooser;
 	
 	@Override
 	protected void initializeComponents() {
@@ -82,8 +92,8 @@ public class AreaInventoryReportPanel extends StandardMagicPanel {
 			}
 		});
 		
-		areaField.setMaximumLength(100);
-		areaField.addFocusListener(new FocusAdapter() {
+		areaComboBox = new JComboBox<>();
+		areaComboBox.addFocusListener(new FocusAdapter() {
 			
 			@Override
 			public void focusLost(FocusEvent e) {
@@ -121,14 +131,20 @@ public class AreaInventoryReportPanel extends StandardMagicPanel {
 			}
 		});
 		
+        excelFileChooser = new JFileChooser();
+        excelFileChooser.setCurrentDirectory(new File(FileUtil.getDesktopFolderPath()));
+        excelFileChooser.setFileFilter(ExcelFileFilter.getInstance());
+		
 		updateTotalAmountFieldWhenItemsTableChanges();
 		initializeUnitPricesAndQuantitiesTable();
 		focusOnComponentWhenThisPanelIsDisplayed(reportNumberField);
 	}
 
 	protected void saveArea() {
-		if (!areaField.getText().equals(areaInventoryReport.getArea())) {
-			areaInventoryReport.setArea(areaField.getText());
+		Area selectedArea = (Area)areaComboBox.getSelectedItem();
+		if ((selectedArea != null && !selectedArea.equals(areaInventoryReport.getArea()))
+				|| (selectedArea == null && areaInventoryReport.getArea() != null))  {
+			areaInventoryReport.setArea(selectedArea);
 			areaInventoryReportService.save(areaInventoryReport);
 		}
 	}
@@ -191,7 +207,7 @@ public class AreaInventoryReportPanel extends StandardMagicPanel {
 	@Override
 	protected void registerKeyBindings() {
 		setFocusOnNextFieldOnEnterKey(reportNumberField);
-		setFocusOnNextFieldOnEnterKey(areaField);
+		setFocusOnNextFieldOnEnterKey(areaComboBox);
 		setFocusOnNextFieldOnEnterKey(checkerField);
 		setFocusOnNextFieldOnEnterKey(doubleCheckerField);
 		
@@ -215,7 +231,7 @@ public class AreaInventoryReportPanel extends StandardMagicPanel {
 	@Override
 	protected void initializeFocusOrder(List<JComponent> focusOrder) {
 		focusOrder.add(reportNumberField);
-		focusOrder.add(areaField);
+		focusOrder.add(areaComboBox);
 		focusOrder.add(checkerField);
 		focusOrder.add(doubleCheckerField);
 		focusOrder.add(reviewerField);
@@ -234,12 +250,15 @@ public class AreaInventoryReportPanel extends StandardMagicPanel {
 		this.areaInventoryReport = areaInventoryReport 
 				= areaInventoryReportService.getAreaInventoryReport(areaInventoryReport.getId());
 		
+		updateComboBoxes();
+		
 		boolean editable = !(areaInventoryReport.getParent().isPosted() || areaInventoryReport.isReviewed());
 		
+		encoderLabel.setText(areaInventoryReport.getCreatedBy().getUsername());
 		reportNumberField.setText(areaInventoryReport.getReportNumber().toString());
 		reportNumberField.setEnabled(editable);
-		areaField.setText(areaInventoryReport.getArea());
-		areaField.setEnabled(editable);
+		areaComboBox.setEnabled(editable);
+		areaComboBox.setSelectedItem(areaInventoryReport.getArea());
 		checkerField.setEnabled(editable);
 		checkerField.setText(areaInventoryReport.getChecker());
 		doubleCheckerField.setEnabled(editable);
@@ -259,8 +278,8 @@ public class AreaInventoryReportPanel extends StandardMagicPanel {
 		encoderLabel.setText(null);
 		reportNumberField.setText(null);
 		reportNumberField.setEnabled(true);
-		areaField.setEnabled(false);
-		areaField.setText(null);
+		areaComboBox.setEnabled(false);
+		areaComboBox.setSelectedItem(null);
 		checkerField.setEnabled(false);
 		checkerField.setText(null);
 		doubleCheckerField.setEnabled(false);
@@ -274,6 +293,12 @@ public class AreaInventoryReportPanel extends StandardMagicPanel {
 		markAsReviewedButton.setEnabled(false);
 	}
 
+	private void updateComboBoxes() {
+		List<Area> areas = areaService.getAllAreas();
+		areaComboBox.setModel(
+				new DefaultComboBoxModel<>(areas.toArray(new Area[areas.size()])));
+	}
+	
 	@Override
 	protected void layoutMainPanel(JPanel mainPanel) {
 		mainPanel.setLayout(new GridBagLayout());
@@ -358,8 +383,8 @@ public class AreaInventoryReportPanel extends StandardMagicPanel {
 		c.gridx = 5;
 		c.gridy = currentRow;
 		c.anchor = GridBagConstraints.WEST;
-		areaField.setPreferredSize(new Dimension(100, 25));
-		mainPanel.add(areaField, c);
+		areaComboBox.setPreferredSize(new Dimension(200, 25));
+		mainPanel.add(areaComboBox, c);
 
 		currentRow++;
 		
@@ -517,28 +542,15 @@ public class AreaInventoryReportPanel extends StandardMagicPanel {
 		});
 		toolBar.add(markAsReviewedButton);
 		
-		/*
-		JButton printPreviewButton = new MagicToolBarButton("print_preview", "Print Preview");
-		printPreviewButton.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				printPreviewDialog.updateDisplay(printService.generateReportAsString(areaInventoryReport));
-				printPreviewDialog.setVisible(true);
-			}
-		});
-		toolBar.add(printPreviewButton);
-		
-		JButton printButton = new MagicToolBarButton("print", "Print");
+		JButton printButton = new MagicToolBarButton("excel", "Generate Excel");
 		printButton.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				printService.print(areaInventoryReport);
+				generateExcel();
 			}
 		});
 		toolBar.add(printButton);
-		*/
 	}
 
 	private void markAreaInventoryReportAsReviewed() {
@@ -546,7 +558,7 @@ public class AreaInventoryReportPanel extends StandardMagicPanel {
 			try {
 				areaInventoryReportService.markAsReviewed(areaInventoryReport);
 			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
+				log.error(e.getMessage(), e);
 				showErrorMessage("Unexpected error occurred during saving");
 				return;
 			}
@@ -580,18 +592,50 @@ public class AreaInventoryReportPanel extends StandardMagicPanel {
 	}
 
 	private void updateUnitPricesAndQuantitiesTable() {
-//		if (itemsTable.getSelectedRow() == -1) {
-//			productInfoTable.setProduct(null);
-//			return;
-//		}
-//		
-//		Product product = itemsTable.getCurrentlySelectedRowItem().getProduct();
-//		if (product != null) {
-//			product = productService.findProductByCode(product.getCode());
-//			productInfoTable.setProduct(product);
-//		} else {
-//			productInfoTable.setProduct(null);
-//		}
+		if (itemsTable.getSelectedRow() == -1) {
+			productInfoTable.setProduct(null);
+			return;
+		}
+		
+		Product2 product = itemsTable.getCurrentlySelectedRowItem().getProduct();
+		if (product != null) {
+			productInfoTable.setProduct(product2Service.getProduct(product.getId()));
+		} else {
+			productInfoTable.setProduct(null);
+		}
 	}
 	
+    private void generateExcel() {
+        excelFileChooser.setSelectedFile(new File(generateSpreadsheetName() + ".xlsx"));
+        
+        int returnVal = excelFileChooser.showSaveDialog(this);
+        if (returnVal != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+        
+        AreaInventoryReportExcelGenerator excelGenerator = new AreaInventoryReportExcelGenerator();
+        
+        try (
+            Workbook workbook = excelGenerator.generateSpreadsheet(areaInventoryReport);
+            FileOutputStream out = new FileOutputStream(excelFileChooser.getSelectedFile());
+        ) {
+            workbook.write(out);
+            if (confirm("Excel file generated.\nDo you wish to open the file?")) {
+    			ExcelUtil.openExcelFile(excelFileChooser.getSelectedFile());
+            }
+        } catch (Exception e) {
+        	log.error(e.getMessage(), e);
+        	showMessageForUnexpectedError();
+        }
+    }
+	
+    private String generateSpreadsheetName() {
+        return new StringBuilder()
+            .append("Area Inventory Report - ")
+            .append(new SimpleDateFormat("MM-dd-yyyy").format(areaInventoryReport.getParent().getInventoryDate()))
+            .append(" - ")
+            .append(areaInventoryReport.getReportNumber())
+            .toString();
+    }
+    
 }

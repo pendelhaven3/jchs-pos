@@ -3,54 +3,21 @@ package com.pj.magic.model;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class AreaInventoryReportItem implements Comparable<AreaInventoryReportItem> {
 
 	private Long id;
 	private AreaInventoryReport parent;
-	private Product product;
+	private Product2 product;
 	private String unit;
 	private Integer quantity;
 
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public AreaInventoryReport getParent() {
-		return parent;
-	}
-
-	public void setParent(AreaInventoryReport parent) {
-		this.parent = parent;
-	}
-
-	public Product getProduct() {
-		return product;
-	}
-
-	public void setProduct(Product product) {
-		this.product = product;
-	}
-
-	public String getUnit() {
-		return unit;
-	}
-
-	public void setUnit(String unit) {
-		this.unit = unit;
-	}
-
-	public Integer getQuantity() {
-		return quantity;
-	}
-
-	public void setQuantity(Integer quantity) {
-		this.quantity = quantity;
-	}
-
+	private String code; // derived field
+	
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder()

@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,20 +17,28 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import com.pj.magic.dao.AreaInventoryReportDao;
+import com.pj.magic.model.Area;
 import com.pj.magic.model.AreaInventoryReport;
 import com.pj.magic.model.InventoryCheck;
+import com.pj.magic.model.User;
 import com.pj.magic.model.search.AreaInventoryReportSearchCriteria;
 
 @Repository
 public class AreaInventoryReportDaoImpl extends MagicDao implements AreaInventoryReportDao {
 
 	private static final String BASE_SELECT_SQL =
-			"select a.ID, INVENTORY_CHECK_ID, REPORT_NO, AREA, CHECKER, DOUBLE_CHECKER,"
+			"select a.ID, INVENTORY_CHECK_ID, REPORT_NO, AREA_ID, CHECKER, DOUBLE_CHECKER, a.CREATE_BY,"
 			+ " a.REVIEW_IND, a.REVIEWER,"
-			+ " b.INVENTORY_DT, b.POST_IND"
+			+ " b.INVENTORY_DT, b.POST_IND,"
+			+ " c.NAME as AREA_NAME,"
+			+ " d.USERNAME as CREATE_BY_USERNAME"
 			+ " from AREA_INV_REPORT a"
 			+ " join INVENTORY_CHECK b"
-			+ "   on b.ID = a.INVENTORY_CHECK_ID";
+			+ "   on b.ID = a.INVENTORY_CHECK_ID"
+			+ " left join AREA c"
+			+ "   on c.ID = a.AREA_ID"
+			+ " join USER d"
+			+ "   on d.ID = a.CREATE_BY";
 	
 	private AreaInventoryReportRowMapper areaInventoryReportRowMapper = new AreaInventoryReportRowMapper();
 	
@@ -55,8 +64,8 @@ public class AreaInventoryReportDaoImpl extends MagicDao implements AreaInventor
 
 	private static final String INSERT_SQL =
 			"insert into AREA_INV_REPORT"
-			+ " (INVENTORY_CHECK_ID, REPORT_NO, AREA, CHECKER, DOUBLE_CHECKER, REVIEWER)"
-			+ " values (?, ?, ?, ?, ?, ?)";
+			+ " (INVENTORY_CHECK_ID, REPORT_NO, AREA_ID, CHECKER, DOUBLE_CHECKER, CREATE_BY, REVIEWER)"
+			+ " values (?, ?, ?, ?, ?, ?, ?)";
 	
 	private void insert(final AreaInventoryReport areaInventoryReport) {
 		KeyHolder holder = new GeneratedKeyHolder();
@@ -68,10 +77,15 @@ public class AreaInventoryReportDaoImpl extends MagicDao implements AreaInventor
 				PreparedStatement ps = con.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS);
 				ps.setLong(1, areaInventoryReport.getParent().getId());
 				ps.setInt(2, areaInventoryReport.getReportNumber());
-				ps.setString(3, areaInventoryReport.getArea());
+				if (areaInventoryReport.getArea() != null) {
+					ps.setLong(3, areaInventoryReport.getArea().getId());
+				} else {
+					ps.setNull(3, Types.INTEGER);
+				}
 				ps.setString(4, areaInventoryReport.getChecker());
 				ps.setString(5, areaInventoryReport.getDoubleChecker());
-				ps.setString(6, areaInventoryReport.getReviewer());
+				ps.setLong(6,  areaInventoryReport.getCreatedBy().getId());
+				ps.setString(7, areaInventoryReport.getReviewer());
 				return ps;
 			}
 		}, holder);
@@ -81,13 +95,13 @@ public class AreaInventoryReportDaoImpl extends MagicDao implements AreaInventor
 
 	private static final String UPDATE_SQL =
 			"update AREA_INV_REPORT"
-			+ " set REPORT_NO = ?, AREA = ?, CHECKER = ?, DOUBLE_CHECKER = ?, REVIEW_IND = ?,"
+			+ " set REPORT_NO = ?, AREA_ID = ?, CHECKER = ?, DOUBLE_CHECKER = ?, REVIEW_IND = ?,"
 			+ " REVIEWER = ? where ID = ?";
 	
 	private void update(AreaInventoryReport areaInventoryReport) {
 		getJdbcTemplate().update(UPDATE_SQL,
 				areaInventoryReport.getReportNumber(),
-				areaInventoryReport.getArea(),
+				(areaInventoryReport.getArea() != null) ? areaInventoryReport.getArea().getId() : null,
 				areaInventoryReport.getChecker(),
 				areaInventoryReport.getDoubleChecker(),
 				(areaInventoryReport.isReviewed()) ? "Y" : "N",
@@ -116,9 +130,13 @@ public class AreaInventoryReportDaoImpl extends MagicDao implements AreaInventor
 			areaInventoryReport.setParent(parent);
 			
 			areaInventoryReport.setReportNumber(rs.getInt("REPORT_NO"));
-			areaInventoryReport.setArea(rs.getString("AREA"));
+			if (rs.getLong("AREA_ID") != 0) {
+				areaInventoryReport.setArea(new Area(rs.getLong("AREA_ID"), rs.getString("AREA_NAME")));
+			}
 			areaInventoryReport.setChecker(rs.getString("CHECKER"));
 			areaInventoryReport.setDoubleChecker(rs.getString("DOUBLE_CHECKER"));
+			areaInventoryReport.setCreatedBy(
+					new User(rs.getLong("CREATE_BY"), rs.getString("CREATE_BY_USERNAME")));
 			areaInventoryReport.setReviewed("Y".equals(rs.getString("REVIEW_IND")));
 			areaInventoryReport.setReviewer(rs.getString("REVIEWER"));
 			return areaInventoryReport;

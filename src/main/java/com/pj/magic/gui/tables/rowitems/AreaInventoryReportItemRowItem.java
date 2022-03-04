@@ -5,16 +5,21 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import com.pj.magic.model.AreaInventoryReportItem;
-import com.pj.magic.model.Product;
+import com.pj.magic.model.Product2;
+
+import lombok.Getter;
+import lombok.Setter;
 
 /*
  * Wrapper class to separate table gui concerns of inputting adjustment in items
  * from the business logic of adjustment in item model.
  */
+@Getter
+@Setter
 public class AreaInventoryReportItemRowItem {
 
 	private AreaInventoryReportItem item;
-	private Product product;
+	private Product2 product;
 	private String unit;
 	private Integer quantity;
 
@@ -29,38 +34,6 @@ public class AreaInventoryReportItemRowItem {
 		}
 	}
 	
-	public AreaInventoryReportItem getItem() {
-		return item;
-	}
-
-	public void setItem(AreaInventoryReportItem item) {
-		this.item = item;
-	}
-
-	public String getUnit() {
-		return unit;
-	}
-
-	public void setUnit(String unit) {
-		this.unit = unit;
-	}
-
-	public Integer getQuantity() {
-		return quantity;
-	}
-
-	public void setQuantity(Integer quantity) {
-		this.quantity = quantity;
-	}
-
-	public Product getProduct() {
-		return product;
-	}
-
-	public void setProduct(Product product) {
-		this.product = product;
-	}
-
 	public boolean isValid() {
 		return product != null && !StringUtils.isEmpty(unit) && quantity != null;
 	}
@@ -93,7 +66,7 @@ public class AreaInventoryReportItemRowItem {
 	}
 
 	public String getProductCode() {
-		return (product != null) ? product.getCode() : null;
+		return item.getCode();
 	}
 
 	public boolean isUpdating() {

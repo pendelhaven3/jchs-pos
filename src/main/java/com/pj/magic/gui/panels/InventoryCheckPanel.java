@@ -109,7 +109,6 @@ public class InventoryCheckPanel extends StandardMagicPanel {
 
 	@Override
 	protected void registerKeyBindings() {
-		/*
 		summaryTable.onEnterKey(new AbstractAction() {
 			
 			@Override
@@ -125,7 +124,6 @@ public class InventoryCheckPanel extends StandardMagicPanel {
 				openActualCountDetailsDialog();
 			}
 		});
-		*/
 	}
 
 	private void openActualCountDetailsDialog() {

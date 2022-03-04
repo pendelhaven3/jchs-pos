@@ -20,6 +20,7 @@ public class InventoryCheck {
 	private List<AreaInventoryReport> areaReports = new ArrayList<>();
 	private boolean posted;
 	private Date postDate;
+	private User postedBy;
 	private List<InventoryCheckSummaryItem> summaryItems = new ArrayList<>();
 
 	public InventoryCheck() {
@@ -78,7 +79,7 @@ public class InventoryCheck {
 	public BigDecimal getTotalBeginningValue() {
 		BigDecimal totalValue = Constants.ZERO;
 		for (InventoryCheckSummaryItem summaryItem : summaryItems) {
-//			totalValue = totalValue.add(summaryItem.getBeginningValue());
+			totalValue = totalValue.add(summaryItem.getBeginningValue());
 		}
 		return totalValue;
 	}
@@ -108,8 +109,7 @@ public class InventoryCheck {
 
 			@Override
 			public boolean apply(InventoryCheckSummaryItem input) {
-//				return input.getBeginningInventory() > 0;
-				return true;
+				return input.getBeginningInventory() > 0;
 			}
 		}));
 	}
@@ -120,14 +120,13 @@ public class InventoryCheck {
 
 			@Override
 			public boolean apply(InventoryCheckSummaryItem input) {
-//				return input.getBeginningInventory() != input.getQuantity();
-				return true;
+				return input.getBeginningInventory() != input.getQuantity();
 			}
 		}));
 	}
 
 	public List<InventoryCheckSummaryItem> searchSummaryItems(InventoryCheckSearchCriteria criteria) {
-		if (criteria.isEmpty()) {
+		if (criteria == null || criteria.isEmpty()) {
 			return summaryItems;
 		}
 		
@@ -139,12 +138,20 @@ public class InventoryCheck {
 
 			@Override
 			public boolean apply(InventoryCheckSummaryItem input) {
-				Product product = input.getProduct();
+				Product2 product = input.getProduct();
 				boolean include = true;
 				
 				if (!StringUtils.isEmpty(codeOrDescription)) {
-					include = product.getCode().startsWith(codeOrDescription) ||
+					include = input.getCode().startsWith(codeOrDescription) ||
 							product.getDescription().toUpperCase().contains(codeOrDescription);
+				}
+				
+				if (include && withDiscrepancy != null) {
+					if (withDiscrepancy) {
+						include = (input.getBeginningInventory() != input.getQuantity());
+					} else {
+						include = (input.getBeginningInventory() == input.getQuantity());
+					}
 				}
 				
 				return include;
@@ -158,8 +165,7 @@ public class InventoryCheck {
 
 			@Override
 			public boolean apply(InventoryCheckSummaryItem input) {
-//				return input.getBeginningInventory() > 0 || input.getQuantity() > 0;
-				return true;
+				return input.getBeginningInventory() > 0 || input.getQuantity() > 0;
 			}
 		}));
 	}
@@ -172,4 +178,12 @@ public class InventoryCheck {
 		this.postDate = postDate;
 	}
 
+	public User getPostedBy() {
+		return postedBy;
+	}
+
+	public void setPostedBy(User postedBy) {
+		this.postedBy = postedBy;
+	}
+	
 }
