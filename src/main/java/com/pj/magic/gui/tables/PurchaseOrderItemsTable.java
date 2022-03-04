@@ -28,7 +28,6 @@ import com.pj.magic.Constants;
 import com.pj.magic.gui.component.MagicCellEditor;
 import com.pj.magic.gui.component.MagicTextField;
 import com.pj.magic.gui.dialog.SelectProductDialog;
-import com.pj.magic.gui.dialog.SelectUnitDialog;
 import com.pj.magic.gui.tables.models.PurchaseOrderItemsTableModel;
 import com.pj.magic.gui.tables.rowitems.PurchaseOrderItemRowItem;
 import com.pj.magic.model.Product;
@@ -470,33 +469,6 @@ public class PurchaseOrderItemsTable extends MagicTable {
 			return (valid) ? super.stopCellEditing() : false;
 		}
 
-	}
-	
-	private class UnitCellEditor extends MagicCellEditor {
-		
-		public UnitCellEditor(JTextField textField) {
-			super(textField);
-		}
-		
-		@Override
-		public boolean stopCellEditing() {
-			String unit = ((JTextField)getComponent()).getText();
-			boolean valid = false;
-			if (StringUtils.isEmpty(unit)) {
-				showErrorMessage("Unit must be specified");
-			} else {
-				PurchaseOrderItemRowItem rowItem = getCurrentlySelectedRowItem();
-				if (!rowItem.getProduct().hasUnit(unit)) {
-					showErrorMessage("Product does not have unit specified");
-				} else if (hasDuplicate(unit, rowItem)) {
-					showErrorMessage("Duplicate item");
-				} else {
-					valid = true;
-				}
-			}
-			return (valid) ? super.stopCellEditing() : false;
-		}
-		
 	}
 	
 	private class QuantityCellEditor extends MagicCellEditor {
