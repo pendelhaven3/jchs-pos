@@ -1,7 +1,6 @@
 package com.pj.magic.service.impl;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -54,17 +53,9 @@ public class InventoryCheckServiceImpl implements InventoryCheckService {
 	public InventoryCheck getInventoryCheck(long id) {
 		InventoryCheck inventoryCheck = inventoryCheckDao.get(id);
 		if (inventoryCheck.isPosted()) {
-			List<InventoryCheckSummaryItem> items = inventoryCheckSummaryItemDao.findAllByPostedInventoryCheck(inventoryCheck);
-			items = items.stream()
-					.filter(item -> item.getQuantity() > 0)
-					.collect(Collectors.toList());
-			inventoryCheck.setSummaryItems(items);
+			inventoryCheck.setSummaryItems(inventoryCheckSummaryItemDao.findAllByPostedInventoryCheck(inventoryCheck));
 		} else {
-			List<InventoryCheckSummaryItem> items = inventoryCheckSummaryItemDao.findAllByInventoryCheck(inventoryCheck);
-			items = items.stream()
-					.filter(item -> item.getQuantity() > 0)
-					.collect(Collectors.toList());
-			inventoryCheck.setSummaryItems(items);
+			inventoryCheck.setSummaryItems(inventoryCheckSummaryItemDao.findAllByInventoryCheck(inventoryCheck));
 		}
 		
 		for (InventoryCheckSummaryItem item : inventoryCheck.getSummaryItems()) {
