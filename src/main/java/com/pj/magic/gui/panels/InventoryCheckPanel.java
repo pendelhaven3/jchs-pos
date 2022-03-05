@@ -5,58 +5,58 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 
-import net.sourceforge.jdatepicker.impl.JDatePanelImpl;
-import net.sourceforge.jdatepicker.impl.JDatePickerImpl;
-import net.sourceforge.jdatepicker.impl.UtilCalendarModel;
-
 import org.apache.commons.lang.time.DateUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.pj.magic.gui.component.DatePickerFormatter;
 import com.pj.magic.gui.component.DoubleClickMouseAdapter;
+import com.pj.magic.gui.component.ExcelFileFilter;
 import com.pj.magic.gui.component.MagicToolBar;
 import com.pj.magic.gui.component.MagicToolBarButton;
 import com.pj.magic.gui.dialog.ActualCountDetailsDialog;
-import com.pj.magic.gui.dialog.PrintPreviewDialog;
 import com.pj.magic.gui.dialog.SearchInventoryChecksDialog;
 import com.pj.magic.gui.tables.InventoryCheckSummaryTable;
 import com.pj.magic.model.InventoryCheck;
 import com.pj.magic.model.InventoryCheckSummaryItem;
 import com.pj.magic.model.search.AreaInventoryReportSearchCriteria;
 import com.pj.magic.model.search.InventoryCheckSearchCriteria;
-import com.pj.magic.model.util.InventoryCheckReportType;
+import com.pj.magic.report.excel.InventoryCheckExcelGenerator;
 import com.pj.magic.service.AreaInventoryReportService;
 import com.pj.magic.service.InventoryCheckService;
 import com.pj.magic.service.LoginService;
-import com.pj.magic.service.PrintService;
-import com.pj.magic.service.PrintServiceImpl;
 import com.pj.magic.util.ComponentUtil;
+import com.pj.magic.util.ExcelUtil;
+import com.pj.magic.util.FileUtil;
 import com.pj.magic.util.FormatterUtil;
 
+import lombok.extern.slf4j.Slf4j;
+import net.sourceforge.jdatepicker.impl.JDatePanelImpl;
+import net.sourceforge.jdatepicker.impl.JDatePickerImpl;
+import net.sourceforge.jdatepicker.impl.UtilCalendarModel;
+
 @Component
+@Slf4j
 public class InventoryCheckPanel extends StandardMagicPanel {
 
-	private static final Logger logger = LoggerFactory.getLogger(InventoryCheckPanel.class);
-	
 	@Autowired private InventoryCheckService inventoryCheckService;
 	@Autowired private InventoryCheckSummaryTable summaryTable;
-	@Autowired private PrintPreviewDialog printPreviewDialog;
-	@Autowired private PrintService printService;
 	@Autowired private ActualCountDetailsDialog actualCountDetailsDialog;
 	@Autowired private SearchInventoryChecksDialog searchInventoryChecksDialog;
 	@Autowired private AreaInventoryReportService areaInventoryReportService;
@@ -68,10 +68,10 @@ public class InventoryCheckPanel extends StandardMagicPanel {
 	private JDatePickerImpl datePicker;
 	private JButton postButton;
 	private JLabel totalActualValueField;
-	private JButton printPreviewButton;
-	private JButton printButton;
+	private JButton generateExcelButton;
 	private JButton showAllButton;
 	private JButton searchButton;
+    private JFileChooser excelFileChooser;
 	
 	@Override
 	protected void initializeComponents() {
@@ -85,6 +85,10 @@ public class InventoryCheckPanel extends StandardMagicPanel {
 				saveInventoryCheck();
 			}
 		});
+		
+        excelFileChooser = new JFileChooser();
+        excelFileChooser.setCurrentDirectory(new File(FileUtil.getDesktopFolderPath()));
+        excelFileChooser.setFileFilter(ExcelFileFilter.getInstance());
 	}
 
 	protected void saveInventoryCheck() {
@@ -101,7 +105,7 @@ public class InventoryCheckPanel extends StandardMagicPanel {
 				showMessage("Saved!");
 				updateDisplay(inventoryCheck);
 			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
+				log.error(e.getMessage(), e);
 				showErrorMessage("Error occurred during saving!");
 			}
 		}
@@ -147,8 +151,6 @@ public class InventoryCheckPanel extends StandardMagicPanel {
 		totalActualValueField.setText(FormatterUtil.formatAmount(inventoryCheck.getTotalActualValue()));
 		
 		postButton.setEnabled(!inventoryCheck.isPosted() && loginService.getLoggedInUser().isSupervisor());
-		printButton.setEnabled(true);
-		printPreviewButton.setEnabled(true);
 		saveButton.setVisible(false);
 		showAllButton.setEnabled(true);
 		searchButton.setEnabled(true);
@@ -176,8 +178,7 @@ public class InventoryCheckPanel extends StandardMagicPanel {
 		totalActualValueField.setText(null);
 		summaryTable.setItems(new ArrayList<InventoryCheckSummaryItem>());
 		postButton.setEnabled(false);
-		printButton.setEnabled(false);
-		printPreviewButton.setEnabled(false);
+		generateExcelButton.setEnabled(false);
 		saveButton.setVisible(true);
 		showAllButton.setEnabled(false);
 		searchButton.setEnabled(false);
@@ -321,25 +322,9 @@ public class InventoryCheckPanel extends StandardMagicPanel {
 		
 		toolBar.add(postButton);
 		
-		printPreviewButton = new MagicToolBarButton("print_preview", "Print Preview");
-		printPreviewButton.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				printPreviewInventoryCheck();
-			}
-		});
-//		toolBar.add(printPreviewButton);
-		
-		printButton = new MagicToolBarButton("print", "Print");
-		printButton.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				print();
-			}
-		});
-//		toolBar.add(printButton);
+		generateExcelButton = new MagicToolBarButton("excel", "Generate Excel");
+		generateExcelButton.addActionListener(e -> generateExcel());
+		toolBar.add(generateExcelButton);
 	}
 
 	private void searchSummaryItems() {
@@ -359,42 +344,6 @@ public class InventoryCheckPanel extends StandardMagicPanel {
 		searchInventoryChecksDialog.updateDisplay();
 	}
 
-	private void print() {
-		printService.print(inventoryCheck, chooseReportType("Print Inventory Check"));
-	}
-
-	private void printPreviewInventoryCheck() {
-		InventoryCheckReportType reportType = chooseReportType("Print Preview");
-		
-		printPreviewDialog.updateDisplay(
-				printService.generateReportAsString(inventoryCheck, reportType));
-		if (reportType == InventoryCheckReportType.COMPLETE) {
-			printPreviewDialog.setColumnsPerLine(PrintServiceImpl.INVENTORY_REPORT_COMPLETE_COLUMNS_PER_LINE);
-		} else {
-			printPreviewDialog.setColumnsPerLine(PrintServiceImpl.INVENTORY_REPORT_COLUMNS_PER_LINE);
-		}
-		printPreviewDialog.setUseCondensedFontForPrinting(true);
-		printPreviewDialog.setVisible(true);
-	}
-	
-	private InventoryCheckReportType chooseReportType(String dialogTitle) {
-		Object[] buttons = {"Beginning Inventory", "Actual Count", "Complete"};
-		int choice = JOptionPane.showOptionDialog(this, "Beginning inventory or actual count?", 
-				dialogTitle, JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, 
-				null, buttons, buttons[0]);
-		
-		switch (choice) {
-		case JOptionPane.YES_OPTION:
-			return InventoryCheckReportType.BEGINNING_INVENTORY;
-		case JOptionPane.NO_OPTION:
-			return InventoryCheckReportType.ACTUAL_COUNT;
-		case JOptionPane.CANCEL_OPTION:
-			return InventoryCheckReportType.COMPLETE;
-		default:
-			return null;
-		}
-	}
-
 	private void postInventoryCheck() {
 		if (!areAllAreaInventoryReportsReviewed()) {
 			showErrorMessage(
@@ -408,7 +357,7 @@ public class InventoryCheckPanel extends StandardMagicPanel {
 				showMessage("Inventory Check posted!");
 				updateDisplay(inventoryCheck);
 			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
+				log.error(e.getMessage(), e);
 				showErrorMessage("Unexpected error!");
 			}
 		}
@@ -421,4 +370,35 @@ public class InventoryCheckPanel extends StandardMagicPanel {
 		return areaInventoryReportService.search(criteria).isEmpty();
 	}
 
+    private void generateExcel() {
+        excelFileChooser.setSelectedFile(new File(generateSpreadsheetName() + ".xlsx"));
+        
+        int returnVal = excelFileChooser.showSaveDialog(this);
+        if (returnVal != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+        
+        InventoryCheckExcelGenerator excelGenerator = new InventoryCheckExcelGenerator();
+        
+        try (
+            Workbook workbook = excelGenerator.generateSpreadsheet(inventoryCheck);
+            FileOutputStream out = new FileOutputStream(excelFileChooser.getSelectedFile());
+        ) {
+            workbook.write(out);
+            if (confirm("Excel file generated.\nDo you wish to open the file?")) {
+    			ExcelUtil.openExcelFile(excelFileChooser.getSelectedFile());
+            }
+        } catch (Exception e) {
+        	log.error(e.getMessage(), e);
+        	showMessageForUnexpectedError();
+        }
+    }
+    
+    private String generateSpreadsheetName() {
+        return new StringBuilder()
+            .append("INVENTORY CHECK - ")
+            .append(new SimpleDateFormat("MM-dd-yyyy").format(inventoryCheck.getInventoryDate()))
+            .toString();
+    }
+    
 }
