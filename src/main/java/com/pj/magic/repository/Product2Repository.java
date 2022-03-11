@@ -5,6 +5,7 @@ import java.util.List;
 import com.pj.magic.model.Product;
 import com.pj.magic.model.Product2;
 import com.pj.magic.model.UnitSku;
+import com.pj.magic.model.search.Product2SearchCriteria;
 
 public interface Product2Repository {
 
@@ -25,5 +26,7 @@ public interface Product2Repository {
 	void addAvailableQuantity(Long id, String unit, Integer quantity);
 
 	void subtractAvailableQuantity(Long id, String unit, int quantity);
+
+	List<Product2> search(Product2SearchCriteria criteria);
 
 }

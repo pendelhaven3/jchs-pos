@@ -98,7 +98,8 @@ public class MagicFrame extends JFrame {
 	public static final String SALES_REQUISITION_PANEL = "SALES_REQUISITION_PANEL";
 	public static final String SALES_INVOICES_LIST_PANEL = "SALES_INVOICES_LIST_PANEL";
 	public static final String SALES_INVOICE_PANEL = "SALES_INVOICE_PANEL";
-	public static final String TRISYS_PRODUCT_LIST_PANEL = "PRODUCT_LIST_PANEL";
+	public static final String TRISYS_PRODUCT_LIST_PANEL = "TRISYS_PRODUCT_LIST_PANEL";
+	public static final String PRODUCT_LIST_PANEL = "PRODUCT_LIST_PANEL";
 	public static final String MAINTAIN_PRODUCT_PANEL = "MAINTAIN_PRODUCT_PANEL";
 	public static final String MANUFACTURER_LIST_PANEL = "MANUFACTURER_LIST_PANEL";
 	public static final String MAINTAIN_MANUFACTURER_PANEL = "MAINTAIN_MANUFACTURER_PANEL";
@@ -232,6 +233,7 @@ public class MagicFrame extends JFrame {
 	@Autowired private SalesInvoiceListPanel salesInvoicesListPanel;
 	@Autowired private SalesInvoicePanel salesInvoicePanel;
 	@Autowired private TrisysProductListPanel trisysProductListPanel;
+	@Autowired private ProductListPanel productListPanel;
 	@Autowired private MaintainProductPanel maintainProductPanel;
 	@Autowired private ManufacturerListPanel manufacturerListPanel;
 	@Autowired private MaintainManufacturerPanel maintainManufacturerPanel;
@@ -347,6 +349,8 @@ public class MagicFrame extends JFrame {
 	private CardLayoutPanel panelHolder;
 	private static final ResourceBundle resourceBundle = ResourceBundle.getBundle("application");
 	
+	private String backPanel;
+	
 	public MagicFrame() {
 		this.setSize(1024, 640);
 		setLocationRelativeTo(null);
@@ -406,6 +410,7 @@ public class MagicFrame extends JFrame {
 		panelHolder.add(salesInvoicesListPanel, SALES_INVOICES_LIST_PANEL);
 		panelHolder.add(salesInvoicePanel, SALES_INVOICE_PANEL);
 		panelHolder.add(trisysProductListPanel, TRISYS_PRODUCT_LIST_PANEL);
+		panelHolder.add(productListPanel, PRODUCT_LIST_PANEL);
 		panelHolder.add(maintainProductPanel, MAINTAIN_PRODUCT_PANEL);
 		panelHolder.add(manufacturerListPanel, MANUFACTURER_LIST_PANEL);
 		panelHolder.add(maintainManufacturerPanel, MAINTAIN_MANUFACTURER_PANEL);
@@ -581,6 +586,18 @@ public class MagicFrame extends JFrame {
 		((CardLayout)panelHolder.getLayout()).show(panelHolder, TRISYS_PRODUCT_LIST_PANEL);
 	}
 	
+	public void switchToProductListPanel() {
+		switchToProductListPanel(true);
+	}
+	
+	public void switchToProductListPanel(boolean refresh) {
+		addPanelNameToTitle("Product List");
+		if (refresh) {
+			productListPanel.updateDisplay();
+		}
+		((CardLayout)panelHolder.getLayout()).show(panelHolder, PRODUCT_LIST_PANEL);
+	}
+
 	public void switchToEditProductPanel(Product2 product) {
 		addPanelNameToTitle("Edit Product");
 		switchToMaintainProductPanel(product);
@@ -1357,6 +1374,17 @@ public class MagicFrame extends JFrame {
 	private void switchToMaintainAreaPanel(Area area) {
 		maintainAreaPanel.updateDisplay(area);
 		((CardLayout)panelHolder.getLayout()).show(panelHolder, MAINTAIN_AREA_PANEL);
+	}
+	
+	public void setBackPanel(String backPanel) {
+		this.backPanel = backPanel;
+	}
+	
+	public void switchBack() {
+		StandardMagicPanel panel = panelHolder.getCardPanel(backPanel);
+		addPanelNameToTitle(panel.getTitle());
+		((CardLayout)panelHolder.getLayout()).show(panelHolder, backPanel);
+		setBackPanel(null);
 	}
 
 }

@@ -11,6 +11,7 @@ import com.pj.magic.model.Product;
 import com.pj.magic.model.Product2;
 import com.pj.magic.model.Supplier;
 import com.pj.magic.model.Unit;
+import com.pj.magic.model.search.Product2SearchCriteria;
 import com.pj.magic.repository.Product2Repository;
 import com.pj.magic.service.Product2Service;
 
@@ -92,6 +93,19 @@ public class Product2ServiceImpl implements Product2Service {
 	@Override
 	public void addAvailableQuantity(Long id, String unit, int quantity) {
 		product2Repository.addAvailableQuantity(id, unit, quantity);
+	}
+
+	@Override
+	public List<Product2> getAllActiveProducts() {
+		Product2SearchCriteria criteria = new Product2SearchCriteria();
+		criteria.setActive(true);
+		
+		return product2Repository.search(criteria);
+	}
+
+	@Override
+	public List<Product2> searchProducts(Product2SearchCriteria criteria) {
+		return product2Repository.search(criteria);
 	}
 
 }

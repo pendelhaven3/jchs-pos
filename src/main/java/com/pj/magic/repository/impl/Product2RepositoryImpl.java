@@ -5,9 +5,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.dao.DataAccessException;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
@@ -24,6 +25,7 @@ import com.pj.magic.model.UnitCost;
 import com.pj.magic.model.UnitPrice;
 import com.pj.magic.model.UnitQuantity;
 import com.pj.magic.model.UnitSku;
+import com.pj.magic.model.search.Product2SearchCriteria;
 import com.pj.magic.repository.Product2Repository;
 
 @Repository
@@ -371,6 +373,31 @@ public class Product2RepositoryImpl extends MagicDao implements Product2Reposito
 		default:
 			throw new RuntimeException("Unrecognized unit: " + unit);
 		}
+	}
+
+	@Override
+	public List<Product2> search(Product2SearchCriteria criteria) {
+		StringBuilder sql = new StringBuilder(BASE_SELECT_SQL);
+		List<Object> params = new ArrayList<>();
+		
+		if (criteria.getActive() != null) {
+			sql.append(" and ACTIVE_IND = ?");
+			params.add(criteria.getActive() ? "Y" : "N");
+		}
+		
+		if (!StringUtils.isEmpty(criteria.getId())) {
+			sql.append(" and ID = ?");
+			params.add(criteria.getId());
+		}
+		
+		if (criteria.getDescriptionLike() != null) {
+			sql.append(" and DESCRIPTION like ?");
+			params.add("%" + criteria.getDescriptionLike() + "%");
+		}
+		
+		sql.append(" order by a.DESCRIPTION");
+		
+		return getJdbcTemplate().query(sql.toString(), rowMapper, params.toArray());
 	}
 
 	/*

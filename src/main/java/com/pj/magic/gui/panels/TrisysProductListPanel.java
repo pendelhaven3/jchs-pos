@@ -67,6 +67,11 @@ public class TrisysProductListPanel extends StandardMagicPanel {
 	private ProductsTableModel tableModel = new ProductsTableModel();
 	private MagicFileChooser fileChooser = new MagicFileChooser();
 	
+	@Override
+	public String getTitle() {
+		return "Trisys Product List";
+	}
+	
 	public void updateDisplay() {
 		List<Product> products = productService.getAllActiveProducts();
 		tableModel.setItems(products);
@@ -144,12 +149,13 @@ public class TrisysProductListPanel extends StandardMagicPanel {
 
 	protected void selectProduct() {
 		Product product = tableModel.getItem(table.getSelectedRow());
+		getMagicFrame().setBackPanel("TRISYS_PRODUCT_LIST_PANEL");
 		getMagicFrame().switchToEditProductPanel(new Product2(product.getProduct2Id()));
 	}
 
 	@Override
 	protected void doOnBack() {
-		getMagicFrame().switchToMainMenuPanel();
+		getMagicFrame().switchToInventoryMenuPanel();
 	}
 
 	@Override
