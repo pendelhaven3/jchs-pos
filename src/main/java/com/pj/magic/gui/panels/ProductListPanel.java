@@ -57,6 +57,7 @@ public class ProductListPanel extends StandardMagicPanel {
     private static final int UOM_2_COLUMN_INDEX = 3;
     private static final int UOM_1_QUANTITY_COLUMN_INDEX = 4;
     private static final int UOM_2_QUANTITY_COLUMN_INDEX = 5;
+    private static final int ACTIVE_COLUMN_INDEX = 6;
     
 	@Autowired private ProductService productService;
 	@Autowired private SearchProductsDialog searchProductsDialog;
@@ -83,6 +84,7 @@ public class ProductListPanel extends StandardMagicPanel {
         table.getColumnModel().getColumn(UOM_2_COLUMN_INDEX).setPreferredWidth(50);
         table.getColumnModel().getColumn(UOM_1_QUANTITY_COLUMN_INDEX).setPreferredWidth(50);
         table.getColumnModel().getColumn(UOM_2_QUANTITY_COLUMN_INDEX).setPreferredWidth(50);
+        table.getColumnModel().getColumn(ACTIVE_COLUMN_INDEX).setPreferredWidth(50);
         
 		focusOnComponentWhenThisPanelIsDisplayed(table);
 	}
@@ -316,7 +318,7 @@ public class ProductListPanel extends StandardMagicPanel {
 
     private class ProductsTableModel extends ListBackedTableModel<Product>{
 
-        private final String[] columnNames = {"Code", "Description", "UOM 1", "UOM 2", "UOM Qty 1", "UOM Qty 2"};
+        private final String[] columnNames = {"Code", "Description", "UOM 1", "UOM 2", "UOM Qty 1", "UOM Qty 2", "Active?"};
 	    
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
@@ -334,6 +336,8 @@ public class ProductListPanel extends StandardMagicPanel {
                 return product.getUnitConversions().get(0).getQuantity();
             case UOM_2_QUANTITY_COLUMN_INDEX:
                 return product.getUnitConversions().size() > 1 ? product.getUnitConversions().get(1).getQuantity() : null;
+            case ACTIVE_COLUMN_INDEX:
+                return product.isActive() ? "Yes" : "No";
             default:
                 throw new RuntimeException("Fetching invalid column index: " + columnIndex);
             }
