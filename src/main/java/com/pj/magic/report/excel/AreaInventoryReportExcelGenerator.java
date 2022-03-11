@@ -8,7 +8,6 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.pj.magic.model.AreaInventoryReport;
@@ -69,9 +68,8 @@ public class AreaInventoryReportExcelGenerator {
             
             row = sheet.createRow(currentRow);
             
-            row.createCell(0).setCellValue(item.getProduct().getDescription());
-            sheet.addMergedRegion(new CellRangeAddress(currentRow, currentRow, 0, 1));
-            
+            row.createCell(0).setCellValue(item.getCode());
+            row.createCell(1).setCellValue(item.getProduct().getDescription());
             row.createCell(2).setCellValue(item.getUnit());
             row.createCell(3).setCellValue(item.getQuantity());
             
