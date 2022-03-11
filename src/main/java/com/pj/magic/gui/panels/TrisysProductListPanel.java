@@ -20,7 +20,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.filechooser.FileFilter;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +58,7 @@ public class TrisysProductListPanel extends StandardMagicPanel {
     private static final int UOM_1_QUANTITY_COLUMN_INDEX = 4;
     private static final int UOM_2_QUANTITY_COLUMN_INDEX = 5;
     private static final int ACTIVE_COLUMN_INDEX = 6;
-    private static final int PRODUCT2_ID_COLUMN_INDEX = 7;
+    private static final int PRODUCT_ID_COLUMN_INDEX = 7;
     
 	@Autowired private ProductService productService;
 	@Autowired private SearchProductsDialog searchProductsDialog;
@@ -87,7 +86,7 @@ public class TrisysProductListPanel extends StandardMagicPanel {
         table.getColumnModel().getColumn(UOM_1_QUANTITY_COLUMN_INDEX).setPreferredWidth(40);
         table.getColumnModel().getColumn(UOM_2_QUANTITY_COLUMN_INDEX).setPreferredWidth(40);
         table.getColumnModel().getColumn(ACTIVE_COLUMN_INDEX).setPreferredWidth(35);
-        table.getColumnModel().getColumn(PRODUCT2_ID_COLUMN_INDEX).setPreferredWidth(45);
+        table.getColumnModel().getColumn(PRODUCT_ID_COLUMN_INDEX).setPreferredWidth(45);
         
 		focusOnComponentWhenThisPanelIsDisplayed(table);
 	}
@@ -315,7 +314,7 @@ public class TrisysProductListPanel extends StandardMagicPanel {
 
     private class ProductsTableModel extends ListBackedTableModel<Product>{
 
-        private final String[] columnNames = {"Code", "Description", "UOM 1", "UOM 2", "UOM Qty 1", "UOM Qty 2", "Active?", "Product2 ID"};
+        private final String[] columnNames = {"Code", "Description", "UOM 1", "UOM 2", "UOM Qty 1", "UOM Qty 2", "Active?", "Product ID"};
 	    
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
@@ -335,7 +334,7 @@ public class TrisysProductListPanel extends StandardMagicPanel {
                 return product.getUnitConversions().size() > 1 ? product.getUnitConversions().get(1).getQuantity() : null;
             case ACTIVE_COLUMN_INDEX:
                 return product.isActive();
-            case PRODUCT2_ID_COLUMN_INDEX:
+            case PRODUCT_ID_COLUMN_INDEX:
                 return product.getProduct2Id() != null ? String.valueOf(product.getProduct2Id()) : null;
             default:
                 throw new RuntimeException("Fetching invalid column index: " + columnIndex);
