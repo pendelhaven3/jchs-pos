@@ -41,6 +41,7 @@ public class Product2ServiceImpl implements Product2Service {
 					existing.setUnitConversion(unit, product.getUnitConversion(unit));
 				}
 				
+				existing.setDescription(product.getDescription());
 				existing.setActive(true);
 				product2Repository.updateFromTrisys(existing);
 			}
