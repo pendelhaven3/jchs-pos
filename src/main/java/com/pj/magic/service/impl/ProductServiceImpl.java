@@ -155,6 +155,10 @@ public class ProductServiceImpl implements ProductService {
 	    	product.setProduct2Id(product2Service.saveFromTrisys(product));
 	        productDao.save(product);
 	    } else {
+	    	if (!existing.isActive()) {
+	    		return;
+	    	}
+	    	
 	    	boolean shouldUpdate = !existing.areFieldsEqual(product) 
 	    			|| existing.getProduct2Id() == null
 	    			|| !existing.hasActiveUnit(product.getUnits().get(0));
