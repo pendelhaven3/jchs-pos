@@ -20,6 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.filechooser.FileFilter;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,9 +48,9 @@ import net.iryndin.jdbf.core.DbfRecord;
 import net.iryndin.jdbf.reader.DbfReader;
 
 @Component
-public class ProductListPanel extends StandardMagicPanel {
+public class TrisysProductListPanel extends StandardMagicPanel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProductListPanel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TrisysProductListPanel.class);
     
     private static final int PRODUCT_CODE_COLUMN_INDEX = 0;
     private static final int PRODUCT_DESCRIPTION_COLUMN_INDEX = 1;
@@ -58,6 +59,7 @@ public class ProductListPanel extends StandardMagicPanel {
     private static final int UOM_1_QUANTITY_COLUMN_INDEX = 4;
     private static final int UOM_2_QUANTITY_COLUMN_INDEX = 5;
     private static final int ACTIVE_COLUMN_INDEX = 6;
+    private static final int PRODUCT2_ID_COLUMN_INDEX = 7;
     
 	@Autowired private ProductService productService;
 	@Autowired private SearchProductsDialog searchProductsDialog;
@@ -79,12 +81,13 @@ public class ProductListPanel extends StandardMagicPanel {
 	protected void initializeComponents() {
 		table = new MagicListTable(tableModel);
         table.getColumnModel().getColumn(PRODUCT_CODE_COLUMN_INDEX).setPreferredWidth(100);
-        table.getColumnModel().getColumn(PRODUCT_DESCRIPTION_COLUMN_INDEX).setPreferredWidth(300);
-        table.getColumnModel().getColumn(UOM_1_COLUMN_INDEX).setPreferredWidth(50);
-        table.getColumnModel().getColumn(UOM_2_COLUMN_INDEX).setPreferredWidth(50);
-        table.getColumnModel().getColumn(UOM_1_QUANTITY_COLUMN_INDEX).setPreferredWidth(50);
-        table.getColumnModel().getColumn(UOM_2_QUANTITY_COLUMN_INDEX).setPreferredWidth(50);
-        table.getColumnModel().getColumn(ACTIVE_COLUMN_INDEX).setPreferredWidth(50);
+        table.getColumnModel().getColumn(PRODUCT_DESCRIPTION_COLUMN_INDEX).setPreferredWidth(280);
+        table.getColumnModel().getColumn(UOM_1_COLUMN_INDEX).setPreferredWidth(35);
+        table.getColumnModel().getColumn(UOM_2_COLUMN_INDEX).setPreferredWidth(35);
+        table.getColumnModel().getColumn(UOM_1_QUANTITY_COLUMN_INDEX).setPreferredWidth(40);
+        table.getColumnModel().getColumn(UOM_2_QUANTITY_COLUMN_INDEX).setPreferredWidth(40);
+        table.getColumnModel().getColumn(ACTIVE_COLUMN_INDEX).setPreferredWidth(35);
+        table.getColumnModel().getColumn(PRODUCT2_ID_COLUMN_INDEX).setPreferredWidth(45);
         
 		focusOnComponentWhenThisPanelIsDisplayed(table);
 	}
@@ -312,7 +315,7 @@ public class ProductListPanel extends StandardMagicPanel {
 
     private class ProductsTableModel extends ListBackedTableModel<Product>{
 
-        private final String[] columnNames = {"Code", "Description", "UOM 1", "UOM 2", "UOM Qty 1", "UOM Qty 2", "Active?"};
+        private final String[] columnNames = {"Code", "Description", "UOM 1", "UOM 2", "UOM Qty 1", "UOM Qty 2", "Active?", "Product2 ID"};
 	    
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
@@ -332,6 +335,8 @@ public class ProductListPanel extends StandardMagicPanel {
                 return product.getUnitConversions().size() > 1 ? product.getUnitConversions().get(1).getQuantity() : null;
             case ACTIVE_COLUMN_INDEX:
                 return product.isActive();
+            case PRODUCT2_ID_COLUMN_INDEX:
+                return product.getProduct2Id() != null ? String.valueOf(product.getProduct2Id()) : null;
             default:
                 throw new RuntimeException("Fetching invalid column index: " + columnIndex);
             }

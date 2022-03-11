@@ -98,7 +98,7 @@ public class MagicFrame extends JFrame {
 	public static final String SALES_REQUISITION_PANEL = "SALES_REQUISITION_PANEL";
 	public static final String SALES_INVOICES_LIST_PANEL = "SALES_INVOICES_LIST_PANEL";
 	public static final String SALES_INVOICE_PANEL = "SALES_INVOICE_PANEL";
-	public static final String PRODUCT_LIST_PANEL = "PRODUCT_LIST_PANEL";
+	public static final String TRISYS_PRODUCT_LIST_PANEL = "PRODUCT_LIST_PANEL";
 	public static final String MAINTAIN_PRODUCT_PANEL = "MAINTAIN_PRODUCT_PANEL";
 	public static final String MANUFACTURER_LIST_PANEL = "MANUFACTURER_LIST_PANEL";
 	public static final String MAINTAIN_MANUFACTURER_PANEL = "MAINTAIN_MANUFACTURER_PANEL";
@@ -231,7 +231,7 @@ public class MagicFrame extends JFrame {
 	@Autowired private SalesRequisitionPanel salesRequisitionPanel;
 	@Autowired private SalesInvoiceListPanel salesInvoicesListPanel;
 	@Autowired private SalesInvoicePanel salesInvoicePanel;
-	@Autowired private ProductListPanel productListPanel;
+	@Autowired private TrisysProductListPanel trisysProductListPanel;
 	@Autowired private MaintainProductPanel maintainProductPanel;
 	@Autowired private ManufacturerListPanel manufacturerListPanel;
 	@Autowired private MaintainManufacturerPanel maintainManufacturerPanel;
@@ -405,7 +405,7 @@ public class MagicFrame extends JFrame {
 		panelHolder.add(salesRequisitionPanel, SALES_REQUISITION_PANEL);
 		panelHolder.add(salesInvoicesListPanel, SALES_INVOICES_LIST_PANEL);
 		panelHolder.add(salesInvoicePanel, SALES_INVOICE_PANEL);
-		panelHolder.add(productListPanel, PRODUCT_LIST_PANEL);
+		panelHolder.add(trisysProductListPanel, TRISYS_PRODUCT_LIST_PANEL);
 		panelHolder.add(maintainProductPanel, MAINTAIN_PRODUCT_PANEL);
 		panelHolder.add(manufacturerListPanel, MANUFACTURER_LIST_PANEL);
 		panelHolder.add(maintainManufacturerPanel, MAINTAIN_MANUFACTURER_PANEL);
@@ -569,16 +569,16 @@ public class MagicFrame extends JFrame {
 		((CardLayout)panelHolder.getLayout()).show(panelHolder, SALES_INVOICE_PANEL);
 	}
 	
-	public void switchToProductListPanel() {
-		switchToProductListPanel(true);
+	public void switchToTrisysProductListPanel() {
+		switchToTrisysProductListPanel(true);
 	}
 	
-	public void switchToProductListPanel(boolean refresh) {
-		addPanelNameToTitle("Product List");
+	public void switchToTrisysProductListPanel(boolean refresh) {
+		addPanelNameToTitle("Trisys Product List");
 		if (refresh) {
-			productListPanel.updateDisplay();
+			trisysProductListPanel.updateDisplay();
 		}
-		((CardLayout)panelHolder.getLayout()).show(panelHolder, PRODUCT_LIST_PANEL);
+		((CardLayout)panelHolder.getLayout()).show(panelHolder, TRISYS_PRODUCT_LIST_PANEL);
 	}
 	
 	public void switchToEditProductPanel(Product2 product) {

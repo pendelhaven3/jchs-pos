@@ -29,7 +29,7 @@ public class InventoryMenuPanel extends MenuPanel {
 
 	private static final String PRICE_CHANGES_REPORT = "Price Changes Report";
 	private static final String PRICING_SCHEME = "Pricing Scheme";
-	private static final String PRODUCT_LIST = "Product List";
+	private static final String TRISYS_PRODUCT_LIST = "Trisys Product List";
 	private static final String INVENTORY_REPORT = "Inventory Report";
 	private static final String UPLOAD_MAXIMUM_STOCK_LEVEL_CHANGES = "Upload Maximum Stock Level Changes";
 
@@ -94,8 +94,8 @@ public class InventoryMenuPanel extends MenuPanel {
 	
 	private void selectMenuItem() {
 		switch ((String)table.getValueAt(table.getSelectedRow(), 0)) {
-		case PRODUCT_LIST:
-			getMagicFrame().switchToProductListPanel();
+		case TRISYS_PRODUCT_LIST:
+			getMagicFrame().switchToTrisysProductListPanel();
 			break;
 		case PRICING_SCHEME:
 			getMagicFrame().switchToPricingSchemeListPanel();
@@ -120,7 +120,7 @@ public class InventoryMenuPanel extends MenuPanel {
 	private class MainMenuTableModel extends AbstractTableModel {
 
 		private final List<String> allMenuItems = Arrays.asList(
-				PRODUCT_LIST,
+				TRISYS_PRODUCT_LIST,
 //				PRICING_SCHEME,
 //				PRICE_CHANGES_REPORT,
 				INVENTORY_REPORT
