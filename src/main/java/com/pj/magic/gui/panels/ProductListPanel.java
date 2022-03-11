@@ -337,7 +337,7 @@ public class ProductListPanel extends StandardMagicPanel {
             case UOM_2_QUANTITY_COLUMN_INDEX:
                 return product.getUnitConversions().size() > 1 ? product.getUnitConversions().get(1).getQuantity() : null;
             case ACTIVE_COLUMN_INDEX:
-                return product.isActive() ? "Yes" : "No";
+                return product.isActive();
             default:
                 throw new RuntimeException("Fetching invalid column index: " + columnIndex);
             }
@@ -348,6 +348,34 @@ public class ProductListPanel extends StandardMagicPanel {
             return columnNames;
         }
 	    
+        @Override
+        public boolean isCellEditable(int rowIndex, int columnIndex) {
+        	return columnIndex == ACTIVE_COLUMN_INDEX;
+        }
+        
+        @Override
+        public Class<?> getColumnClass(int columnIndex) {
+        	if (columnIndex == ACTIVE_COLUMN_INDEX) {
+        		return Boolean.class;
+        	} else {
+            	return super.getColumnClass(columnIndex);
+        	}
+        }
+        
+        @Override
+        public void setValueAt(Object value, int rowIndex, int columnIndex) {
+        	if (columnIndex == ACTIVE_COLUMN_INDEX) {
+        		Boolean active = (Boolean)value;
+        		String message = active ? "Mark product code as active?" : "Mark product code as inactive?";
+        		if (confirm(message)) {
+        			Product product = getItem(rowIndex);
+        			productService.markAsActive(product.getCode(), active);
+        			product.setActive(active);
+            		fireTableCellUpdated(rowIndex, ACTIVE_COLUMN_INDEX);
+        		}
+        	}
+        }
+        
 	}
 	
 }

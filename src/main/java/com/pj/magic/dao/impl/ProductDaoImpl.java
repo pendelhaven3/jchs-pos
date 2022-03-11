@@ -266,8 +266,6 @@ public class ProductDaoImpl extends MagicDao implements ProductDao {
 		}
 	}
 
-	private static final String DELETE_SQL = "delete from PRODUCT where ID = ?";
-	
 	private static final String UPDATE_MAXIMUM_STOCK_LEVEL_SQL = 
 			"update PRODUCT set MAX_STOCK_LEVEL = ? where ID = ?";
 	
@@ -304,30 +302,11 @@ public class ProductDaoImpl extends MagicDao implements ProductDao {
 		return getJdbcTemplate().queryForList(GET_ALL_ACTIVE_PRODUCT_CODES_SQL, String.class);
 	}
 	
-	private static final String UPDATE_ACTIVE_INDICATOR_SQL = 
-			"update product2" + 
-			" set active_unit_ind_case = (case (select uom_code from product where code = ?) when 'CASE' then ? else active_unit_ind_case end)," + 
-			" active_unit_ind_ties = (case (select uom_code from product where code = ?) when 'TIES' then ? else active_unit_ind_ties end)," + 
-			" active_unit_ind_pack = (case (select uom_code from product where code = ?) when 'PACK' then ? else active_unit_ind_pack end)," + 
-			" active_unit_ind_hdzn = (case (select uom_code from product where code = ?) when 'HDZN' then ? else active_unit_ind_hdzn end)," + 
-			" active_unit_ind_pcs = (case (select uom_code from product where code = ?) when 'PCS' then ? else active_unit_ind_pcs end)" + 
-			" where id = (select product2_id from product where code = ?)";	
+	private static final String UPDATE_ACTIVE_INDICATOR_SQL = "update PRODUCT set ACTIVE_IND = ? where CODE = ?";
 
 	@Override
 	public void updateActiveIndicator(String productCode, boolean active) {
-		String activeInd = (active) ? "Y" : "N";
-		getJdbcTemplate().update(UPDATE_ACTIVE_INDICATOR_SQL,
-				productCode,
-				activeInd,
-				productCode,
-				activeInd,
-				productCode,
-				activeInd,
-				productCode,
-				activeInd,
-				productCode,
-				activeInd,
-				productCode);
+		getJdbcTemplate().update(UPDATE_ACTIVE_INDICATOR_SQL, (active) ? "Y" : "N", productCode);
 	}
 
 	@Override

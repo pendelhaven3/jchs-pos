@@ -1,6 +1,5 @@
 package com.pj.magic.service.impl;
 
-import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -19,15 +18,12 @@ import com.pj.magic.dao.PurchaseOrderItemDao;
 import com.pj.magic.dao.SalesRequisitionItemDao;
 import com.pj.magic.dao.StockQuantityConversionItemDao;
 import com.pj.magic.dao.SupplierDao;
-import com.pj.magic.dao.SystemDao;
-import com.pj.magic.exception.NotEnoughStocksException;
 import com.pj.magic.model.PricingScheme;
 import com.pj.magic.model.Product;
 import com.pj.magic.model.Product2;
 import com.pj.magic.model.ProductPriceHistory;
 import com.pj.magic.model.Supplier;
 import com.pj.magic.model.search.ProductSearchCriteria;
-import com.pj.magic.repository.Product2Repository;
 import com.pj.magic.service.LoginService;
 import com.pj.magic.service.Product2Service;
 import com.pj.magic.service.ProductService;
@@ -48,9 +44,7 @@ public class ProductServiceImpl implements ProductService {
 	@Autowired private AreaInventoryReportItemDao areaInventoryReportItemDao;
 	@Autowired private ProductPriceHistoryDao productPriceHistoryDao;
 	@Autowired private LoginService loginService;
-	@Autowired private SystemDao systemDao;
 	@Autowired private Product2Service product2Service;
-	@Autowired private Product2Repository product2Repository;
 	
 	@Override
 	public List<Product> getAllProducts() {
@@ -194,6 +188,11 @@ public class ProductServiceImpl implements ProductService {
         	LOGGER.info("Update product as inactive: {}", productCode);
 			productDao.updateActiveIndicator(productCode, false);
 		}
+	}
+
+	@Override
+	public void markAsActive(String productCode, Boolean active) {
+		productDao.updateActiveIndicator(productCode, active);
 	}
 
 }

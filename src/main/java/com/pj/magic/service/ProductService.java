@@ -48,4 +48,6 @@ public interface ProductService {
 
 	void updateProductsAsInactive(List<String> activeProductCodes);
 
+	void markAsActive(String productCode, Boolean active);
+
 }
