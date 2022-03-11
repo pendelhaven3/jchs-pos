@@ -221,8 +221,6 @@ public class ProductListPanel extends StandardMagicPanel {
             return;
         }
         
-        List<String> activeProductCodes = productService.getAllActiveProductCodes();
-        
         try (
             CSVReader reader = new CSVReaderBuilder(new StringReader(csvString)).withSkipLines(1).build();
         ) {
@@ -265,16 +263,12 @@ public class ProductListPanel extends StandardMagicPanel {
                 }
                 
                 productService.updateProduct(product);
-                activeProductCodes.remove(product.getCode());
             }
         } catch (Exception e) {
             LOGGER.error(e.getMessage(), e);
             showErrorMessage("Unexpected error occurred");
             return;
         }
-        
-        LOGGER.info("Updating {} products as inactive", activeProductCodes.size());
-        productService.updateProductsAsInactive(activeProductCodes);
         
         showMessage("Product list updated");
         updateDisplay();

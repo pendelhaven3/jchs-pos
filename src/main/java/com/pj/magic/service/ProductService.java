@@ -44,10 +44,6 @@ public interface ProductService {
 
     void updateProduct(Product product);
 
-	List<String> getAllActiveProductCodes();
-
-	void updateProductsAsInactive(List<String> activeProductCodes);
-
 	void markAsActive(String productCode, Boolean active);
 
 }
