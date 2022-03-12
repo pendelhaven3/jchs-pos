@@ -20,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.pj.magic.gui.tables.MagicListTable;
-import com.pj.magic.gui.tables.UnpaidSalesInvoicesTable;
 import com.pj.magic.model.Customer;
 import com.pj.magic.model.SalesInvoice;
 import com.pj.magic.service.SalesInvoiceService;
@@ -194,7 +193,7 @@ public class AddSalesInvoicesToPaymentDialog extends MagicDialog {
 		@Override
 		public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
 			switch (columnIndex) {
-			case UnpaidSalesInvoicesTable.SELECTION_CHECKBOX_COLUMN_INDEX:
+			case SELECTION_CHECKBOX_COLUMN_INDEX:
 				if (selected.contains(rowIndex)) {
 					selected.remove(selected.indexOf(rowIndex));
 				} else {
