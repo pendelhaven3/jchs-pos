@@ -7,6 +7,11 @@ import com.pj.magic.model.ProductCategory;
 import com.pj.magic.model.ProductSubcategory;
 import com.pj.magic.model.Supplier;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class ProductSearchCriteria {
 
 	private Boolean active;
@@ -16,61 +21,6 @@ public class ProductSearchCriteria {
 	private ProductSubcategory subcategory;
 	private String codeOrDescriptionLike;
 	private Supplier supplier;
+	private Boolean withMoreThanTwoBarcodes;
 	
-	public Boolean getActive() {
-		return active;
-	}
-
-	public void setActive(Boolean active) {
-		this.active = active;
-	}
-
-	public PricingScheme getPricingScheme() {
-		return pricingScheme;
-	}
-
-	public void setPricingScheme(PricingScheme pricingScheme) {
-		this.pricingScheme = pricingScheme;
-	}
-
-	public Manufacturer getManufacturer() {
-		return manufacturer;
-	}
-
-	public void setManufacturer(Manufacturer manufacturer) {
-		this.manufacturer = manufacturer;
-	}
-
-	public ProductCategory getCategory() {
-		return category;
-	}
-
-	public void setCategory(ProductCategory category) {
-		this.category = category;
-	}
-
-	public ProductSubcategory getSubcategory() {
-		return subcategory;
-	}
-
-	public void setSubcategory(ProductSubcategory subcategory) {
-		this.subcategory = subcategory;
-	}
-
-	public String getCodeOrDescriptionLike() {
-		return codeOrDescriptionLike;
-	}
-
-	public void setCodeOrDescriptionLike(String codeOrDescriptionLike) {
-		this.codeOrDescriptionLike = codeOrDescriptionLike;
-	}
-
-	public Supplier getSupplier() {
-		return supplier;
-	}
-
-	public void setSupplier(Supplier supplier) {
-		this.supplier = supplier;
-	}
-
 }

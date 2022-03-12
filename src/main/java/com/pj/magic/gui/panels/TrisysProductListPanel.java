@@ -190,6 +190,10 @@ public class TrisysProductListPanel extends StandardMagicPanel {
         });
         
         toolBar.add(searchButton);
+        
+        JButton alertButton = new MagicToolBarButton("alert", "Products with more than 2 barcodes");
+        alertButton.addActionListener(e -> showProductsWithMultipleBarcodes());
+        toolBar.add(alertButton);
 	}
 
 	private void showActiveProducts() {
@@ -316,6 +320,20 @@ public class TrisysProductListPanel extends StandardMagicPanel {
             return sb.toString();
         }
     }
+	
+	private void showProductsWithMultipleBarcodes() {
+		ProductSearchCriteria criteria = new ProductSearchCriteria();
+		criteria.setWithMoreThanTwoBarcodes(true);
+		
+		List<Product> products = productService.searchProducts(criteria);
+		tableModel.setItems(products);
+		if (!products.isEmpty()) {
+			table.changeSelection(0, 0, false, false);
+			table.requestFocusInWindow();
+		} else {
+			showMessage("No products with more than 2 barcodes");
+		}
+	}
 
     private class ProductsTableModel extends ListBackedTableModel<Product>{
 

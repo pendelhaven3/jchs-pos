@@ -215,6 +215,10 @@ public class ProductDaoImpl extends MagicDao implements ProductDao {
 			params.add(criteria.getSupplier().getId());
 		}
 		
+		if (criteria.getWithMoreThanTwoBarcodes() != null) {
+			sql.append(" and a.PRODUCT2_ID is not null and a.PRODUCT2_ID in (select PRODUCT2_ID from PRODUCT where PRODUCT2_ID is not null group by PRODUCT2_ID having count(PRODUCT2_ID) > 2)");
+		}
+		
 		sql.append(" order by a.DESCRIPTION");
 		
 		return getJdbcTemplate().query(sql.toString(), productRowMapper, params.toArray());
