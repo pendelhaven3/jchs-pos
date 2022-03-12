@@ -35,6 +35,7 @@ create table PRODUCT (
   MAX_STOCK_LEVEL integer(4) default 0,
   MIN_STOCK_LEVEL integer(4) default 0,
   ACTIVE_IND char(1) default 'Y',
+  CREATE_DT datetime default current_timestamp,
   constraint PRODUCT$PK primary key (ID),
   constraint PRODUCT$UK unique (CODE)
 );
