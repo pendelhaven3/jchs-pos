@@ -30,7 +30,8 @@ public class PurchasesMenuPanel extends MenuPanel {
 	private static final String PURCHASE_ORDER = "Purchase Order";
 	private static final String PURCHASE_RETURN = "Purchase Return - Good Stock";
 	private static final String BAD_PURCHASE_RETURN = "Purchase Return - Bad Stock";
-	
+	private static final String PRODUCT_COST_LIST = "Product Cost List";
+
 	private MagicListTable table;
 	private MainMenuTableModel tableModel;
 	
@@ -104,6 +105,9 @@ public class PurchasesMenuPanel extends MenuPanel {
 		case BAD_PURCHASE_RETURN:
 			getMagicFrame().switchToPurchaseReturnBadStockListPanel();
 			break;
+		case PRODUCT_COST_LIST:
+			getMagicFrame().switchToProductCostListPanel();
+			break;
 		}
 	}
 
@@ -121,7 +125,8 @@ public class PurchasesMenuPanel extends MenuPanel {
 				RECEIVING_RECEIPT,
 				PRODUCT_CANVASS,
 				PURCHASE_RETURN,
-				BAD_PURCHASE_RETURN
+				BAD_PURCHASE_RETURN,
+				PRODUCT_COST_LIST
 		);
 		
 		@Override

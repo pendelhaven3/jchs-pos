@@ -219,6 +219,8 @@ public class MagicFrame extends JFrame {
     public static final String TRISYS_SALES_PANEL = "TRISYS_SALES_PANEL";
     public static final String ADMIN_MISCELLANEOUS_PANEL = "ADMIN_MISCELLANEOUS_PANEL";
     public static final String MAINTAIN_TRISYS_PRODUCT_PANEL = "MAINTAIN_TRISYS_PRODUCT_PANEL";
+    public static final String PRODUCT_COST_LIST_PANEL = "PRODUCT_COST_LIST_PANEL";
+    public static final String EDIT_PRODUCT_COST_PANEL = "EDIT_PRODUCT_COST_PANEL";
 	
 	@Value("${application.title}")
 	private String baseTitle;
@@ -338,6 +340,8 @@ public class MagicFrame extends JFrame {
     @Autowired private AreaListPanel areaListPanel;
     @Autowired private MaintainAreaPanel maintainAreaPanel;
     @Autowired private MaintainTrisysProductPanel maintainTrisysProductPanel;
+    @Autowired private ProductCostListPanel productCostListPanel;
+    @Autowired private EditProductCostPanel editProductCostPanel;
 	
 	@Autowired private SystemService systemParameterService;
 	@Autowired private DataSource dataSource;
@@ -516,6 +520,8 @@ public class MagicFrame extends JFrame {
 		panelHolder.add(areaListPanel, AREA_LIST_PANEL);
 		panelHolder.add(maintainAreaPanel, MAINTAIN_AREA_PANEL);
 		panelHolder.add(maintainTrisysProductPanel, MAINTAIN_TRISYS_PRODUCT_PANEL);
+		panelHolder.add(productCostListPanel, PRODUCT_COST_LIST_PANEL);
+		panelHolder.add(editProductCostPanel, EDIT_PRODUCT_COST_PANEL);
         getContentPane().add(panelHolder);
 
         switchToLoginPanel();
@@ -1373,6 +1379,18 @@ public class MagicFrame extends JFrame {
         addPanelNameToTitle(maintainTrisysProductPanel.getTitle());
         maintainTrisysProductPanel.updateDisplay(product);
         ((CardLayout)panelHolder.getLayout()).show(panelHolder, MAINTAIN_TRISYS_PRODUCT_PANEL);
+	}
+
+	public void switchToProductCostListPanel() {
+        addPanelNameToTitle(productCostListPanel.getTitle());
+        productCostListPanel.updateDisplay();
+        ((CardLayout)panelHolder.getLayout()).show(panelHolder, PRODUCT_COST_LIST_PANEL);
+	}
+
+	public void switchToEditProductCostPanel(Product2 product) {
+        addPanelNameToTitle(editProductCostPanel.getTitle());
+        editProductCostPanel.updateDisplay(product);
+        ((CardLayout)panelHolder.getLayout()).show(panelHolder, EDIT_PRODUCT_COST_PANEL);
 	}
 
 }

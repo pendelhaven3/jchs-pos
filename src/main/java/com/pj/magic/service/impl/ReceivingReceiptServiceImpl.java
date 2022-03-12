@@ -103,12 +103,16 @@ public class ReceivingReceiptServiceImpl implements ReceivingReceiptService {
 			Product2 product = product2Repository.get(item.getProduct().getId());
 			BigDecimal currentCost = product.getFinalCost(item.getUnit());
 			
-			product.setGrossCost(item.getUnit(), 
-					item.getCost().multiply(costMultipler).setScale(2, RoundingMode.HALF_UP));
-			product.setFinalCost(item.getUnit(), 
-					item.getFinalCost().multiply(costMultipler).setScale(2, RoundingMode.HALF_UP));
-			if (item.getProduct().getUnits().size() > 1) {
-				product.autoCalculateCostsOfSmallerUnits(item.getUnit());
+			try {
+				product.setGrossCost(item.getUnit(), 
+						item.getCost().multiply(costMultipler).setScale(2, RoundingMode.HALF_UP));
+				product.setFinalCost(item.getUnit(), 
+						item.getFinalCost().multiply(costMultipler).setScale(2, RoundingMode.HALF_UP));
+				if (item.getProduct().getUnits().size() > 1) {
+					product.autoCalculateCostsOfSmallerUnits(item.getUnit());
+				}
+			} catch (Exception e) {
+				throw e;
 			}
 			product2Repository.updateCosts(product);
 			

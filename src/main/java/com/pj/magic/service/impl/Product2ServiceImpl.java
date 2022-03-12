@@ -108,4 +108,9 @@ public class Product2ServiceImpl implements Product2Service {
 		return product2Repository.search(criteria);
 	}
 
+	@Override
+	public void updateCosts(Product2 product) {
+		product2Repository.updateCosts(product);
+	}
+
 }

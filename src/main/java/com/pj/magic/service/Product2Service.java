@@ -29,4 +29,6 @@ public interface Product2Service {
 
 	List<Product2> searchProducts(Product2SearchCriteria criteria);
 
+	void updateCosts(Product2 product);
+
 }
