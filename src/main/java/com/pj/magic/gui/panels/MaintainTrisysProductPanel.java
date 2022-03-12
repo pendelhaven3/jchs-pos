@@ -142,6 +142,7 @@ public class MaintainTrisysProductPanel extends StandardMagicPanel {
 		
 		unlinkButton.setEnabled(product.isLinked());
 		linkButton.setEnabled(!product.isLinked());
+		goToProduct2Button.setEnabled(product.isLinked());
 	}
 
 	@Override
