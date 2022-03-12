@@ -3,10 +3,8 @@ package com.pj.magic.service.impl;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.pj.magic.dao.BirForm2307ReportDao;
 import com.pj.magic.dao.InventoryCheckDao;
@@ -20,7 +18,6 @@ import com.pj.magic.model.report.EwtReport;
 import com.pj.magic.model.report.EwtReportItem;
 import com.pj.magic.model.report.InventoryReport;
 import com.pj.magic.model.report.PilferageReport;
-import com.pj.magic.model.report.ProductQuantityDiscrepancyReport;
 import com.pj.magic.model.report.SalesByManufacturerReport;
 import com.pj.magic.model.report.StockOfftakeReport;
 import com.pj.magic.model.search.EwtReportCriteria;
@@ -97,28 +94,6 @@ public class ReportServiceImpl implements ReportService {
 		StockOfftakeReport report = new StockOfftakeReport();
 		report.setItems(reportDao.searchStockOfftakeReportItems(criteria));
 		return report;
-	}
-
-	@Override
-	public List<ProductQuantityDiscrepancyReport> getProductQuantityDiscrepancyReports() {
-		return reportDao.getProductQuantityDiscrepancyReports();
-	}
-
-	@Transactional
-	@Override
-	public void generateDailyProductQuantityDiscrepancyReport() {
-		if (!hasInventoryCheckYesterday()) {
-			reportDao.createProductQuantityDiscrepancyReportForToday();
-		}
-	}
-
-	private boolean hasInventoryCheckYesterday() {
-		return inventoryCheckDao.findByInventoryDate(DateUtils.addDays(new Date(), -1)) != null;
-	}
-
-	@Override
-	public ProductQuantityDiscrepancyReport getProductQuantityDiscrepancyReport(Date date) {
-		return reportDao.getProductQuantityDiscrepancyReportByDate(date);
 	}
 
 	@Override

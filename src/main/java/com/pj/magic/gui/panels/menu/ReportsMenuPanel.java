@@ -44,7 +44,6 @@ public class ReportsMenuPanel extends MenuPanel {
 	private static final String CUSTOMER_CHECK_PAYMENTS_REPORT = "Customer Check Payments Report";
 	private static final String DISBURSEMENT_REPORT = "Disbursement Report";
 	private static final String STOCK_OFFTAKE_REPORT = "Stock Offtake Report";
-	private static final String DAILY_PRODUCT_QUANTITY_DISCREPANCY_REPORT = "Daily Product Quantity Discrepancy Report";
 	private static final String PILFERAGE_REPORT = "Pilferage Report";
     private static final String EWT_REPORT = "BIR EWT Report";
     private static final String BIR_FORM_2307_REPORT_LIST = "BIR Form 2307 Report List";
@@ -143,9 +142,6 @@ public class ReportsMenuPanel extends MenuPanel {
 		case STOCK_OFFTAKE_REPORT:
 			getMagicFrame().switchToStockOfftakeReportPanel();
 			break;
-		case DAILY_PRODUCT_QUANTITY_DISCREPANCY_REPORT:
-			getMagicFrame().switchToDailyProductQuantityDiscrepancyReportListPanel();
-			break;
 		case PILFERAGE_REPORT:
 			getMagicFrame().switchToPilferageReportPanel();
 			break;
@@ -179,7 +175,6 @@ public class ReportsMenuPanel extends MenuPanel {
 //				PURCHASE_PAYMENT_CREDIT_CARD_PAYMENTS_REPORT,
 //				SALES_BY_MANUFACTURER_REPORT,
 //				STOCK_OFFTAKE_REPORT,
-//				DAILY_PRODUCT_QUANTITY_DISCREPANCY_REPORT,
 //				PILFERAGE_REPORT
 				EWT_REPORT,
 				BIR_FORM_2307_REPORT_LIST

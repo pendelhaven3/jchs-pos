@@ -74,7 +74,6 @@ import com.pj.magic.model.Supplier;
 import com.pj.magic.model.TrisysSalesImport;
 import com.pj.magic.model.TrisysSales;
 import com.pj.magic.model.User;
-import com.pj.magic.model.report.ProductQuantityDiscrepancyReport;
 import com.pj.magic.service.SystemService;
 import com.pj.magic.util.ApplicationUtil;
 
@@ -211,10 +210,6 @@ public class MagicFrame extends JFrame {
 			"UPLOAD_MAXIMUM_STOCK_LEVEL_CHANGES_PANEL";
 	public static final String INVENTORY_CORRECTION_LIST_PANEL = "INVENTORY_CORRECTION_LIST_PANEL";
 	public static final String INVENTORY_CORRECTION_PANEL = "INVENTORY_CORRECTION_PANEL";
-	public static final String DAILY_PRODUCT_QUANTITY_DISCREPANCY_REPORT_LIST_PANEL = 
-			"DAILY_PRODUCT_QUANTITY_DISCREPANCY_REPORT_LIST_PANEL";
-	public static final String PRODUCT_QUANTITY_DISCREPANCY_REPORT_PANEL = 
-			"DAILY_PRODUCT_QUANTITY_DISCREPANCY_REPORT_PANEL";
 	public static final String PILFERAGE_REPORT_PANEL = "PILFERAGE_REPORT_PANEL";
     public static final String EWT_REPORT_PANEL = "EWT_REPORT_LIST_PANEL";
     public static final String BIR_FORM_2307_REPORT_LIST_PANEL = "BIR_FORM_2307_REPORT_LIST_PANEL";
@@ -332,8 +327,6 @@ public class MagicFrame extends JFrame {
 	@Autowired private UploadMaximumStockLevelChangesPanel uploadMaximumStockLevelChangesPanel;
 	@Autowired private InventoryCorrectionListPanel inventoryCorrectionListPanel;
 	@Autowired private InventoryCorrectionPanel inventoryCorrectionPanel;
-	@Autowired private DailyProductQuantityDiscrepancyReportListPanel dailyProductQuantityDiscrepancyReportListPanel;
-	@Autowired private ProductQuantityDiscrepancyReportPanel productQuantityDiscrepancyReportPanel;
 	@Autowired private PilferageReportPanel pilferageReportPanel;
     @Autowired private EwtReportPanel ewtReportPanel;
     @Autowired private BirForm2307ReportListPanel birForm2307ReportListPanel;
@@ -512,9 +505,6 @@ public class MagicFrame extends JFrame {
 		panelHolder.add(uploadMaximumStockLevelChangesPanel, UPLOAD_MAXIMUM_STOCK_LEVEL_CHANGES_PANEL);
 		panelHolder.add(inventoryCorrectionListPanel, INVENTORY_CORRECTION_LIST_PANEL);
 		panelHolder.add(inventoryCorrectionPanel, INVENTORY_CORRECTION_PANEL);
-		panelHolder.add(dailyProductQuantityDiscrepancyReportListPanel, 
-				DAILY_PRODUCT_QUANTITY_DISCREPANCY_REPORT_LIST_PANEL);
-		panelHolder.add(productQuantityDiscrepancyReportPanel, PRODUCT_QUANTITY_DISCREPANCY_REPORT_PANEL);
 		panelHolder.add(pilferageReportPanel, PILFERAGE_REPORT_PANEL);
         panelHolder.add(ewtReportPanel, EWT_REPORT_PANEL);
         panelHolder.add(birForm2307ReportListPanel, BIR_FORM_2307_REPORT_LIST_PANEL);
@@ -1303,18 +1293,6 @@ public class MagicFrame extends JFrame {
 		addPanelNameToTitle("Inventory Correction");
 		inventoryCorrectionPanel.updateDisplay(inventoryCorrection);
 		((CardLayout)panelHolder.getLayout()).show(panelHolder, INVENTORY_CORRECTION_PANEL);
-	}
-
-	public void switchToDailyProductQuantityDiscrepancyReportListPanel() {
-		addPanelNameToTitle("Daily Product Quantity Discrepancy Report List");
-		dailyProductQuantityDiscrepancyReportListPanel.updateDisplay();
-		((CardLayout)panelHolder.getLayout()).show(panelHolder, DAILY_PRODUCT_QUANTITY_DISCREPANCY_REPORT_LIST_PANEL);
-	}
-
-	public void switchToProductQuantityDiscrepancyReportPanel(ProductQuantityDiscrepancyReport report) {
-		addPanelNameToTitle("Product Quantity Discrepancy Report");
-		productQuantityDiscrepancyReportPanel.updateDisplay(report);
-		((CardLayout)panelHolder.getLayout()).show(panelHolder, PRODUCT_QUANTITY_DISCREPANCY_REPORT_PANEL);
 	}
 
 	public void switchToPilferageReportPanel() {
