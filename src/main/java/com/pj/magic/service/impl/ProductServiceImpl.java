@@ -183,4 +183,9 @@ public class ProductServiceImpl implements ProductService {
 		productDao.updateActiveIndicator(productCode, active);
 	}
 
+	@Override
+	public void unlinkCodeFromProduct(Product product) {
+		productDao.removeProduct2Id(product.getId());
+	}
+
 }

@@ -35,7 +35,6 @@ import com.pj.magic.gui.dialog.SearchProductsDialog;
 import com.pj.magic.gui.tables.MagicListTable;
 import com.pj.magic.gui.tables.models.ListBackedTableModel;
 import com.pj.magic.model.Product;
-import com.pj.magic.model.Product2;
 import com.pj.magic.model.Unit;
 import com.pj.magic.model.UnitConversion;
 import com.pj.magic.model.search.ProductSearchCriteria;
@@ -150,7 +149,7 @@ public class TrisysProductListPanel extends StandardMagicPanel {
 	protected void selectProduct() {
 		Product product = tableModel.getItem(table.getSelectedRow());
 		getMagicFrame().setBackPanel("TRISYS_PRODUCT_LIST_PANEL");
-		getMagicFrame().switchToEditProductPanel(new Product2(product.getProduct2Id()));
+		getMagicFrame().switchToMaintainTrisysProductPanel(product);
 	}
 
 	@Override

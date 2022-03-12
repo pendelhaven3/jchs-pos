@@ -529,5 +529,9 @@ public class Product implements Comparable<Product>, Serializable {
 		product2.setUnits(units);
 		return product2;
 	}
+
+	public boolean isLinked() {
+		return product2Id != null;
+	}
 	
 }

@@ -54,6 +54,7 @@ import com.pj.magic.model.PaymentAdjustment;
 import com.pj.magic.model.PaymentTerm;
 import com.pj.magic.model.PaymentTerminalAssignment;
 import com.pj.magic.model.PricingScheme;
+import com.pj.magic.model.Product;
 import com.pj.magic.model.Product2;
 import com.pj.magic.model.ProductCategory;
 import com.pj.magic.model.Promo;
@@ -222,6 +223,7 @@ public class MagicFrame extends JFrame {
     public static final String TRISYS_SALES_IMPORT_PANEL = "TRISYS_SALES_IMPORT_PANEL";
     public static final String TRISYS_SALES_PANEL = "TRISYS_SALES_PANEL";
     public static final String ADMIN_MISCELLANEOUS_PANEL = "ADMIN_MISCELLANEOUS_PANEL";
+    public static final String MAINTAIN_TRISYS_PRODUCT_PANEL = "MAINTAIN_TRISYS_PRODUCT_PANEL";
 	
 	@Value("${application.title}")
 	private String baseTitle;
@@ -342,6 +344,7 @@ public class MagicFrame extends JFrame {
     @Autowired private AdminMiscellaneousPanel adminMiscellaneousPanel;
     @Autowired private AreaListPanel areaListPanel;
     @Autowired private MaintainAreaPanel maintainAreaPanel;
+    @Autowired private MaintainTrisysProductPanel maintainTrisysProductPanel;
 	
 	@Autowired private SystemService systemParameterService;
 	@Autowired private DataSource dataSource;
@@ -522,6 +525,7 @@ public class MagicFrame extends JFrame {
         panelHolder.add(adminMiscellaneousPanel, ADMIN_MISCELLANEOUS_PANEL);
 		panelHolder.add(areaListPanel, AREA_LIST_PANEL);
 		panelHolder.add(maintainAreaPanel, MAINTAIN_AREA_PANEL);
+		panelHolder.add(maintainTrisysProductPanel, MAINTAIN_TRISYS_PRODUCT_PANEL);
         getContentPane().add(panelHolder);
 
         switchToLoginPanel();
@@ -1385,6 +1389,12 @@ public class MagicFrame extends JFrame {
 		addPanelNameToTitle(panel.getTitle());
 		((CardLayout)panelHolder.getLayout()).show(panelHolder, backPanel);
 		setBackPanel(null);
+	}
+
+	public void switchToMaintainTrisysProductPanel(Product product) {
+        addPanelNameToTitle(maintainTrisysProductPanel.getTitle());
+        maintainTrisysProductPanel.updateDisplay(product);
+        ((CardLayout)panelHolder.getLayout()).show(panelHolder, MAINTAIN_TRISYS_PRODUCT_PANEL);
 	}
 
 }

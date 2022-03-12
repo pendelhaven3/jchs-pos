@@ -38,5 +38,7 @@ public interface ProductDao {
 	void subtractAvailableQuantity(Product product, int quantity);
 
 	void addAvailableQuantity(Product product, int quantity);
+
+	void removeProduct2Id(Long id);
 	
 }

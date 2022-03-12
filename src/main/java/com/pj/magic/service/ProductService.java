@@ -46,4 +46,6 @@ public interface ProductService {
 
 	void markAsActive(String productCode, Boolean active);
 
+	void unlinkCodeFromProduct(Product product);
+
 }
