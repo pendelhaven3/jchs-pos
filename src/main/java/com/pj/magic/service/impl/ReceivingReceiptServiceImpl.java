@@ -14,7 +14,6 @@ import com.pj.magic.dao.ReceivingReceiptItemDao;
 import com.pj.magic.dao.SystemDao;
 import com.pj.magic.exception.AlreadyCancelledException;
 import com.pj.magic.exception.AlreadyPostedException;
-import com.pj.magic.model.Product;
 import com.pj.magic.model.Product2;
 import com.pj.magic.model.ProductCanvassItem;
 import com.pj.magic.model.ReceivingReceipt;
@@ -26,11 +25,6 @@ import com.pj.magic.repository.Product2Repository;
 import com.pj.magic.service.LoginService;
 import com.pj.magic.service.ReceivingReceiptService;
 
-/**
- * 
- * @author PJ Miranda
- *
- */
 @Service
 public class ReceivingReceiptServiceImpl implements ReceivingReceiptService {
 
@@ -172,7 +166,7 @@ public class ReceivingReceiptServiceImpl implements ReceivingReceiptService {
 	}
 
 	@Override
-	public ReceivingReceiptItem findMostRecentReceivingReceiptItem(Supplier supplier, Product product) {
+	public ReceivingReceiptItem findMostRecentReceivingReceiptItem(Supplier supplier, Product2 product) {
 		ReceivingReceiptItem item = receivingReceiptItemDao
 				.findMostRecentBySupplierAndProduct(supplier, product);
 		if (item == null) {

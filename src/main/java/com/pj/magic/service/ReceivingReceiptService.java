@@ -3,7 +3,7 @@ package com.pj.magic.service;
 import java.math.BigDecimal;
 import java.util.List;
 
-import com.pj.magic.model.Product;
+import com.pj.magic.model.Product2;
 import com.pj.magic.model.ProductCanvassItem;
 import com.pj.magic.model.ReceivingReceipt;
 import com.pj.magic.model.ReceivingReceiptItem;
@@ -11,11 +11,6 @@ import com.pj.magic.model.Supplier;
 import com.pj.magic.model.search.ProductCanvassSearchCriteria;
 import com.pj.magic.model.search.ReceivingReceiptSearchCriteria;
 
-/**
- * 
- * @author PJ Miranda
- *
- */
 public interface ReceivingReceiptService {
 
 	void save(ReceivingReceipt receivingReceipt);
@@ -36,7 +31,7 @@ public interface ReceivingReceiptService {
 	
 	ReceivingReceipt findReceivingReceiptByReceivingReceiptNumber(long receivingReceiptNumber);
 	
-	ReceivingReceiptItem findMostRecentReceivingReceiptItem(Supplier supplier, Product product);
+	ReceivingReceiptItem findMostRecentReceivingReceiptItem(Supplier supplier, Product2 product);
 
 	List<ProductCanvassItem> getProductCanvass(ProductCanvassSearchCriteria criteria);
 

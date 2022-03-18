@@ -14,9 +14,11 @@ import com.pj.magic.Constants;
 import com.pj.magic.gui.tables.PurchaseReturnBadStockItemsTable;
 import com.pj.magic.gui.tables.SalesRequisitionItemsTable;
 import com.pj.magic.gui.tables.rowitems.PurchaseReturnBadStockItemRowItem;
+import com.pj.magic.model.Product;
 import com.pj.magic.model.PurchaseReturnBadStock;
 import com.pj.magic.model.PurchaseReturnBadStockItem;
 import com.pj.magic.model.ReceivingReceiptItem;
+import com.pj.magic.service.Product2Service;
 import com.pj.magic.service.ProductService;
 import com.pj.magic.service.PurchaseReturnBadStockService;
 import com.pj.magic.service.ReceivingReceiptService;
@@ -31,6 +33,7 @@ public class PurchaseReturnBadStockItemsTableModel extends AbstractTableModel {
 	@Autowired private ProductService productService;
 	@Autowired private PurchaseReturnBadStockService purchaseReturnBadStockService;
 	@Autowired private ReceivingReceiptService receivingReceiptService;
+	@Autowired private Product2Service product2Service;
 	
 	private List<PurchaseReturnBadStockItemRowItem> rowItems = new ArrayList<>();
 	private PurchaseReturnBadStock purchaseReturnBadStock;
@@ -107,19 +110,13 @@ public class PurchaseReturnBadStockItemsTableModel extends AbstractTableModel {
 		String val = (String)value;
 		switch (columnIndex) {
 		case PurchaseReturnBadStockItemsTable.PRODUCT_CODE_COLUMN_INDEX:
-			if (rowItem.getProduct() != null && rowItem.getProduct().getCode().equals(val)) {
+			if (rowItem.getProduct() != null && rowItem.getItem().getCode().equals(val)) {
 				return;
 			}
-			rowItem.setProduct(productService.findProductByCode(val));
-			rowItem.setUnit(null);
-			break;
-		case PurchaseReturnBadStockItemsTable.UNIT_COLUMN_INDEX:
-			if (!StringUtils.isEmpty(rowItem.getUnit()) && rowItem.getUnit().equals(val)) {
-				return;
-			}
-			rowItem.setUnit(val);
-			rowItem.setUnitCost(null);
-			rowItem.getItem().setUnitCost(null);
+			Product product1 = productService.findProductByCode(val);
+			rowItem.setProduct(product2Service.getProduct(product1.getProduct2Id()));
+			rowItem.setUnit(product1.getUnits().get(0));
+			rowItem.getItem().setCode(product1.getCode());
 			break;
 		case PurchaseReturnBadStockItemsTable.QUANTITY_COLUMN_INDEX:
 			if (rowItem.getQuantity() != null && rowItem.getQuantity().equals(Integer.valueOf(val))) {
@@ -177,8 +174,6 @@ public class PurchaseReturnBadStockItemsTableModel extends AbstractTableModel {
 			switch (columnIndex) {
 			case SalesRequisitionItemsTable.PRODUCT_CODE_COLUMN_INDEX:
 				return true;
-			case SalesRequisitionItemsTable.UNIT_COLUMN_INDEX:
-				return rowItem.getProduct() != null;
 			case SalesRequisitionItemsTable.QUANTITY_COLUMN_INDEX:
 				return rowItem.getProduct() != null && !StringUtils.isEmpty(rowItem.getUnit());
 			case SalesRequisitionItemsTable.UNIT_PRICE_COLUMN_INDEX:
@@ -209,15 +204,6 @@ public class PurchaseReturnBadStockItemsTableModel extends AbstractTableModel {
 		addItem(item);
 	}
 
-	public boolean hasDuplicate(PurchaseReturnBadStockItemRowItem checkItem) {
-		for (PurchaseReturnBadStockItemRowItem rowItem : rowItems) {
-			if (rowItem.equals(checkItem) && rowItem != checkItem) {
-				return true;
-			}
-		}
-		return false;
-	}
-
 	public boolean isValid(int rowIndex) {
 		return rowItems.get(rowIndex).isValid();
 	}
@@ -232,10 +218,9 @@ public class PurchaseReturnBadStockItemsTableModel extends AbstractTableModel {
 		}
 	}
 
-	public boolean hasDuplicate(String unit, PurchaseReturnBadStockItemRowItem checkRowItem) {
+	public boolean hasDuplicate(String code, PurchaseReturnBadStockItemRowItem checkRowItem) {
 		for (PurchaseReturnBadStockItemRowItem rowItem : rowItems) {
-			if (checkRowItem.getProduct().equals(rowItem.getProduct()) 
-					&& unit.equals(rowItem.getUnit()) && rowItem != checkRowItem) {
+			if (rowItem != checkRowItem && code.equals(rowItem.getItem().getCode())) {
 				return true;
 			}
 		}

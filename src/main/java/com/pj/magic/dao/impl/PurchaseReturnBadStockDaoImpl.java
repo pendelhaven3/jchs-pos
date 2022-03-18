@@ -18,6 +18,7 @@ import org.springframework.stereotype.Repository;
 import com.pj.magic.dao.PurchaseReturnBadStockDao;
 import com.pj.magic.model.PurchaseReturnBadStock;
 import com.pj.magic.model.Supplier;
+import com.pj.magic.model.User;
 import com.pj.magic.model.search.PurchaseReturnBadStockSearchCriteria;
 import com.pj.magic.util.DbUtil;
 
@@ -29,10 +30,13 @@ public class PurchaseReturnBadStockDaoImpl extends MagicDao implements PurchaseR
 	private static final String BASE_SELECT_SQL =
 			"select a.ID, PURCHASE_RETURN_BAD_STOCK_NO, SUPPLIER_ID, POST_IND, POST_DT, POST_BY,"
 			+ " a.REMARKS,"
-			+ " b.CODE as SUPPLIER_CODE, b.NAME as SUPPLIER_NAME"
+			+ " b.CODE as SUPPLIER_CODE, b.NAME as SUPPLIER_NAME,"
+			+ " c.USERNAME as POST_BY_USERNAME"
 			+ " from PURCHASE_RETURN_BAD_STOCK a"
 			+ " join SUPPLIER b"
-			+ "   on b.ID = a.SUPPLIER_ID";
+			+ "   on b.ID = a.SUPPLIER_ID"
+			+ " left join USER c"
+			+ "   on c.ID = a.POST_BY";
 
 	private PurchaseReturnBadStockRowMapper purchaseReturnBadStockRowMapper = new PurchaseReturnBadStockRowMapper();
 	
@@ -113,6 +117,7 @@ public class PurchaseReturnBadStockDaoImpl extends MagicDao implements PurchaseR
 			purchaseReturnBadStock.setPosted("Y".equals(rs.getString("POST_IND")));
 			if (purchaseReturnBadStock.isPosted()) {
 				purchaseReturnBadStock.setPostDate(rs.getDate("POST_DT"));
+				purchaseReturnBadStock.setPostedBy(new User(rs.getLong("POST_BY"), rs.getString("POST_BY_USERNAME")));
 			}
 			
 			purchaseReturnBadStock.setRemarks(rs.getString("REMARKS"));

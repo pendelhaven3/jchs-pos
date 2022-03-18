@@ -15,7 +15,6 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import com.pj.magic.dao.ReceivingReceiptItemDao;
-import com.pj.magic.model.Product;
 import com.pj.magic.model.Product2;
 import com.pj.magic.model.ReceivingReceipt;
 import com.pj.magic.model.ReceivingReceiptItem;
@@ -113,26 +112,6 @@ public class ReceivingReceiptItemDaoImpl extends MagicDao implements ReceivingRe
 		return items;
 	}
 
-	private class ReceivingReceiptItemRowMapper implements RowMapper<ReceivingReceiptItem> {
-
-		@Override
-		public ReceivingReceiptItem mapRow(ResultSet rs, int rowNum) throws SQLException {
-			ReceivingReceiptItem item = new ReceivingReceiptItem();
-			item.setId(rs.getLong("ID"));
-			item.setParent(new ReceivingReceipt(rs.getLong("RECEIVING_RECEIPT_ID")));
-			item.setProduct(new Product2(rs.getLong("PRODUCT_ID")));
-			item.setUnit(rs.getString("UNIT"));
-			item.setQuantity(rs.getInt("QUANTITY"));
-			item.setCost(rs.getBigDecimal("COST").setScale(2));
-			item.setDiscount1(rs.getBigDecimal("DISCOUNT_1").setScale(2));
-			item.setDiscount2(rs.getBigDecimal("DISCOUNT_2").setScale(2));
-			item.setDiscount3(rs.getBigDecimal("DISCOUNT_3").setScale(2));
-			item.setFlatRateDiscount(rs.getBigDecimal("FLAT_RATE_DISCOUNT").setScale(2));
-			return item;
-		}
-		
-	}
-	
 	private static final String FIND_MOST_RECENT_BY_SUPPLIER_AND_PRODUCT_SQL = BASE_SELECT_SQL
 			+ " where a.PRODUCT_ID = ?"
 			+ " and a.UNIT = ?"
@@ -141,7 +120,7 @@ public class ReceivingReceiptItemDaoImpl extends MagicDao implements ReceivingRe
 			+ " limit 1";
 	
 	@Override
-	public ReceivingReceiptItem findMostRecentBySupplierAndProduct(Supplier supplier, Product product) {
+	public ReceivingReceiptItem findMostRecentBySupplierAndProduct(Supplier supplier, Product2 product) {
 		try {
 			return getJdbcTemplate().queryForObject(FIND_MOST_RECENT_BY_SUPPLIER_AND_PRODUCT_SQL,
 					rowMapper, product.getId(), product.getMaxUnit(), supplier.getId());

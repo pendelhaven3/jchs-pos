@@ -16,7 +16,7 @@ import org.springframework.stereotype.Repository;
 import com.pj.magic.dao.PurchaseReturnBadStockItemDao;
 import com.pj.magic.model.PurchaseReturnBadStock;
 import com.pj.magic.model.PurchaseReturnBadStockItem;
-import com.pj.magic.model.Product;
+import com.pj.magic.model.Product2;
 
 @Repository
 public class PurchaseReturnBadStockItemDaoImpl extends MagicDao implements PurchaseReturnBadStockItemDao {
@@ -26,10 +26,30 @@ public class PurchaseReturnBadStockItemDaoImpl extends MagicDao implements Purch
 			+ " b.CODE as PRODUCT_CODE, b.DESCRIPTION as PRODUCT_DESCRIPTION"
 			+ " from PURCHASE_RETURN_BAD_STOCK_ITEM a"
 			+ " join PRODUCT b"
-			+ "   on b.ID = a.PRODUCT_ID";
+			+ "   on b.PRODUCT2_ID = a.PRODUCT_ID"
+			+ "   and b.UOM_CODE = a.UNIT";
 	
-	private PurchaseReturnBadStockItemRowMapper purchaseReturnBadStockItemRowMapper = 
-			new PurchaseReturnBadStockItemRowMapper();
+	private RowMapper<PurchaseReturnBadStockItem> rowMapper = new RowMapper<PurchaseReturnBadStockItem>() {
+
+		@Override
+		public PurchaseReturnBadStockItem mapRow(ResultSet rs, int rowNum) throws SQLException {
+			PurchaseReturnBadStockItem item = new PurchaseReturnBadStockItem();
+			item.setId(rs.getLong("ID"));
+			item.setCode(rs.getString("PRODUCT_CODE"));
+			
+			Product2 product = new Product2();
+			product.setId(rs.getLong("PRODUCT_ID"));
+			product.setDescription(rs.getString("PRODUCT_DESCRIPTION"));
+			item.setProduct(product);
+			
+			item.setUnit(rs.getString("UNIT"));
+			item.setQuantity(rs.getInt("QUANTITY"));
+			item.setUnitCost(rs.getBigDecimal("UNIT_COST"));
+			
+			return item;
+		}
+		
+	};
 	
 	@Override
 	public void save(PurchaseReturnBadStockItem item) {
@@ -84,8 +104,7 @@ public class PurchaseReturnBadStockItemDaoImpl extends MagicDao implements Purch
 	@Override
 	public List<PurchaseReturnBadStockItem> findAllByPurchaseReturnBadStock(
 			PurchaseReturnBadStock purchaseReturnBadStock) {
-		return getJdbcTemplate().query(FIND_ALL_BY_PURCHASE_RETURN_BAD_STOCK_SQL, purchaseReturnBadStockItemRowMapper, 
-				purchaseReturnBadStock.getId());
+		return getJdbcTemplate().query(FIND_ALL_BY_PURCHASE_RETURN_BAD_STOCK_SQL, rowMapper, purchaseReturnBadStock.getId());
 	}
 
 	private static final String DELETE_SQL = "delete from PURCHASE_RETURN_BAD_STOCK_ITEM where ID = ?";
@@ -95,26 +114,4 @@ public class PurchaseReturnBadStockItemDaoImpl extends MagicDao implements Purch
 		getJdbcTemplate().update(DELETE_SQL, item.getId());
 	}
 
-	private class PurchaseReturnBadStockItemRowMapper implements RowMapper<PurchaseReturnBadStockItem> {
-
-		@Override
-		public PurchaseReturnBadStockItem mapRow(ResultSet rs, int rowNum) throws SQLException {
-			PurchaseReturnBadStockItem item = new PurchaseReturnBadStockItem();
-			item.setId(rs.getLong("ID"));
-			
-			Product product = new Product();
-			product.setId(rs.getLong("PRODUCT_ID"));
-			product.setCode(rs.getString("PRODUCT_CODE"));
-			product.setDescription(rs.getString("PRODUCT_DESCRIPTION"));
-			item.setProduct(product);
-			
-			item.setUnit(rs.getString("UNIT"));
-			item.setQuantity(rs.getInt("QUANTITY"));
-			item.setUnitCost(rs.getBigDecimal("UNIT_COST"));
-			
-			return item;
-		}
-		
-	}
-	
 }

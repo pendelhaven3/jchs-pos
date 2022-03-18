@@ -7,10 +7,10 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.pj.magic.dao.ProductDao;
 import com.pj.magic.dao.PurchaseReturnBadStockDao;
 import com.pj.magic.dao.PurchaseReturnBadStockItemDao;
 import com.pj.magic.dao.SystemDao;
+import com.pj.magic.exception.AlreadyPostedException;
 import com.pj.magic.model.PurchaseReturnBadStock;
 import com.pj.magic.model.PurchaseReturnBadStockItem;
 import com.pj.magic.model.search.PurchaseReturnBadStockSearchCriteria;
@@ -23,7 +23,6 @@ public class PurchaseReturnBadStockServiceImpl implements PurchaseReturnBadStock
 	@Autowired private PurchaseReturnBadStockDao purchaseReturnBadStockDao;
 	@Autowired private PurchaseReturnBadStockItemDao purchaseReturnBadStockItemDao;
 	@Autowired private LoginService loginService;
-	@Autowired private ProductDao productDao;
 	@Autowired private SystemDao systemDao;
 	
 	@Transactional
@@ -37,9 +36,9 @@ public class PurchaseReturnBadStockServiceImpl implements PurchaseReturnBadStock
 		PurchaseReturnBadStock purchaseReturnBadStock = purchaseReturnBadStockDao.get(id);
 		if (purchaseReturnBadStock != null) {
 			purchaseReturnBadStock.setItems(purchaseReturnBadStockItemDao.findAllByPurchaseReturnBadStock(purchaseReturnBadStock));
-			for (PurchaseReturnBadStockItem item : purchaseReturnBadStock.getItems()) {
-				item.setProduct(productDao.get(item.getProduct().getId()));
-			}
+//			for (PurchaseReturnBadStockItem item : purchaseReturnBadStock.getItems()) {
+//				item.setProduct(productDao.get(item.getProduct().getId()));
+//			}
 		}
 		return purchaseReturnBadStock;
 	}
@@ -77,6 +76,11 @@ public class PurchaseReturnBadStockServiceImpl implements PurchaseReturnBadStock
 	@Override
 	public void post(PurchaseReturnBadStock purchaseReturnBadStock) {
 		PurchaseReturnBadStock updated = getPurchaseReturnBadStock(purchaseReturnBadStock.getId());
+		
+		if (updated.isPosted()) {
+		    throw new AlreadyPostedException("PRBS No. " + updated.getPurchaseReturnBadStockNumber().toString() + " is already posted");
+		}
+		
 		updated.setPosted(true);
 		updated.setPostDate(systemDao.getCurrentDateTime());
 		updated.setPostedBy(loginService.getLoggedInUser());
