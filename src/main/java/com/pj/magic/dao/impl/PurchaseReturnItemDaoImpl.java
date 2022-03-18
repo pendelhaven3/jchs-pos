@@ -33,7 +33,8 @@ public class PurchaseReturnItemDaoImpl extends MagicDao implements PurchaseRetur
 			+ " join RECEIVING_RECEIPT_ITEM b"
 			+ "   on b.ID = a.RECEIVING_RECEIPT_ITEM_ID"
 			+ " join PRODUCT c"
-			+ "   on c.ID = b.PRODUCT_ID"
+			+ "   on c.PRODUCT2_ID = b.PRODUCT_ID"
+			+ "   and c.UOM_CODE = b.UNIT"
 			+ " join RECEIVING_RECEIPT d"
 			+ "   on d.ID = b.RECEIVING_RECEIPT_ID";
 	
@@ -56,6 +57,7 @@ public class PurchaseReturnItemDaoImpl extends MagicDao implements PurchaseRetur
 			item.setId(rs.getLong("ID"));
 			item.setParent(new PurchaseReturn(rs.getLong("PURCHASE_RETURN_ID")));
 			item.setQuantity(rs.getInt("QUANTITY"));
+			item.setCode(rs.getString("PRODUCT_CODE"));
 			
 			Product2 product = new Product2();
 			product.setId(rs.getLong("PRODUCT_ID"));
@@ -63,6 +65,7 @@ public class PurchaseReturnItemDaoImpl extends MagicDao implements PurchaseRetur
 			
 			ReceivingReceiptItem receivingReceiptItem = new ReceivingReceiptItem();
 			receivingReceiptItem.setId(rs.getLong("RECEIVING_RECEIPT_ITEM_ID"));
+			receivingReceiptItem.setCode(rs.getString("PRODUCT_CODE"));
 			receivingReceiptItem.setProduct(product);
 			receivingReceiptItem.setUnit(rs.getString("UNIT"));
 			receivingReceiptItem.setQuantity(rs.getInt("RECEIVING_RECEIPT_ITEM_QUANTITY"));

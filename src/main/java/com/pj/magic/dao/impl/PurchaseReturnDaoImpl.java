@@ -19,6 +19,7 @@ import com.pj.magic.dao.PurchaseReturnDao;
 import com.pj.magic.model.PurchaseReturn;
 import com.pj.magic.model.ReceivingReceipt;
 import com.pj.magic.model.Supplier;
+import com.pj.magic.model.User;
 import com.pj.magic.model.search.PurchaseReturnSearchCriteria;
 import com.pj.magic.util.DbUtil;
 
@@ -29,18 +30,22 @@ public class PurchaseReturnDaoImpl extends MagicDao implements PurchaseReturnDao
 	
 	private static final String BASE_SELECT_SQL = 
 			"select a.ID, PURCHASE_RETURN_NO, RECEIVING_RECEIPT_ID, b.RECEIVING_RECEIPT_NO, "
-			+ " a.POST_IND, a.POST_DT, a.REMARKS,"
-			+ " a.PAID_IND, a.PAID_DT,"
-			+ " b.SUPPLIER_ID, c.CODE as SUPPLIER_CODE, c.NAME as SUPPLIER_NAME"
+			+ " a.POST_IND, a.POST_DT, a.POST_BY, a.REMARKS,"
+			+ " a.PAID_IND, a.PAID_DT, a.PAID_BY,"
+			+ " b.SUPPLIER_ID, c.CODE as SUPPLIER_CODE, c.NAME as SUPPLIER_NAME,"
+			+ " d.USERNAME as POST_BY_USERNAME,"
+			+ " e.USERNAME as PAID_BY_USERNAME"
 			+ " from PURCHASE_RETURN a"
 			+ " join RECEIVING_RECEIPT b"
 			+ "   on b.ID = a.RECEIVING_RECEIPT_ID"
 			+ " join SUPPLIER c"
-			+ "   on c.ID = b.SUPPLIER_ID";
+			+ "   on c.ID = b.SUPPLIER_ID"
+			+ " left join USER d"
+			+ "   on d.ID = a.POST_BY"
+			+ " left join USER e"
+			+ "   on e.ID = a.PAID_BY";
 	
-	private PurchaseReturnRowMapper purchaseReturnRowMapper = new PurchaseReturnRowMapper();
-	
-	private class PurchaseReturnRowMapper implements RowMapper<PurchaseReturn> {
+	private RowMapper<PurchaseReturn> rowMapper = new RowMapper<PurchaseReturn>() {
 
 		@Override
 		public PurchaseReturn mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -62,11 +67,13 @@ public class PurchaseReturnDaoImpl extends MagicDao implements PurchaseReturnDao
 			purchaseReturn.setPosted("Y".equals(rs.getString("POST_IND")));
 			if (purchaseReturn.isPosted()) {
 				purchaseReturn.setPostDate(rs.getDate("POST_DT"));
+				purchaseReturn.setPostedBy(new User(rs.getLong("POST_BY"), rs.getString("POST_BY_USERNAME")));
 			}
 			
 			purchaseReturn.setPaid("Y".equals(rs.getString("PAID_IND")));
 			if (purchaseReturn.isPaid()) {
 				purchaseReturn.setPaidDate(rs.getDate("PAID_DT"));
+				purchaseReturn.setPaidBy(new User(rs.getLong("PAID_BY"), rs.getString("PAID_BY_USERNAME")));
 			}
 			
 			purchaseReturn.setRemarks(rs.getString("REMARKS"));
@@ -74,8 +81,8 @@ public class PurchaseReturnDaoImpl extends MagicDao implements PurchaseReturnDao
 			return purchaseReturn;
 		}
 		
-	}
-
+	};
+	
 	@Override
 	public void save(PurchaseReturn purchaseReturn) {
 		if (purchaseReturn.getId() == null) {
@@ -86,17 +93,19 @@ public class PurchaseReturnDaoImpl extends MagicDao implements PurchaseReturnDao
 	}
 
 	private static final String UPDATE_SQL =
-			"update PURCHASE_RETURN set RECEIVING_RECEIPT_ID = ?, POST_IND = ?, POST_DT = ?,"
-			+ " REMARKS = ?, PAID_IND = ?, PAID_DT = ? where ID = ?";
+			"update PURCHASE_RETURN set RECEIVING_RECEIPT_ID = ?, POST_IND = ?, POST_DT = ?, POST_BY = ?,"
+			+ " REMARKS = ?, PAID_IND = ?, PAID_DT = ?, PAID_BY = ? where ID = ?";
 	
 	private void update(PurchaseReturn purchaseReturn) {
 		getJdbcTemplate().update(UPDATE_SQL,
 				purchaseReturn.getReceivingReceipt().getId(),
 				purchaseReturn.isPosted() ? "Y" : "N",
 				purchaseReturn.isPosted() ? purchaseReturn.getPostDate() : null,
+				purchaseReturn.isPosted() ? purchaseReturn.getPostedBy().getId() : null,
 				purchaseReturn.getRemarks(),
 				purchaseReturn.isPaid() ? "Y" : "N",
 				purchaseReturn.isPaid() ? purchaseReturn.getPaidDate() : null,
+				purchaseReturn.isPaid() ? purchaseReturn.getPaidBy().getId() : null,
 				purchaseReturn.getId());
 	}
 	
@@ -127,7 +136,7 @@ public class PurchaseReturnDaoImpl extends MagicDao implements PurchaseReturnDao
 	@Override
 	public PurchaseReturn get(long id) {
 		try {
-			return getJdbcTemplate().queryForObject(GET_SQL, purchaseReturnRowMapper, id);
+			return getJdbcTemplate().queryForObject(GET_SQL, rowMapper, id);
 		} catch (IncorrectResultSizeDataAccessException e) {
 			return null;
 		}
@@ -186,7 +195,7 @@ public class PurchaseReturnDaoImpl extends MagicDao implements PurchaseReturnDao
 		
 		sql.append(" order by PURCHASE_RETURN_NO desc");
 		
-		return getJdbcTemplate().query(sql.toString(), purchaseReturnRowMapper, params.toArray());
+		return getJdbcTemplate().query(sql.toString(), rowMapper, params.toArray());
 	}
 
 	private static final String FIND_BY_PURCHASE_RETURN_NUMBER_SQL = BASE_SELECT_SQL 
@@ -195,7 +204,7 @@ public class PurchaseReturnDaoImpl extends MagicDao implements PurchaseReturnDao
 	@Override
 	public PurchaseReturn findByPurchaseReturnNumber(long purchaseReturnNumber) {
 		try {
-			return getJdbcTemplate().queryForObject(FIND_BY_PURCHASE_RETURN_NUMBER_SQL, purchaseReturnRowMapper, 
+			return getJdbcTemplate().queryForObject(FIND_BY_PURCHASE_RETURN_NUMBER_SQL, rowMapper, 
 					purchaseReturnNumber);
 		} catch (IncorrectResultSizeDataAccessException e) {
 			return null;

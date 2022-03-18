@@ -5,7 +5,6 @@ import java.math.BigDecimal;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
-import com.pj.magic.model.Product;
 import com.pj.magic.model.Product2;
 import com.pj.magic.model.PurchaseReturnItem;
 
@@ -30,30 +29,6 @@ public class PurchaseReturnItemRowItem {
 		reset();
 	}
 	
-	public PurchaseReturnItem getItem() {
-		return item;
-	}
-
-	public void setItem(PurchaseReturnItem item) {
-		this.item = item;
-	}
-
-	public String getUnit() {
-		return unit;
-	}
-
-	public void setUnit(String unit) {
-		this.unit = unit;
-	}
-
-	public Integer getQuantity() {
-		return quantity;
-	}
-
-	public void setQuantity(Integer quantity) {
-		this.quantity = quantity;
-	}
-
 	public boolean isValid() {
 		return product != null && quantity != null;
 	}

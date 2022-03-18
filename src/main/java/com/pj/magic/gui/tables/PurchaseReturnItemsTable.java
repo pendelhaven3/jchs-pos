@@ -28,20 +28,12 @@ import com.pj.magic.Constants;
 import com.pj.magic.gui.component.MagicCellEditor;
 import com.pj.magic.gui.component.MagicTextField;
 import com.pj.magic.gui.dialog.SelectProductDialog;
-import com.pj.magic.gui.dialog.SelectUnitDialog;
 import com.pj.magic.gui.tables.models.PurchaseReturnItemsTableModel;
 import com.pj.magic.gui.tables.rowitems.PurchaseReturnItemRowItem;
 import com.pj.magic.model.Product;
 import com.pj.magic.model.PurchaseReturn;
 import com.pj.magic.model.PurchaseReturnItem;
-import com.pj.magic.model.ReceivingReceiptItem;
 import com.pj.magic.service.ProductService;
-
-/*
- * [PJ 7/10/2014] 
- * ItemsTable has 2 modes: edit (default) and add (allows adding blank rows after the last row).
- * 
- */
 
 @Component
 public class PurchaseReturnItemsTable extends MagicTable {
@@ -61,7 +53,6 @@ public class PurchaseReturnItemsTable extends MagicTable {
 	private static final String F4_ACTION_NAME = "F4";
 	
 	@Autowired private SelectProductDialog selectProductDialog;
-	@Autowired private SelectUnitDialog selectUnitDialog;
 	@Autowired private ProductService productService;
 	@Autowired private PurchaseReturnItemsTableModel tableModel;
 	
@@ -92,9 +83,6 @@ public class PurchaseReturnItemsTable extends MagicTable {
 		
 		MagicTextField productCodeTextField = new MagicTextField();
 		columnModel.getColumn(PRODUCT_CODE_COLUMN_INDEX).setCellEditor(new ProductCodeCellEditor(productCodeTextField));
-		
-		MagicTextField unitTextField = new MagicTextField();
-		columnModel.getColumn(UNIT_COLUMN_INDEX).setCellEditor(new UnitCellEditor(unitTextField));
 		
 		MagicTextField quantityTextField = new MagicTextField();
 		quantityTextField.setMaximumLength(Constants.QUANTITY_MAXIMUM_LENGTH);
@@ -137,10 +125,6 @@ public class PurchaseReturnItemsTable extends MagicTable {
 		return getSelectedColumn() == PRODUCT_CODE_COLUMN_INDEX;
 	}
 
-	public boolean isUnitFieldSelected() {
-		return getSelectedColumn() == UNIT_COLUMN_INDEX;
-	}
-	
 	public boolean isLastRowSelected() {
 		return getSelectedRow() + 1 == tableModel.getRowCount();
 	}
@@ -189,14 +173,13 @@ public class PurchaseReturnItemsTable extends MagicTable {
 		getEditorComponent().requestFocusInWindow();
 	}
 	
-	private boolean hasDuplicate(String unit, PurchaseReturnItemRowItem rowItem) {
+	private boolean hasDuplicate(String code, PurchaseReturnItemRowItem rowItem) {
 		for (PurchaseReturnItem item : salesReturn.getItems()) {
-			if (item.getReceivingReceiptItem().getProduct().equals(rowItem.getProduct()) 
-					&& item.getReceivingReceiptItem().getUnit().equals(unit) && item != rowItem.getItem()) {
+			if (item.getReceivingReceiptItem().getCode().equals(code) && item != rowItem.getItem()) {
 				return true;
 			}
 		}
-		return tableModel.hasDuplicate(unit, rowItem);
+		return tableModel.hasDuplicate(code, rowItem);
 	}
 	
 	public void setPurchaseReturn(PurchaseReturn salesReturn) {
@@ -245,8 +228,6 @@ public class PurchaseReturnItemsTable extends MagicTable {
 					}
 					String criteria = (String)getCellEditor().getCellEditorValue();
 					openSelectProductDialog(criteria, criteria);
-				} else if (isUnitFieldSelected()) {
-					openSelectUnitDialog();
 				}
 			}
 		});
@@ -287,7 +268,7 @@ public class PurchaseReturnItemsTable extends MagicTable {
 				}
 				if (isProductCodeFieldSelected()) {
 					openSelectProductDialogUsingPreviousCriteria();
-				} else if (isUnitFieldSelected() || isQuantityFieldSelected()) {
+				} else if (isQuantityFieldSelected()) {
 					copyValueFromPreviousRow();
 				}
 			}
@@ -321,26 +302,9 @@ public class PurchaseReturnItemsTable extends MagicTable {
 		}
 	}
 
-	protected void openSelectUnitDialog() {
-		if (!isEditing()) {
-			editCellAt(getSelectedRow(), UNIT_COLUMN_INDEX);
-		}
-		
-		selectUnitDialog.setUnits(getCurrentlySelectedRowItem().getProduct().getUnits());
-		selectUnitDialog.searchUnits((String)getCellEditor().getCellEditorValue());
-		selectUnitDialog.setVisible(true);
-		
-		String unit = selectUnitDialog.getSelectedUnit();
-		if (unit != null) {
-			((JTextField)getEditorComponent()).setText(unit);
-			getCellEditor().stopCellEditing();
-		}
-	}
-
 	private void openSelectProductDialog(String criteria, String currentlySelectedCode) {
 		previousSelectProductCriteria = criteria;
 		
-//		selectProductDialog.searchProducts(criteria, currentlySelectedCode, salesReturn.getPricingScheme());
 		selectProductDialog.searchProducts(criteria, currentlySelectedCode);
 		selectProductDialog.setVisible(true);
 		
@@ -395,11 +359,7 @@ public class PurchaseReturnItemsTable extends MagicTable {
 					public void run() {
 						switch (column) {
 						case PRODUCT_CODE_COLUMN_INDEX:
-							model.fireTableCellUpdated(row, UNIT_COST_COLUMN_INDEX);
-							model.fireTableCellUpdated(row, AMOUNT_COLUMN_INDEX);
-							selectAndEditCellAt(row, UNIT_COLUMN_INDEX);
-							break;
-						case UNIT_COLUMN_INDEX:
+							model.fireTableCellUpdated(row, UNIT_COLUMN_INDEX);
 							model.fireTableCellUpdated(row, UNIT_COST_COLUMN_INDEX);
 							model.fireTableCellUpdated(row, AMOUNT_COLUMN_INDEX);
 							selectAndEditCellAt(row, QUANTITY_COLUMN_INDEX);
@@ -433,44 +393,20 @@ public class PurchaseReturnItemsTable extends MagicTable {
 				Product product = productService.findProductByCode(code);
 				if (product == null) {
 					showErrorMessage("No product matching code specified");
-				} else if (!salesReturn.getReceivingReceipt().hasProduct(product)) {
+				} else if (!salesReturn.getReceivingReceipt().hasProduct(product.getProduct2Id())) {
 					showErrorMessage("Receiving Receipt does not have specified product");
 				} else {
-					valid = true;
+					PurchaseReturnItemRowItem rowItem = getCurrentlySelectedRowItem();
+					if (hasDuplicate(code, rowItem)) {
+						showErrorMessage("Duplicate item");
+					} else {
+						valid = true;
+					}
 				}
 			}
 			return (valid) ? super.stopCellEditing() : false;
 		}
 
-	}
-	
-	private class UnitCellEditor extends MagicCellEditor {
-		
-		public UnitCellEditor(JTextField textField) {
-			super(textField);
-		}
-		
-		@Override
-		public boolean stopCellEditing() {
-			String unit = ((JTextField)getComponent()).getText();
-			boolean valid = false;
-			if (StringUtils.isEmpty(unit)) {
-				showErrorMessage("Unit must be specified");
-			} else {
-				PurchaseReturnItemRowItem rowItem = getCurrentlySelectedRowItem();
-				if (!rowItem.getProduct().hasUnit(unit)) {
-					showErrorMessage("Product does not have unit specified");
-				} else if (hasDuplicate(unit, rowItem)) {
-					showErrorMessage("Duplicate item");
-//				} else if (!salesReturn.getReceivingReceipt().hasProductAndUnit(rowItem.getProduct(), unit)) {
-//					showErrorMessage("Receiving Receipt does not have specified product and unit");
-				} else {
-					valid = true;
-				}
-			}
-			return (valid) ? super.stopCellEditing() : false;
-		}
-		
 	}
 	
 	private class QuantityCellEditor extends MagicCellEditor {
@@ -488,15 +424,15 @@ public class PurchaseReturnItemsTable extends MagicTable {
 			} else if (Integer.parseInt(quantity) == 0) {
 				showErrorMessage("Quantity must be greater than 0");
 			} else {
-				PurchaseReturnItemRowItem rowItem = getCurrentlySelectedRowItem();
-				ReceivingReceiptItem item = null;
+//				PurchaseReturnItemRowItem rowItem = getCurrentlySelectedRowItem();
+//				ReceivingReceiptItem item = null;
 //				ReceivingReceiptItem item = salesReturn.getReceivingReceipt()
 //						.findItemByProductAndUnit(rowItem.getProduct(), rowItem.getUnit());
-				if (Integer.parseInt(quantity) > item.getQuantity()) {
-					showErrorMessage("Quantity cannot be more than Receiving Receipt item quantity");
-				} else {
+//				if (Integer.parseInt(quantity) > item.getQuantity()) {
+//					showErrorMessage("Quantity cannot be more than Receiving Receipt item quantity");
+//				} else {
 					valid = true;
-				}
+//				}
 			}
 			return (valid) ? super.stopCellEditing() : false;
 		}

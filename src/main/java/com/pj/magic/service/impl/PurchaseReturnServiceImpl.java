@@ -7,13 +7,14 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.pj.magic.dao.ProductDao;
 import com.pj.magic.dao.PurchaseReturnDao;
 import com.pj.magic.dao.PurchaseReturnItemDao;
 import com.pj.magic.dao.SystemDao;
 import com.pj.magic.model.PurchaseReturn;
 import com.pj.magic.model.PurchaseReturnItem;
+import com.pj.magic.model.ReceivingReceiptItem;
 import com.pj.magic.model.search.PurchaseReturnSearchCriteria;
+import com.pj.magic.repository.Product2Repository;
 import com.pj.magic.service.LoginService;
 import com.pj.magic.service.PurchaseReturnService;
 import com.pj.magic.service.ReceivingReceiptService;
@@ -24,9 +25,9 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
 	@Autowired private PurchaseReturnDao purchaseReturnDao;
 	@Autowired private PurchaseReturnItemDao purchaseReturnItemDao;
 	@Autowired private ReceivingReceiptService receivingReceiptService;
-	@Autowired private ProductDao productDao;
 	@Autowired private SystemDao systemDao;
 	@Autowired private LoginService loginService;
+	@Autowired private Product2Repository product2Repository;
 	
 	@Transactional
 	@Override
@@ -67,14 +68,17 @@ public class PurchaseReturnServiceImpl implements PurchaseReturnService {
 		PurchaseReturn updated = purchaseReturnDao.get(purchaseReturn.getId());
 		updated.setItems(purchaseReturnItemDao.findAllByPurchaseReturn(purchaseReturn));
 		
-//		for (PurchaseReturnItem item : updated.getItems()) {
-//			Product product = productDao.get(item.getReceivingReceiptItem().getProduct().getId());
-//			product.addUnitQuantity(item.getReceivingReceiptItem().getUnit(), -1 * item.getQuantity());
-//			productDao.updateAvailableQuantities(product);
-//		}
+		for (PurchaseReturnItem item : updated.getItems()) {
+			ReceivingReceiptItem receivingReceiptItem = item.getReceivingReceiptItem();
+			product2Repository.subtractAvailableQuantity(
+					receivingReceiptItem.getProduct().getId(),
+					receivingReceiptItem.getUnit(),
+					item.getQuantity());
+		}
+		
 		updated.setPosted(true);
 		updated.setPostDate(systemDao.getCurrentDateTime());
-//		updated.setPostedBy(loginService.getLoggedInUser());
+		updated.setPostedBy(loginService.getLoggedInUser());
 		purchaseReturnDao.save(updated);
 	}
 

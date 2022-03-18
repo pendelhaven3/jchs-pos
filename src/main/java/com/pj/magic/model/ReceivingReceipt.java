@@ -256,7 +256,7 @@ public class ReceivingReceipt {
 		return !posted && !cancelled;
 	}
 
-	public ReceivingReceiptItem findItemByProductAndUnit(Product product, String unit) {
+	public ReceivingReceiptItem findItemByProductAndUnit(Product2 product, String unit) {
 		for (ReceivingReceiptItem item : items) {
 			if (product.equals(item.getProduct()) && unit.equals(item.getUnit())) {
 				return item;
@@ -265,18 +265,9 @@ public class ReceivingReceipt {
 		return null;
 	}
 
-	public boolean hasProduct(Product product) {
+	public boolean hasProduct(Long product2Id) {
 		for (ReceivingReceiptItem item : items) {
-			if (product.equals(item.getProduct())) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public boolean hasProductAndUnit(Product product, String unit) {
-		for (ReceivingReceiptItem item : items) {
-			if (product.equals(item.getProduct()) && unit.equals(item.getUnit())) {
+			if (product2Id.equals(item.getProduct().getId())) {
 				return true;
 			}
 		}

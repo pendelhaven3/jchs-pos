@@ -199,12 +199,16 @@ create table PURCHASE_RETURN (
   RECEIVING_RECEIPT_ID integer not null,
   POST_IND char(1) default 'N' not null,
   POST_DT datetime null,
+  POST_BY integer null,
   REMARKS varchar(100) null,
   PAID_IND char(1) default 'N' not null,
   PAID_DT date null,
+  PAID_BY integer null,
   constraint PURCHASE_RETURN$PK primary key (ID),
   constraint PURCHASE_RETURN$UK unique (PURCHASE_RETURN_NO),
-  constraint PURCHASE_RETURN$FK foreign key (RECEIVING_RECEIPT_ID) references RECEIVING_RECEIPT (ID)
+  constraint PURCHASE_RETURN$FK foreign key (RECEIVING_RECEIPT_ID) references RECEIVING_RECEIPT (ID),
+  constraint PURCHASE_RETURN$FK2 foreign key (POST_BY) references USER (ID),
+  constraint PURCHASE_RETURN$FK3 foreign key (PAID_BY) references USER (ID)
 );
 
 create table PURCHASE_RETURN_ITEM (

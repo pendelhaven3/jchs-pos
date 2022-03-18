@@ -13,9 +13,9 @@ import org.springframework.stereotype.Component;
 import com.pj.magic.gui.tables.PurchaseReturnItemsTable;
 import com.pj.magic.gui.tables.rowitems.PurchaseReturnItemRowItem;
 import com.pj.magic.model.Product;
-import com.pj.magic.model.Product2;
 import com.pj.magic.model.PurchaseReturn;
 import com.pj.magic.model.PurchaseReturnItem;
+import com.pj.magic.service.Product2Service;
 import com.pj.magic.service.ProductService;
 import com.pj.magic.service.PurchaseReturnService;
 import com.pj.magic.util.FormatterUtil;
@@ -27,6 +27,7 @@ public class PurchaseReturnItemsTableModel extends AbstractTableModel {
 	
 	@Autowired private ProductService productService;
 	@Autowired private PurchaseReturnService purchaseReturnService;
+	@Autowired private Product2Service product2Service;
 	
 	private List<PurchaseReturnItemRowItem> rowItems = new ArrayList<>();
 	private PurchaseReturn purchaseReturn;
@@ -107,11 +108,9 @@ public class PurchaseReturnItemsTableModel extends AbstractTableModel {
 				return;
 			}
 			Product product1 = productService.findProductByCode(val);
-			rowItem.setProduct(new Product2(product1.getProduct2Id()));
+			rowItem.setProduct(product2Service.getProduct(product1.getProduct2Id()));
 			rowItem.setUnit(product1.getUnits().get(0));
-			break;
-		case PurchaseReturnItemsTable.UNIT_COLUMN_INDEX:
-			rowItem.setUnit(val);
+			rowItem.getItem().setCode(product1.getCode());
 			break;
 		case PurchaseReturnItemsTable.QUANTITY_COLUMN_INDEX:
 			rowItem.setQuantity(Integer.valueOf(val));
@@ -119,8 +118,8 @@ public class PurchaseReturnItemsTableModel extends AbstractTableModel {
 		}
 		if (rowItem.isValid()) {
 			PurchaseReturnItem item = rowItem.getItem();
-//			item.setReceivingReceiptItem(
-//					purchaseReturn.getReceivingReceipt().findItemByProductAndUnit(rowItem.getProduct(), rowItem.getUnit()));
+			item.setReceivingReceiptItem(
+					purchaseReturn.getReceivingReceipt().findItemByProductAndUnit(rowItem.getProduct(), rowItem.getUnit()));
 			item.setQuantity(rowItem.getQuantity());
 			
 			boolean newItem = (item.getId() == null);
@@ -142,8 +141,6 @@ public class PurchaseReturnItemsTableModel extends AbstractTableModel {
 		switch (columnIndex) {
 		case PurchaseReturnItemsTable.PRODUCT_CODE_COLUMN_INDEX:
 			return true;
-		case PurchaseReturnItemsTable.UNIT_COLUMN_INDEX:
-			return rowItem.getProduct() != null;
 		case PurchaseReturnItemsTable.QUANTITY_COLUMN_INDEX:
 			return rowItem.getProduct() != null && !StringUtils.isEmpty(rowItem.getUnit());
 		default:
@@ -178,16 +175,15 @@ public class PurchaseReturnItemsTableModel extends AbstractTableModel {
 		return rowItems;
 	}
 
-	public boolean hasDuplicate(String unit, PurchaseReturnItemRowItem checkRowItem) {
+	public boolean hasDuplicate(String code, PurchaseReturnItemRowItem checkRowItem) {
 		for (PurchaseReturnItemRowItem rowItem : rowItems) {
-			if (checkRowItem.getProduct().equals(rowItem.getProduct()) 
-					&& unit.equals(rowItem.getUnit()) && rowItem != checkRowItem) {
+			if (rowItem != checkRowItem && code.equals(rowItem.getItem().getCode())) {
 				return true;
 			}
 		}
 		return false;
 	}
-
+	
 	public void reset(int row) {
 		rowItems.get(row).reset();
 		fireTableRowsUpdated(row, row);
