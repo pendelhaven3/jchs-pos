@@ -159,7 +159,7 @@ public class AreaInventoryReportDaoImpl extends MagicDao implements AreaInventor
 	}
 
 	private static final String FIND_ALL_BY_INVENTORY_CHECK_SQL = BASE_SELECT_SQL
-			+ " where a.INVENTORY_CHECK_ID = ?";
+			+ " where a.INVENTORY_CHECK_ID = ? order by a.REPORT_NO";
 	
 	@Override
 	public List<AreaInventoryReport> findAllByInventoryCheck(InventoryCheck inventoryCheck) {
