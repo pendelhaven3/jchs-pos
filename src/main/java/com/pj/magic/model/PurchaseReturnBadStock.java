@@ -7,6 +7,11 @@ import java.util.List;
 
 import com.pj.magic.Constants;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class PurchaseReturnBadStock {
 
 	private Long id;
@@ -16,6 +21,7 @@ public class PurchaseReturnBadStock {
 	private Date postDate;
 	private User postedBy;
 	private String remarks;
+	private Date pickupDate;
 	
 	private List<PurchaseReturnBadStockItem> items = new ArrayList<>();
 
@@ -25,46 +31,6 @@ public class PurchaseReturnBadStock {
 	
 	public PurchaseReturnBadStock(Long id) {
 		this.id = id;
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public Long getPurchaseReturnBadStockNumber() {
-		return purchaseReturnBadStockNumber;
-	}
-
-	public void setPurchaseReturnBadStockNumber(Long purchaseReturnBadStockNumber) {
-		this.purchaseReturnBadStockNumber = purchaseReturnBadStockNumber;
-	}
-
-	public Supplier getSupplier() {
-		return supplier;
-	}
-
-	public void setSupplier(Supplier supplier) {
-		this.supplier = supplier;
-	}
-
-	public List<PurchaseReturnBadStockItem> getItems() {
-		return items;
-	}
-
-	public void setItems(List<PurchaseReturnBadStockItem> items) {
-		this.items = items;
-	}
-
-	public boolean isPosted() {
-		return posted;
-	}
-
-	public void setPosted(boolean posted) {
-		this.posted = posted;
 	}
 
 	public String getStatus() {
@@ -79,36 +45,12 @@ public class PurchaseReturnBadStock {
 		return !items.isEmpty();
 	}
 
-	public Date getPostDate() {
-		return postDate;
-	}
-
-	public void setPostDate(Date postDate) {
-		this.postDate = postDate;
-	}
-
-	public User getPostedBy() {
-		return postedBy;
-	}
-
-	public void setPostedBy(User postedBy) {
-		this.postedBy = postedBy;
-	}
-
 	public BigDecimal getTotalAmount() {
 		BigDecimal total = Constants.ZERO;
 		for (PurchaseReturnBadStockItem item : items) {
 			total = total.add(item.getAmount());
 		}
 		return total;
-	}
-
-	public String getRemarks() {
-		return remarks;
-	}
-
-	public void setRemarks(String remarks) {
-		this.remarks = remarks;
 	}
 
 }

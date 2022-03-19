@@ -9,6 +9,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -30,12 +32,14 @@ import javax.swing.filechooser.FileFilter;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.pj.magic.gui.component.DatePickerFormatter;
 import com.pj.magic.gui.component.EllipsisButton;
 import com.pj.magic.gui.component.MagicTextField;
 import com.pj.magic.gui.component.MagicToolBar;
@@ -51,6 +55,10 @@ import com.pj.magic.util.ComponentUtil;
 import com.pj.magic.util.ExcelUtil;
 import com.pj.magic.util.FileUtil;
 import com.pj.magic.util.FormatterUtil;
+
+import net.sourceforge.jdatepicker.impl.JDatePanelImpl;
+import net.sourceforge.jdatepicker.impl.JDatePickerImpl;
+import net.sourceforge.jdatepicker.impl.UtilCalendarModel;
 
 @Component
 public class PurchaseReturnBadStockPanel extends StandardMagicPanel {
@@ -83,6 +91,8 @@ public class PurchaseReturnBadStockPanel extends StandardMagicPanel {
 	private JButton addItemButton;
 	private JButton deleteItemButton;
     private JFileChooser excelFileChooser;
+	private JDatePickerImpl datePicker;
+	private UtilCalendarModel pickupDateModel;
 	
 	@Override
 	protected void initializeComponents() {
@@ -118,6 +128,19 @@ public class PurchaseReturnBadStockPanel extends StandardMagicPanel {
             }
         });
 		
+		pickupDateModel = new UtilCalendarModel();
+		pickupDateModel.addPropertyChangeListener(new PropertyChangeListener() {
+			
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				if ("value".equals(evt.getPropertyName()) && evt.getOldValue() != null 
+						&& evt.getNewValue() != null) {
+					purchaseReturnBadStock.setPickupDate(pickupDateModel.getValue().getTime());
+					purchaseReturnBadStockService.save(purchaseReturnBadStock);
+				}
+			}
+		});
+        
 		focusOnComponentWhenThisPanelIsDisplayed(supplierCodeField);
 		updateTotalAmountFieldWhenItemsTableChanges();
 	}
@@ -265,6 +288,16 @@ public class PurchaseReturnBadStockPanel extends StandardMagicPanel {
 		deleteItemButton.setEnabled(!purchaseReturnBadStock.isPosted());
 		
 		itemsTable.setPurchaseReturnBadStock(purchaseReturnBadStock);
+		
+		if (purchaseReturnBadStock.getPickupDate() != null) {
+			updatePickupDateField();
+		}
+		datePicker.getComponents()[1].setVisible(!purchaseReturnBadStock.isPosted());
+	}
+
+	private void updatePickupDateField() {
+		pickupDateModel.setValue(null); // set to null first to prevent property change listener from triggering
+		pickupDateModel.setValue(DateUtils.toCalendar(purchaseReturnBadStock.getPickupDate()));
 	}
 
 	private void clearDisplay() {
@@ -283,6 +316,7 @@ public class PurchaseReturnBadStockPanel extends StandardMagicPanel {
 		itemsTable.setPurchaseReturnBadStock(purchaseReturnBadStock);
 		addItemButton.setEnabled(false);
 		deleteItemButton.setEnabled(false);
+		datePicker.getComponents()[1].setVisible(false);
 	}
 
 	@Override
@@ -387,6 +421,22 @@ public class PurchaseReturnBadStockPanel extends StandardMagicPanel {
 		c.anchor = GridBagConstraints.WEST;
 		remarksField.setPreferredSize(new Dimension(300, 25));
 		mainPanel.add(remarksField, c);
+		
+		c = new GridBagConstraints();
+		c.gridx = 4;
+		c.gridy = currentRow;
+		c.anchor = GridBagConstraints.WEST;
+		mainPanel.add(ComponentUtil.createLabel(100, "Pickup Date:"), c);
+		
+		c = new GridBagConstraints();
+		c.weightx = 1.0;
+		c.gridx = 5;
+		c.gridy = currentRow;
+		c.anchor = GridBagConstraints.WEST;
+		
+		JDatePanelImpl datePanel = new JDatePanelImpl(pickupDateModel);
+		datePicker = new JDatePickerImpl(datePanel, new DatePickerFormatter());
+		mainPanel.add(datePicker, c);
 		
 		currentRow++;
 		
