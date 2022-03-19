@@ -82,7 +82,7 @@ public class AreaInventoryReportPanel extends StandardMagicPanel {
 	@Override
 	protected void initializeComponents() {
 		reportNumberField = new MagicTextField();
-		reportNumberField.setMaximumLength(2);
+		reportNumberField.setMaximumLength(3);
 		reportNumberField.setNumbersOnly(true);
 		reportNumberField.addFocusListener(new FocusAdapter() {
 			
