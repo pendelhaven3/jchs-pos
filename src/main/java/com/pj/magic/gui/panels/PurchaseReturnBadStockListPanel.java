@@ -63,7 +63,7 @@ public class PurchaseReturnBadStockListPanel extends StandardMagicPanel {
 		if (!purchaseReturnBadStocks.isEmpty()) {
 			table.changeSelection(0, 0);
 		}
-		
+	
 		searchPurchaseReturnBadStocksDialog.updateDisplay();
 	}
 
