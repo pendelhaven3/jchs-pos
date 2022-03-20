@@ -197,10 +197,6 @@ public class SelectSalesInvoicesForPromoRedemptionDialog extends MagicDialog {
 					BigDecimal amount = promoRedemption.getPromo().getPromoType3Rule().getQualifyingAmount(salesInvoice);
 					return FormatterUtil.formatAmount(amount);
 				}
-				case PROMO_TYPE_5: {
-					BigDecimal amount = promoRedemption.getPromo().getPromoType5Rule().getQualifyingAmount(salesInvoice);
-					return FormatterUtil.formatAmount(amount);
-				}
 				default:
 					return "-";
 				}

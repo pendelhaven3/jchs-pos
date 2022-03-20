@@ -44,7 +44,6 @@ import com.pj.magic.gui.panels.StandardMagicPanel;
 import com.pj.magic.gui.tables.PromoType2RulesTable;
 import com.pj.magic.gui.tables.PromoType3RulePromoProductsTable;
 import com.pj.magic.gui.tables.PromoType4RulePromoProductsTable;
-import com.pj.magic.gui.tables.PromoType5RulePromoProductsTable;
 import com.pj.magic.model.Manufacturer;
 import com.pj.magic.model.PricingScheme;
 import com.pj.magic.model.Product;
@@ -53,7 +52,6 @@ import com.pj.magic.model.PromoType;
 import com.pj.magic.model.PromoType1Rule;
 import com.pj.magic.model.PromoType3Rule;
 import com.pj.magic.model.PromoType4Rule;
-import com.pj.magic.model.PromoType5Rule;
 import com.pj.magic.model.Unit;
 import com.pj.magic.service.ManufacturerService;
 import com.pj.magic.service.PricingSchemeService;
@@ -83,7 +81,6 @@ public class PromoPanel extends StandardMagicPanel {
 	@Autowired private PromoType2RulesTable promoType2RulesTable;
 	@Autowired private PromoType3RulePromoProductsTable promoType3RulePromoProductsTable;
 	@Autowired private PromoType4RulePromoProductsTable promoType4RulePromoProductsTable;
-	@Autowired private PromoType5RulePromoProductsTable promoType5RulePromoProductsTable;
 	
 	private Promo promo;
 	private JLabel promoNumberLabel;
@@ -102,7 +99,6 @@ public class PromoPanel extends StandardMagicPanel {
 	private JComboBox<String> freeUnitComboBox;
 	private MagicTextField freeQuantityField;
 	private MagicTextField dailyRedeemLimitPerCustomerField;
-	private MagicTextField rebateField;
 	private MagicButton saveButton;
 	private JButton addRuleButton;
 	private JButton removeRuleButton;
@@ -115,10 +111,6 @@ public class PromoPanel extends StandardMagicPanel {
 	private JButton addAllType4PromoProductButton;
 	private JButton removeAllType4PromoProductButton;
 	private JButton addAllType4PromoProductByManufacturerButton;
-	private JButton addType5PromoProductButton;
-	private JButton removeType5PromoProductButton;
-	private JButton addAllType5PromoProductButton;
-	private JButton removeAllType5PromoProductButton;
 	
 	@Override
 	protected void initializeComponents() {
@@ -164,8 +156,6 @@ public class PromoPanel extends StandardMagicPanel {
 		dailyRedeemLimitPerCustomerField.setNumbersOnly(true);
 		
 		pricingSchemeComboBox = new JComboBox<>();
-		
-		rebateField = new MagicTextField();
 		
 		saveButton = new MagicButton("Save");
 		saveButton.addActionListener(new ActionListener() {
@@ -220,9 +210,6 @@ public class PromoPanel extends StandardMagicPanel {
 			case PROMO_TYPE_4:
 				savePromoType4();
 				break;
-			case PROMO_TYPE_5:
-				savePromoType5();
-				break;
 			}
 		}
 	}
@@ -254,34 +241,6 @@ public class PromoPanel extends StandardMagicPanel {
 		}
 	}
 
-	private void savePromoType5() {
-		if (!validatePromoType5()) {
-			return;
-		}
-		
-		if (confirm("Save Promo?")) {
-			setCommonFieldsForSaving();
-			if (promo.getPromoType5Rule() == null) {
-				promo.setPromoType5Rule(new PromoType5Rule());
-			}
-			PromoType5Rule rule = promo.getPromoType5Rule();
-			rule.setParent(promo);
-			rule.setTargetAmount(NumberUtil.toBigDecimal(targetAmountField.getText()));
-			rule.setRebate(NumberUtil.toBigDecimal(rebateField.getText()));
-			
-			try {
-				promoService.save(promo);
-			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
-				showErrorMessage("Error occurred during saving!");
-				return;
-			}
-			
-			showMessage("Saved!");
-			updateDisplay(promo);
-		}
-	}
-
 	private boolean validatePromoType4() {
 		try {
 			validateCommonFields();
@@ -293,30 +252,6 @@ public class PromoPanel extends StandardMagicPanel {
 		if (!NumberUtil.isAmount(targetAmountField.getText())) {
 			showErrorMessage("Target Amount must be a valid amount");
 			targetAmountField.requestFocusInWindow();
-			return false;
-		}
-		
-		return true;
-	}
-
-	private boolean validatePromoType5() {
-		try {
-			validateCommonFields();
-			validateMandatoryField(targetAmountField, "Target Amount");
-			validateMandatoryField(rebateField, "Rebate");
-		} catch (ValidationException e) {
-			return false;
-		}
-		
-		if (!NumberUtil.isAmount(targetAmountField.getText())) {
-			showErrorMessage("Target Amount must be a valid amount");
-			targetAmountField.requestFocusInWindow();
-			return false;
-		}
-		
-		if (!NumberUtil.isAmount(rebateField.getText())) {
-			showErrorMessage("Rebate must be a valid amount");
-			rebateField.requestFocusInWindow();
 			return false;
 		}
 		
@@ -1157,9 +1092,6 @@ public class PromoPanel extends StandardMagicPanel {
 		case PROMO_TYPE_4:
 			updateDisplayForPromoType4();
 			break;
-		case PROMO_TYPE_5:
-			updateDisplayForPromoType5();
-			break;
 		}
 		promoDetailsPanel.revalidate();
 		promoDetailsPanel.repaint();
@@ -1347,172 +1279,6 @@ public class PromoPanel extends StandardMagicPanel {
 	
 	private void addType4PromoProduct() {
 		promoType4RulePromoProductsTable.addNewRow();
-	}
-
-	private void updateDisplayForPromoType5() {
-		updateToPromoType5Panel(promoDetailsPanel);
-		
-		PromoType5Rule rule = promo.getPromoType5Rule();
-		if (rule != null) {
-			targetAmountField.setText(FormatterUtil.formatAmount(rule.getTargetAmount()));
-			rebateField.setText(FormatterUtil.formatAmount(rule.getRebate()));
-			promoType5RulePromoProductsTable.setRule(rule);
-			addType5PromoProductButton.setEnabled(true);
-			removeType5PromoProductButton.setEnabled(true);
-			addAllType5PromoProductButton.setEnabled(true);
-			removeType5PromoProductButton.setEnabled(true);
-		} else {
-			targetAmountField.setText(null);
-			rebateField.setText(null);
-			promoType5RulePromoProductsTable.clear();
-			addType5PromoProductButton.setEnabled(false);
-			removeType5PromoProductButton.setEnabled(false);
-			addAllType5PromoProductButton.setEnabled(false);
-			removeAllType5PromoProductButton.setEnabled(false);
-		}
-	}
-
-	private void updateToPromoType5Panel(JPanel panel) {
-		int currentRow = 0;
-		
-		GridBagConstraints c = new GridBagConstraints();
-		c.gridx = 0;
-		c.gridy = currentRow;
-		panel.add(Box.createVerticalStrut(20), c);
-		
-		currentRow++;
-		
-		c = new GridBagConstraints();
-		c.gridx = 0;
-		c.gridy = currentRow;
-		c.anchor = GridBagConstraints.WEST;
-		panel.add(ComponentUtil.createLabel(150, "Target Amount: "), c);
-		
-		c = new GridBagConstraints();
-		c.gridx = 1;
-		c.gridy = currentRow;
-		c.anchor = GridBagConstraints.WEST;
-		targetAmountField.setPreferredSize(new Dimension(100, 25));
-		panel.add(targetAmountField, c);
-		
-		currentRow++;
-		
-		c = new GridBagConstraints();
-		c.gridx = 0;
-		c.gridy = currentRow;
-		c.anchor = GridBagConstraints.WEST;
-		panel.add(ComponentUtil.createLabel(150, "Rebate: "), c);
-		
-		c = new GridBagConstraints();
-		c.gridx = 1;
-		c.gridy = currentRow;
-		c.anchor = GridBagConstraints.WEST;
-		rebateField.setPreferredSize(new Dimension(100, 25));
-		panel.add(rebateField, c);
-		
-		currentRow++;
-		
-		c = new GridBagConstraints();
-		c.gridx = 0;
-		c.gridy = currentRow;
-		panel.add(Box.createVerticalStrut(20), c);
-		
-		currentRow++;
-		
-		c = new GridBagConstraints();
-		c.gridx = 0;
-		c.gridy = currentRow;
-		c.anchor = GridBagConstraints.WEST;
-		c.gridwidth = 2;
-		panel.add(createPromoType5RulePromoProductsTableToolBar(), c);
-		
-		currentRow++;
-		
-		c = new GridBagConstraints();
-		c.gridx = 0;
-		c.gridy = currentRow;
-		c.anchor = GridBagConstraints.WEST;
-		c.gridwidth = 2;
-		panel.add(ComponentUtil.createScrollPane(promoType5RulePromoProductsTable, 600, 100), c);
-	}
-
-	private JPanel createPromoType5RulePromoProductsTableToolBar() {
-		JPanel panel = new JPanel();
-		
-		addType5PromoProductButton = new MagicToolBarButton("plus_small", "Add Promo Product", true);
-		addType5PromoProductButton.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				addType5PromoProduct();
-			}
-		});
-		panel.add(addType5PromoProductButton, BorderLayout.WEST);
-		
-		removeType5PromoProductButton = new MagicToolBarButton("minus_small", "Remove Promo Product", true);
-		removeType5PromoProductButton.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				removeType5PromoProduct();
-			}
-		});
-		panel.add(removeType5PromoProductButton, BorderLayout.WEST);
-		
-		addAllType5PromoProductButton = new MagicToolBarButton("add_all_small", "Add All Promo Product", true);
-		addAllType5PromoProductButton.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				addAllType5PromoProduct();
-			}
-		});
-		panel.add(addAllType5PromoProductButton, BorderLayout.WEST);
-		
-		removeAllType5PromoProductButton = new MagicToolBarButton("delete_all_small", "Remove All Promo Products", true);
-		removeAllType5PromoProductButton.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				removeAllType5PromoProduct();
-			}
-		});
-		panel.add(removeAllType5PromoProductButton, BorderLayout.WEST);
-		
-		return panel;
-	}
-
-	private void removeAllType5PromoProduct() {
-		if (confirm("Remove all promo products?")) {
-			try {
-				promoService.removeAllPromoProducts(promo.getPromoType5Rule());
-			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
-				showMessageForUnexpectedError();
-			}
-			updateDisplay(promo);
-		}
-	}
-
-	private void addAllType5PromoProduct() {
-		if (confirm("Add all products to promo?")) {
-			try {
-				promoService.addAllPromoProducts(promo.getPromoType5Rule());
-			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
-				showMessageForUnexpectedError();
-				return;
-			}
-			updateDisplay(promo);
-		}
-	}
-
-	private void removeType5PromoProduct() {
-		promoType5RulePromoProductsTable.removeCurrentlySelectedPromoProduct();
-	}
-
-	private void addType5PromoProduct() {
-		promoType5RulePromoProductsTable.addNewRow();
 	}
 
 	private void updateDisplayForPromoType2() {

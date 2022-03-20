@@ -21,7 +21,6 @@ public class PromoRedemption {
 	private User postedBy;
 	private List<PromoRedemptionSalesInvoice> redemptionSalesInvoices = new ArrayList<>();
 	private List<PromoRedemptionReward> rewards = new ArrayList<>();
-	private List<PromoRedemptionRebate> rebates = new ArrayList<>();
 	private boolean cancelled;
 	private Date cancelDate;
 	private User cancelledBy;
@@ -140,21 +139,8 @@ public class PromoRedemption {
 			break;
 		case PROMO_TYPE_4:
 			break;
-		case PROMO_TYPE_5:
-			total = getPromoType5TotalAmount();
-			break;
 		}
 
-		return total;
-	}
-
-	private BigDecimal getPromoType5TotalAmount() {
-		PromoType5Rule rule = promo.getPromoType5Rule();
-
-		BigDecimal total = BigDecimal.ZERO;
-		for (PromoRedemptionSalesInvoice salesInvoice : redemptionSalesInvoices) {
-			total = total.add(rule.getQualifyingAmount(salesInvoice.getSalesInvoice()));
-		}
 		return total;
 	}
 
@@ -225,28 +211,6 @@ public class PromoRedemption {
 							redemptionSalesInvoice.getSalesInvoice());
 				}
 			}
-		}
-	}
-
-	public List<PromoRedemptionRebate> getRebates() {
-		return rebates;
-	}
-
-	public void setRebates(List<PromoRedemptionRebate> rebates) {
-		this.rebates = rebates;
-	}
-
-	public BigDecimal getTotalRebates() {
-		if (posted) {
-			BigDecimal total = BigDecimal.ZERO;
-			for (PromoRedemptionRebate rebate : rebates) {
-				total = total.add(rebate.getPaymentAdjustment().getAmount());
-			}
-			return total;
-		} else {
-			PromoType5Rule rule = getPromo().getPromoType5Rule();
-			return getPromoType5TotalAmount().divideToIntegralValue(rule.getTargetAmount()).multiply(rule.getRebate())
-					.setScale(2);
 		}
 	}
 

@@ -28,7 +28,6 @@ public class Promo {
 	private List<PromoType2Rule> promoType2Rules;
 	private PromoType3Rule promoType3Rule;
 	private PromoType4Rule promoType4Rule;
-	private PromoType5Rule promoType5Rule;
 
 	public Promo() {
 		// default constructor
@@ -84,8 +83,6 @@ public class Promo {
 			return sb.toString();
 		case PROMO_TYPE_3:
 			return promoType3Rule.getMechanicsDescription();
-		case PROMO_TYPE_5:
-			return promoType5Rule.getMechanicsDescription();
 		default:
 			return null;
 		}
@@ -279,18 +276,6 @@ public class Promo {
 
 	public boolean isPromoType3() {
 		return promoType.isType3();
-	}
-
-	public PromoType5Rule getPromoType5Rule() {
-		return promoType5Rule;
-	}
-
-	public void setPromoType5Rule(PromoType5Rule promoType5Rule) {
-		this.promoType5Rule = promoType5Rule;
-	}
-
-	public boolean isPromoType5() {
-		return promoType.isType5();
 	}
 
 	public boolean isPromoType2() {

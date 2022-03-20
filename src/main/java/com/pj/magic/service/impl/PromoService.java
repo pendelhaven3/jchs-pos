@@ -9,8 +9,6 @@ import com.pj.magic.model.PromoType3Rule;
 import com.pj.magic.model.PromoType3RulePromoProduct;
 import com.pj.magic.model.PromoType4Rule;
 import com.pj.magic.model.PromoType4RulePromoProduct;
-import com.pj.magic.model.PromoType5Rule;
-import com.pj.magic.model.PromoType5RulePromoProduct;
 import com.pj.magic.model.search.PromoSearchCriteria;
 
 public interface PromoService {
@@ -44,14 +42,6 @@ public interface PromoService {
 	void removeAllPromoProducts(PromoType4Rule rule);
 
 	List<Promo> search(PromoSearchCriteria criteria);
-
-	void save(PromoType5RulePromoProduct promoProduct);
-
-	void removeAllPromoProducts(PromoType5Rule promoType5Rule);
-
-	void addAllPromoProducts(PromoType5Rule promoType5Rule);
-
-	void delete(PromoType5RulePromoProduct promoProduct);
 
 	void addAllPromoProductsByManufacturer(PromoType4Rule rule, Manufacturer manufacturer);
 	

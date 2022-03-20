@@ -34,7 +34,6 @@ import com.pj.magic.gui.panels.promo.PromoPanel;
 import com.pj.magic.gui.panels.promo.PromoRedemptionListPanel;
 import com.pj.magic.gui.panels.promo.PromoRedemptionPanel;
 import com.pj.magic.gui.panels.promo.PromoRedemptionPromoListPanel;
-import com.pj.magic.gui.panels.promo.PromoRedemptionRebatesPanel;
 import com.pj.magic.model.AdjustmentIn;
 import com.pj.magic.model.AdjustmentOut;
 import com.pj.magic.model.AdjustmentType;
@@ -325,7 +324,6 @@ public class MagicFrame extends JFrame {
 	@Autowired private CreditCardStatementListPanel creditCardStatementListPanel;
 	@Autowired private CreditCardStatementPanel creditCardStatementPanel;
 	@Autowired private StockOfftakeReportPanel stockOfftakeReportPanel;
-	@Autowired private PromoRedemptionRebatesPanel promoRedemptionRebatesPanel;
 	@Autowired private UploadMaximumStockLevelChangesPanel uploadMaximumStockLevelChangesPanel;
 	@Autowired private InventoryCorrectionListPanel inventoryCorrectionListPanel;
 	@Autowired private InventoryCorrectionPanel inventoryCorrectionPanel;
@@ -505,7 +503,6 @@ public class MagicFrame extends JFrame {
 		panelHolder.add(creditCardStatementListPanel, CREDIT_CARD_STATEMENT_LIST_PANEL);
 		panelHolder.add(creditCardStatementPanel, CREDIT_CARD_STATEMENT_PANEL);
 		panelHolder.add(stockOfftakeReportPanel, STOCK_OFFTAKE_REPORT_PANEL);
-		panelHolder.add(promoRedemptionRebatesPanel, PROMO_REDEMPTION_REBATES_PANEL);
 		panelHolder.add(uploadMaximumStockLevelChangesPanel, UPLOAD_MAXIMUM_STOCK_LEVEL_CHANGES_PANEL);
 		panelHolder.add(inventoryCorrectionListPanel, INVENTORY_CORRECTION_LIST_PANEL);
 		panelHolder.add(inventoryCorrectionPanel, INVENTORY_CORRECTION_PANEL);
@@ -1275,12 +1272,6 @@ public class MagicFrame extends JFrame {
 		addPanelNameToTitle("Stock Offtake Report");
 		stockOfftakeReportPanel.updateDisplay();
 		((CardLayout)panelHolder.getLayout()).show(panelHolder, STOCK_OFFTAKE_REPORT_PANEL);
-	}
-
-	public void switchToPromoRedemptionRebatesPanel(PromoRedemption promoRedemption) {
-		addPanelNameToTitle("Promo Redemption Rebates");
-		promoRedemptionRebatesPanel.updateDisplay(promoRedemption);
-		((CardLayout)panelHolder.getLayout()).show(panelHolder, PROMO_REDEMPTION_REBATES_PANEL);
 	}
 
 	public void switchToUploadMaximumStockLevelChangesPanel() {

@@ -1,6 +1,5 @@
 package com.pj.magic.service.impl;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -10,12 +9,9 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.pj.magic.dao.AdjustmentTypeDao;
-import com.pj.magic.dao.PaymentAdjustmentDao;
 import com.pj.magic.dao.ProductDao;
 import com.pj.magic.dao.PromoPointsClaimDao;
 import com.pj.magic.dao.PromoRedemptionDao;
-import com.pj.magic.dao.PromoRedemptionRebateDao;
 import com.pj.magic.dao.PromoRedemptionRewardDao;
 import com.pj.magic.dao.PromoRedemptionSalesInvoiceDao;
 import com.pj.magic.dao.SalesInvoiceItemDao;
@@ -26,19 +22,16 @@ import com.pj.magic.exception.NotEnoughStocksException;
 import com.pj.magic.exception.NothingToRedeemException;
 import com.pj.magic.model.AvailedPromoPointsItem;
 import com.pj.magic.model.Customer;
-import com.pj.magic.model.PaymentAdjustment;
 import com.pj.magic.model.Product;
 import com.pj.magic.model.Promo;
 import com.pj.magic.model.PromoPointsClaim;
 import com.pj.magic.model.PromoRedemption;
-import com.pj.magic.model.PromoRedemptionRebate;
 import com.pj.magic.model.PromoRedemptionReward;
 import com.pj.magic.model.PromoRedemptionSalesInvoice;
 import com.pj.magic.model.PromoType;
 import com.pj.magic.model.PromoType1Rule;
 import com.pj.magic.model.PromoType2Rule;
 import com.pj.magic.model.PromoType3Rule;
-import com.pj.magic.model.PromoType5Rule;
 import com.pj.magic.model.SalesInvoice;
 import com.pj.magic.model.SalesReturn;
 import com.pj.magic.model.search.PromoRedemptionSearchCriteria;
@@ -61,10 +54,7 @@ public class PromoRedemptionServiceImpl implements PromoRedemptionService {
 	@Autowired private PromoService promoService;
 	@Autowired private ProductDao productDao;
 	@Autowired private PromoRedemptionRewardDao promoRedemptionRewardDao;
-	@Autowired private PromoRedemptionRebateDao promoRedemptionRebateDao;
 	@Autowired private PromoPointsClaimDao promoPointsClaimDao;
-	@Autowired private AdjustmentTypeDao adjustmentTypeDao;
-	@Autowired private PaymentAdjustmentDao paymentAdjustmentDao;
 	@Autowired private SystemDao systemDao;
 	@Autowired private SalesReturnService salesReturnService;
 	@Autowired private NoMoreStockAdjustmentService noMoreStockAdjustmentService;
@@ -113,11 +103,7 @@ public class PromoRedemptionServiceImpl implements PromoRedemptionService {
 		}
 		
 		if (promoRedemption.isPosted()) {
-			if (promoRedemption.getPromo().isPromoType5()) {
-				promoRedemption.setRebates(promoRedemptionRebateDao.findAllByPromoRedemption(promoRedemption));
-			} else {
-				promoRedemption.setRewards(promoRedemptionRewardDao.findAllByPromoRedemption(promoRedemption));
-			}
+			promoRedemption.setRewards(promoRedemptionRewardDao.findAllByPromoRedemption(promoRedemption));
 		}
 		
 		return promoRedemption;
@@ -149,9 +135,6 @@ public class PromoRedemptionServiceImpl implements PromoRedemptionService {
 			postForPromoType3(updated);
 			break;
 		case PROMO_TYPE_4:
-			break;
-		case PROMO_TYPE_5:
-			postForPromoType5(updated);
 			break;
 		}
 		
@@ -245,32 +228,6 @@ public class PromoRedemptionServiceImpl implements PromoRedemptionService {
 		promoRedemptionRewardDao.save(reward);
 	}
 
-	private void postForPromoType5(PromoRedemption promoRedemption) {
-		promoRedemption.validateSalesInvoicesPricingScheme();
-		
-		PromoType5Rule rule = promoRedemption.getPromo().getPromoType5Rule();
-		BigDecimal rebate = rule.evaluate(promoRedemption.getSalesInvoices());
-		
-		if (rebate.compareTo(BigDecimal.ZERO) == 0) {
-			throw new NothingToRedeemException();
-		}
-		
-		PaymentAdjustment paymentAdjustment = new PaymentAdjustment();
-		paymentAdjustment.setCustomer(promoRedemption.getCustomer());
-		paymentAdjustment.setAdjustmentType(adjustmentTypeDao.findByCode("CM"));
-		paymentAdjustment.setAmount(rebate);
-		paymentAdjustment.setRemarks("PROMO REDEMPTION NO. " + promoRedemption.getPromoRedemptionNumber());
-		paymentAdjustment.setPosted(true);
-		paymentAdjustment.setPostedBy(loginService.getLoggedInUser());
-		paymentAdjustment.setPostDate(systemDao.getCurrentDateTime());
-		paymentAdjustmentDao.save(paymentAdjustment);
-		
-		PromoRedemptionRebate promoRedemptionRebate = new PromoRedemptionRebate();
-		promoRedemptionRebate.setPromoRedemption(promoRedemption);
-		promoRedemptionRebate.setPaymentAdjustment(paymentAdjustment);
-		promoRedemptionRebateDao.save(promoRedemptionRebate);
-	}
-	
 	@Override
 	public List<PromoRedemption> getPromoRedemptionsByPromo(Promo promo) {
 		return promoRedemptionDao.findAllByPromo(promo);
