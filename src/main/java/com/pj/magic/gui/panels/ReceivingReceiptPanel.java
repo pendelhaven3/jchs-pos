@@ -39,6 +39,7 @@ import org.springframework.stereotype.Component;
 import com.pj.magic.exception.AlreadyCancelledException;
 import com.pj.magic.exception.AlreadyPostedException;
 import com.pj.magic.gui.component.DatePickerFormatter;
+import com.pj.magic.gui.component.MagicFileChooser;
 import com.pj.magic.gui.component.MagicToolBar;
 import com.pj.magic.gui.component.MagicToolBarButton;
 import com.pj.magic.gui.dialog.PrintPreviewDialog;
@@ -46,6 +47,7 @@ import com.pj.magic.gui.dialog.SetDiscountsForAllItemsDialog;
 import com.pj.magic.gui.dialog.StatusDetailsDialog;
 import com.pj.magic.gui.tables.ReceivingReceiptItemsTable;
 import com.pj.magic.model.ReceivingReceipt;
+import com.pj.magic.report.excel.RRCostCheckExcelGenerator;
 import com.pj.magic.report.excel.ReceivingReceiptExcelGenerator;
 import com.pj.magic.service.ExcelService;
 import com.pj.magic.service.PrintService;
@@ -95,7 +97,7 @@ public class ReceivingReceiptPanel extends StandardMagicPanel {
 	private MagicToolBarButton cancelButton;
 	private MagicToolBarButton setDiscountsForAllButton;
 	private JDatePickerImpl datePicker;
-    private JFileChooser excelFileChooser;
+    private MagicFileChooser excelFileChooser;
 	
 	@Override
 	protected void initializeComponents() {
@@ -120,7 +122,7 @@ public class ReceivingReceiptPanel extends StandardMagicPanel {
 			}
 		});
 		
-        excelFileChooser = new JFileChooser();
+        excelFileChooser = new MagicFileChooser();
         excelFileChooser.setCurrentDirectory(new File(FileUtil.getDesktopFolderPath()));
         excelFileChooser.setFileFilter(new FileFilter() {
             
@@ -540,6 +542,7 @@ public class ReceivingReceiptPanel extends StandardMagicPanel {
         toolBar.add(toExcelButton);
         
         toolBar.add(new MagicToolBarButton("excel", "Generate new format Excel spreadsheet", e -> generateNewFormatExcelFile()));
+        toolBar.add(new MagicToolBarButton("cost_check", "Generate cost check report", e -> generateCostCheckReport()));
 	}
 
     protected void openSetDiscountsForAllItemsDialog() {
@@ -642,4 +645,32 @@ public class ReceivingReceiptPanel extends StandardMagicPanel {
         }
     }
 	
+    private void generateCostCheckReport() {
+    	String filename = new StringBuilder()
+                .append("RR ")
+                .append(receivingReceipt.getReceivingReceiptNumber())
+                .append(" - Cost Check Report")
+                .toString();
+    	
+        excelFileChooser.setSelectedFile(new File(filename + ".xlsx"));
+        
+        if (!excelFileChooser.selectSaveFile(this)) {
+        	return;
+        }
+        
+        RRCostCheckExcelGenerator excelGenerator = new RRCostCheckExcelGenerator(supplierService);
+        
+        try (
+            Workbook workbook = excelGenerator.generateSpreadsheet(receivingReceipt);
+            FileOutputStream out = new FileOutputStream(excelFileChooser.getSelectedFile());
+        ) {
+            workbook.write(out);
+            if (confirm("Excel file generated.\nDo you wish to open the file?")) {
+    			ExcelUtil.openExcelFile(excelFileChooser.getSelectedFile());
+            }
+        } catch (Exception e) {
+        	showMessageForUnexpectedError(e);
+        }
+	}
+
 }

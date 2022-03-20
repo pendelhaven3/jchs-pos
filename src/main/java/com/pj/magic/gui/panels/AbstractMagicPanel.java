@@ -226,4 +226,8 @@ public abstract class AbstractMagicPanel extends JPanel {
 		showErrorMessage(Constants.UNEXPECTED_ERROR_MESSAGE);
 	}
 	
+	protected void showMessageForUnexpectedError(Throwable t) {
+		showErrorMessage(Constants.UNEXPECTED_ERROR_MESSAGE + ": " + t.getMessage());
+	}
+	
 }
