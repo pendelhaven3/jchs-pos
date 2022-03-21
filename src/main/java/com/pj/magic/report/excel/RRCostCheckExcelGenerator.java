@@ -53,24 +53,24 @@ public class RRCostCheckExcelGenerator {
         row = sheet.createRow(currentRow);
         row.createCell(0).setCellValue("Supplier: ");
         row.createCell(1).setCellValue(receivingReceipt.getSupplier().getName());
-        row.createCell(6).setCellValue("RR #");
-        row.createCell(7).setCellValue(String.valueOf(receivingReceipt.getReceivingReceiptNumber()));
+        row.createCell(7).setCellValue("RR #");
+        row.createCell(8).setCellValue(String.valueOf(receivingReceipt.getReceivingReceiptNumber()));
         
         currentRow++;
         
         row = sheet.createRow(currentRow);
         row.createCell(0).setCellValue("PO #:");
         row.createCell(1).setCellValue(String.valueOf(receivingReceipt.getRelatedPurchaseOrderNumber()));
-        row.createCell(6).setCellValue("Ref #:");
-        row.createCell(7).setCellValue(receivingReceipt.getReferenceNumber());
+        row.createCell(7).setCellValue("Ref #:");
+        row.createCell(8).setCellValue(receivingReceipt.getReferenceNumber());
         
         currentRow++;
         
         row = sheet.createRow(currentRow);
         row.createCell(0).setCellValue("Terms:");
         row.createCell(1).setCellValue(receivingReceipt.getPaymentTerm().getName());
-        row.createCell(6).setCellValue("Date:");
-        row.createCell(7).setCellValue(FormatterUtil.formatDate(receivingReceipt.getReceivedDate()));
+        row.createCell(7).setCellValue("Date:");
+        row.createCell(8).setCellValue(FormatterUtil.formatDate(receivingReceipt.getReceivedDate()));
         
         currentRow++;
         currentRow++;
@@ -102,6 +102,10 @@ public class RRCostCheckExcelGenerator {
         cell.setCellStyle(centered);
         
         cell = row.createCell(7);
+        cell.setCellValue("Gross Cost");
+        cell.setCellStyle(centered);
+        
+        cell = row.createCell(8);
         cell.setCellValue("Final Cost");
         cell.setCellStyle(centered);
         
@@ -131,6 +135,10 @@ public class RRCostCheckExcelGenerator {
             cell.setCellStyle(amountFormat);
             
             cell = row.createCell(7);
+            cell.setCellValue(item.getGrossCostWithVat().doubleValue());
+            cell.setCellStyle(amountFormat);
+            
+            cell = row.createCell(8);
             cell.setCellValue(item.getFinalCostWithVat().doubleValue());
             cell.setCellStyle(amountFormat);
         }
@@ -143,6 +151,7 @@ public class RRCostCheckExcelGenerator {
         sheet.autoSizeColumn(5);
         sheet.autoSizeColumn(6);
         sheet.autoSizeColumn(7);
+        sheet.autoSizeColumn(8);
         
         return workbook;
     }
