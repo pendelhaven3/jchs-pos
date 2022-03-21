@@ -52,6 +52,8 @@ public class AdjustmentInItemsTableModel extends AbstractTableModel {
 			return (rowItem.getProduct() != null) ? rowItem.getProduct().getDescription() : null;
 		case AdjustmentInItemsTable.QUANTITY_COLUMN_INDEX:
 			return rowItem.getQuantity();
+		case AdjustmentInItemsTable.UNIT_COLUMN_INDEX:
+			return rowItem.getUnit();
 		case AdjustmentInItemsTable.COST_COLUMN_INDEX:
 			BigDecimal cost = rowItem.getCost();
 			return (cost != null) ? FormatterUtil.formatAmount(cost) : "";

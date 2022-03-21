@@ -350,6 +350,7 @@ public class AdjustmentInItemsTable extends MagicTable {
 					public void run() {
 						switch (column) {
 						case PRODUCT_CODE_COLUMN_INDEX:
+							model.fireTableCellUpdated(row, UNIT_COLUMN_INDEX);
 							model.fireTableCellUpdated(row, COST_COLUMN_INDEX);
 							model.fireTableCellUpdated(row, AMOUNT_COLUMN_INDEX);
 							selectAndEditCellAt(row, QUANTITY_COLUMN_INDEX);

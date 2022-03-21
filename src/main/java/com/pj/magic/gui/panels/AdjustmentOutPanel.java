@@ -49,8 +49,6 @@ public class AdjustmentOutPanel extends StandardMagicPanel {
 	
 	@Autowired private AdjustmentOutItemsTable itemsTable;
 	@Autowired private AdjustmentOutService adjustmentOutService;
-//	@Autowired private PrintPreviewDialog printPreviewDialog;
-//	@Autowired private PrintService printService;
 	@Autowired private LoginService loginService;
 	@Autowired private Product2Service product2Service;
 	
@@ -66,8 +64,6 @@ public class AdjustmentOutPanel extends StandardMagicPanel {
 	private JButton postButton;
 	private JButton addItemButton;
 	private JButton deleteItemButton;
-//	private JButton printPreviewButton;
-//	private JButton printButton;
 	private ProductInfoTable productInfoTable;
 	
 	@Override
@@ -491,27 +487,6 @@ public class AdjustmentOutPanel extends StandardMagicPanel {
 			}
 		});
 		toolBar.add(postButton);
-		
-//		printPreviewButton = new MagicToolBarButton("print_preview", "Print Preview");
-//		printPreviewButton.addActionListener(new ActionListener() {
-//			
-//			@Override
-//			public void actionPerformed(ActionEvent e) {
-//				printPreviewDialog.updateDisplay(printService.generateReportAsString(adjustmentOut));
-//				printPreviewDialog.setVisible(true);
-//			}
-//		});
-//		toolBar.add(printPreviewButton);
-//		
-//		printButton = new MagicToolBarButton("print", "Print");
-//		printButton.addActionListener(new ActionListener() {
-//			
-//			@Override
-//			public void actionPerformed(ActionEvent e) {
-//				printService.print(adjustmentOut);
-//			}
-//		});
-//		toolBar.add(printButton);
 	}
 
 }

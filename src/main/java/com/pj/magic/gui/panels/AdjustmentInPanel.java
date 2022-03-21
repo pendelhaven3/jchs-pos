@@ -48,8 +48,6 @@ public class AdjustmentInPanel extends StandardMagicPanel {
 	
 	@Autowired private AdjustmentInItemsTable itemsTable;
 	@Autowired private AdjustmentInService adjustmentInService;
-//	@Autowired private PrintPreviewDialog printPreviewDialog;
-//	@Autowired private PrintService printService;
 	@Autowired private LoginService loginService;
 	@Autowired private Product2Service product2Service;
 	
@@ -65,8 +63,6 @@ public class AdjustmentInPanel extends StandardMagicPanel {
 	private JButton postButton;
 	private JButton addItemButton;
 	private JButton deleteItemButton;
-	private JButton printPreviewButton;
-	private JButton printButton;
 	private ProductInfoTable productInfoTable;
 	
 	@Override
@@ -187,8 +183,6 @@ public class AdjustmentInPanel extends StandardMagicPanel {
 		postButton.setEnabled(!adjustmentIn.isPosted());
 		addItemButton.setEnabled(!adjustmentIn.isPosted());
 		deleteItemButton.setEnabled(!adjustmentIn.isPosted());
-		printPreviewButton.setEnabled(true);
-		printButton.setEnabled(true);
 		
 		itemsTable.setAdjustmentIn(adjustmentIn);
 	}
@@ -208,8 +202,6 @@ public class AdjustmentInPanel extends StandardMagicPanel {
 		postButton.setEnabled(false);
 		addItemButton.setEnabled(false);
 		deleteItemButton.setEnabled(false);
-		printPreviewButton.setEnabled(false);
-		printButton.setEnabled(false);
 	}
 
 	@Override
@@ -488,27 +480,6 @@ public class AdjustmentInPanel extends StandardMagicPanel {
 			}
 		});
 		toolBar.add(postButton);
-		
-//		printPreviewButton = new MagicToolBarButton("print_preview", "Print Preview");
-//		printPreviewButton.addActionListener(new ActionListener() {
-//			
-//			@Override
-//			public void actionPerformed(ActionEvent e) {
-//				printPreviewDialog.updateDisplay(printService.generateReportAsString(adjustmentIn));
-//				printPreviewDialog.setVisible(true);
-//			}
-//		});
-//		toolBar.add(printPreviewButton);
-//		
-//		printButton = new MagicToolBarButton("print", "Print");
-//		printButton.addActionListener(new ActionListener() {
-//			
-//			@Override
-//			public void actionPerformed(ActionEvent e) {
-//				printService.print(adjustmentIn);
-//			}
-//		});
-//		toolBar.add(printButton);
 	}
 
 }
