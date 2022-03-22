@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.pj.magic.model.Product;
 import com.pj.magic.model.Product2;
+import com.pj.magic.model.ProductCustomCode;
 import com.pj.magic.model.Supplier;
 import com.pj.magic.model.search.Product2SearchCriteria;
 
@@ -30,5 +31,13 @@ public interface Product2Service {
 	List<Product2> searchProducts(Product2SearchCriteria criteria);
 
 	void updateCosts(Product2 product);
+
+	List<ProductCustomCode> getCustomCodes(Long id);
+
+	ProductCustomCode findCustomCode(Long productId, String text);
+
+	void save(ProductCustomCode customCode);
+
+	void delete(ProductCustomCode customCode);
 
 }

@@ -33,6 +33,7 @@ import com.pj.magic.exception.ValidationException;
 import com.pj.magic.gui.component.MagicComboBox;
 import com.pj.magic.gui.component.MagicTextField;
 import com.pj.magic.gui.component.MagicToolBar;
+import com.pj.magic.gui.component.MagicToolBarButton;
 import com.pj.magic.gui.dialog.SelectSupplierDialog;
 import com.pj.magic.gui.tables.ProductSuppliersTable;
 import com.pj.magic.model.Manufacturer;
@@ -990,6 +991,12 @@ public class MaintainProductPanel extends StandardMagicPanel {
 
 	@Override
 	protected void addToolBarButtons(MagicToolBar toolBar) {
+        JButton customCodesButton = new MagicToolBarButton("search", "Custom Codes", e -> goToCustomCodesPanel());
+		toolBar.add(customCodesButton);
+	}
+
+	private void goToCustomCodesPanel() {
+		getMagicFrame().switchToCustomCodesListPanel(product);
 	}
 
 }

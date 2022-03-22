@@ -56,6 +56,7 @@ import com.pj.magic.model.PricingScheme;
 import com.pj.magic.model.Product;
 import com.pj.magic.model.Product2;
 import com.pj.magic.model.ProductCategory;
+import com.pj.magic.model.ProductCustomCode;
 import com.pj.magic.model.Promo;
 import com.pj.magic.model.PromoRedemption;
 import com.pj.magic.model.PurchaseOrder;
@@ -220,6 +221,8 @@ public class MagicFrame extends JFrame {
     public static final String MAINTAIN_TRISYS_PRODUCT_PANEL = "MAINTAIN_TRISYS_PRODUCT_PANEL";
     public static final String PRODUCT_COST_LIST_PANEL = "PRODUCT_COST_LIST_PANEL";
     public static final String EDIT_PRODUCT_COST_PANEL = "EDIT_PRODUCT_COST_PANEL";
+    public static final String PRODUCT_CUSTOM_CODES_LIST_PANEL = "PRODUCT_CUSTOM_CODES_LIST_PANEL";
+    public static final String MAINTAIN_PRODUCT_CUSTOM_CODE_PANEL = "MAINTAIN_PRODUCT_CUSTOM_CODE_PANEL";
 	
 	@Value("${application.title}")
 	private String baseTitle;
@@ -340,6 +343,8 @@ public class MagicFrame extends JFrame {
     @Autowired private MaintainTrisysProductPanel maintainTrisysProductPanel;
     @Autowired private ProductCostListPanel productCostListPanel;
     @Autowired private EditProductCostPanel editProductCostPanel;
+    @Autowired private ProductCustomCodesListPanel productCustomCodesListPanel;
+    @Autowired private MaintainProductCustomCodePanel maintainProductCustomCodePanel;
 	
 	@Autowired private SystemService systemParameterService;
 	@Autowired private DataSource dataSource;
@@ -519,6 +524,8 @@ public class MagicFrame extends JFrame {
 		panelHolder.add(maintainTrisysProductPanel, MAINTAIN_TRISYS_PRODUCT_PANEL);
 		panelHolder.add(productCostListPanel, PRODUCT_COST_LIST_PANEL);
 		panelHolder.add(editProductCostPanel, EDIT_PRODUCT_COST_PANEL);
+		panelHolder.add(productCustomCodesListPanel, PRODUCT_CUSTOM_CODES_LIST_PANEL);
+		panelHolder.add(maintainProductCustomCodePanel, MAINTAIN_PRODUCT_CUSTOM_CODE_PANEL);
         getContentPane().add(panelHolder);
 
         switchToLoginPanel();
@@ -1382,6 +1389,24 @@ public class MagicFrame extends JFrame {
         addPanelNameToTitle(editProductCostPanel.getTitle());
         editProductCostPanel.updateDisplay(product);
         ((CardLayout)panelHolder.getLayout()).show(panelHolder, EDIT_PRODUCT_COST_PANEL);
+	}
+
+	public void switchToCustomCodesListPanel(Product2 product) {
+        addPanelNameToTitle(productCustomCodesListPanel.getTitle());
+        productCustomCodesListPanel.updateDisplay(product);
+        ((CardLayout)panelHolder.getLayout()).show(panelHolder, PRODUCT_CUSTOM_CODES_LIST_PANEL);
+	}
+
+	public void switchToAddNewCustomCodePanel(ProductCustomCode customCode) {
+        addPanelNameToTitle(maintainProductCustomCodePanel.getTitle());
+        maintainProductCustomCodePanel.updateDisplay(customCode);
+        ((CardLayout)panelHolder.getLayout()).show(panelHolder, MAINTAIN_PRODUCT_CUSTOM_CODE_PANEL);
+	}
+
+	public void switchToEditCustomCodePanel(ProductCustomCode customCode) {
+        addPanelNameToTitle(maintainProductCustomCodePanel.getTitle());
+        maintainProductCustomCodePanel.updateDisplay(customCode);
+        ((CardLayout)panelHolder.getLayout()).show(panelHolder, MAINTAIN_PRODUCT_CUSTOM_CODE_PANEL);
 	}
 
 }

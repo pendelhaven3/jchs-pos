@@ -9,10 +9,12 @@ import org.springframework.transaction.annotation.Transactional;
 import com.pj.magic.dao.SupplierDao;
 import com.pj.magic.model.Product;
 import com.pj.magic.model.Product2;
+import com.pj.magic.model.ProductCustomCode;
 import com.pj.magic.model.Supplier;
 import com.pj.magic.model.Unit;
 import com.pj.magic.model.search.Product2SearchCriteria;
 import com.pj.magic.repository.Product2Repository;
+import com.pj.magic.repository.ProductCustomCodeRepository;
 import com.pj.magic.service.Product2Service;
 
 @Service
@@ -23,6 +25,9 @@ public class Product2ServiceImpl implements Product2Service {
 	
 	@Autowired
 	private SupplierDao supplierDao;
+	
+	@Autowired
+	private ProductCustomCodeRepository productCustomCodeRepository;
 	
 	@Override
 	public Long saveFromTrisys(Product product) {
@@ -111,6 +116,26 @@ public class Product2ServiceImpl implements Product2Service {
 	@Override
 	public void updateCosts(Product2 product) {
 		product2Repository.updateCosts(product);
+	}
+
+	@Override
+	public List<ProductCustomCode> getCustomCodes(Long id) {
+		return productCustomCodeRepository.findAllByProductId(id);
+	}
+
+	@Override
+	public ProductCustomCode findCustomCode(Long productId, String code) {
+		return productCustomCodeRepository.findByProductIdAndCode(productId, code);
+	}
+
+	@Override
+	public void save(ProductCustomCode customCode) {
+		productCustomCodeRepository.save(customCode);
+	}
+
+	@Override
+	public void delete(ProductCustomCode customCode) {
+		productCustomCodeRepository.delete(customCode);
 	}
 
 }
