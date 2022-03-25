@@ -379,7 +379,15 @@ public class Product2 implements Comparable<Product2>, Serializable {
 	}
 
 	public String getMaxUnit() {
-	    return units.get(units.size() - 1);
+		Collections.sort(units, new Comparator<String>() {
+
+			@Override
+			public int compare(String unit1, String unit2) {
+				return Unit.compare(unit1, unit2) * -1;
+			}
+		});
+		
+		return units.get(0);
 	}
 	
     public void autoCalculateCostsOfSmallerUnits() {
