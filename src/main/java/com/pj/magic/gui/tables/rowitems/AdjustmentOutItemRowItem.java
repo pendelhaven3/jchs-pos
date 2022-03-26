@@ -7,7 +7,6 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import com.pj.magic.model.AdjustmentOutItem;
-import com.pj.magic.model.Product;
 import com.pj.magic.model.Product2;
 
 import lombok.Getter;
@@ -45,14 +44,14 @@ public class AdjustmentOutItemRowItem {
 		return product != null && !StringUtils.isEmpty(unit) && quantity != null;  
 	}
 
-	public BigDecimal getUnitPrice() {
-		BigDecimal unitPrice = item.getUnitPrice();
-		if (unitPrice == null) {
+	public BigDecimal getCost() {
+		BigDecimal cost = item.getCost();
+		if (cost == null) {
 			if (product != null && !StringUtils.isEmpty(unit)) {
-				unitPrice = product.getUnitPrice(unit);
+				cost = product.getFinalCost(unit);
 			}
 		}
-		return unitPrice;
+		return cost;
 	}
 
 	public BigDecimal getAmount() {

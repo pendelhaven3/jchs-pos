@@ -54,8 +54,8 @@ public class AdjustmentOutItemsTableModel extends AbstractTableModel {
 			return rowItem.getUnit();
 		case AdjustmentOutItemsTable.QUANTITY_COLUMN_INDEX:
 			return rowItem.getQuantity();
-		case AdjustmentOutItemsTable.UNIT_PRICE_COLUMN_INDEX:
-			BigDecimal unitPrice = rowItem.getUnitPrice();
+		case AdjustmentOutItemsTable.UNIT_COST_COLUMN_INDEX:
+			BigDecimal unitPrice = rowItem.getCost();
 			return (unitPrice != null) ? FormatterUtil.formatAmount(unitPrice) : "";
 		case AdjustmentOutItemsTable.AMOUNT_COLUMN_INDEX:
 			BigDecimal amount = rowItem.getAmount();
@@ -178,7 +178,7 @@ public class AdjustmentOutItemsTableModel extends AbstractTableModel {
 
 	@Override
 	public Class<?> getColumnClass(int columnIndex) {
-		if (columnIndex == AdjustmentOutItemsTable.UNIT_PRICE_COLUMN_INDEX
+		if (columnIndex == AdjustmentOutItemsTable.UNIT_COST_COLUMN_INDEX
 				|| columnIndex == AdjustmentOutItemsTable.AMOUNT_COLUMN_INDEX) {
 			return Number.class;
 		} else {

@@ -17,20 +17,23 @@ public class AdjustmentOutItem implements Comparable<AdjustmentOutItem> {
 	private Product2 product;
 	private String unit;
 	private Integer quantity;
-	private BigDecimal unitPrice;
+	private BigDecimal cost;
 	
 	private String code; // derived field
 
-	public BigDecimal getUnitPrice() {
-		return unitPrice;
+	public BigDecimal getEffectiveCost() {
+		BigDecimal cost = this.cost;
+		if (cost == null) {
+			cost = product.getFinalCost(unit);
+		}
+		return cost;
 	}
 	
 	public BigDecimal getAmount() {
 		if (product == null || quantity == null) {
 			return null;
 		}
-		
-		return getEffectiveUnitPrice().multiply(new BigDecimal(quantity.intValue()));
+		return getEffectiveCost().multiply(new BigDecimal(quantity.intValue()));
 	}
 	
 	public boolean isQuantityValid() {
@@ -70,16 +73,4 @@ public class AdjustmentOutItem implements Comparable<AdjustmentOutItem> {
 		}
 	}
 
-	public void setUnitPrice(BigDecimal unitPrice) {
-		this.unitPrice = unitPrice;
-	}
-	
-	public BigDecimal getEffectiveUnitPrice() {
-		BigDecimal unitPrice = this.unitPrice;
-		if (unitPrice == null) {
-			unitPrice = product.getUnitPrice(unit);
-		}
-		return unitPrice;
-	}
-	
 }

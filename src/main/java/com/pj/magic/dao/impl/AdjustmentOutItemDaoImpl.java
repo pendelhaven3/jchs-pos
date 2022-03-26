@@ -24,7 +24,7 @@ import com.pj.magic.model.Product2;
 public class AdjustmentOutItemDaoImpl extends MagicDao implements AdjustmentOutItemDao {
 
 	private static final String BASE_SELECT_SQL =
-			"select a.ID, a.ADJUSTMENT_OUT_ID, a.PRODUCT_ID, a.UNIT, a.QUANTITY, a.UNIT_PRICE, b.CODE"
+			"select a.ID, a.ADJUSTMENT_OUT_ID, a.PRODUCT_ID, a.UNIT, a.QUANTITY, a.COST, b.CODE"
 			+ " from ADJUSTMENT_OUT_ITEM a"
 			+ " join PRODUCT b"
 			+ "   on b.PRODUCT2_ID = a.PRODUCT_ID"
@@ -41,7 +41,7 @@ public class AdjustmentOutItemDaoImpl extends MagicDao implements AdjustmentOutI
 			item.setUnit(rs.getString("UNIT"));
 			item.setCode(rs.getString("CODE"));
 			item.setQuantity(rs.getInt("QUANTITY"));
-			item.setUnitPrice(rs.getBigDecimal("UNIT_PRICE"));
+			item.setCost(rs.getBigDecimal("COST"));
 			return item;
 		}
 		
@@ -81,12 +81,12 @@ public class AdjustmentOutItemDaoImpl extends MagicDao implements AdjustmentOutI
 	
 	private static final String UPDATE_SQL =
 			"update ADJUSTMENT_OUT_ITEM"
-			+ " set PRODUCT_ID = ?, UNIT = ?, QUANTITY = ?, UNIT_PRICE = ?"
+			+ " set PRODUCT_ID = ?, UNIT = ?, QUANTITY = ?, COST = ?"
 			+ " where ID = ?";
 	
 	private void update(AdjustmentOutItem item) {
 		getJdbcTemplate().update(UPDATE_SQL, item.getProduct().getId(), item.getUnit(),
-				item.getQuantity(), item.getUnitPrice(), item.getId());
+				item.getQuantity(), item.getCost(), item.getId());
 	}
 
 	private static final String FIND_ALL_BY_ADJUSTMENT_OUT_SQL = BASE_SELECT_SQL

@@ -18,3 +18,6 @@ create table PRODUCT_CUSTOM_CODE (
   constraint PRODUCT_CUSTOM_CODE$UK unique (PRODUCT_ID, CODE),
   constraint PRODUCT_CUSTOM_CODE$FK foreign key (PRODUCT_ID) references PRODUCT2 (ID)
 );
+
+alter table ADJUSTMENT_OUT_ITEM add COST numeric(10, 2) null;
+alter table ADJUSTMENT_OUT_ITEM drop column UNIT_PRICE;

@@ -42,7 +42,7 @@ public class AdjustmentOutItemsTable extends MagicTable {
 	public static final int PRODUCT_DESCRIPTION_COLUMN_INDEX = 1;
 	public static final int UNIT_COLUMN_INDEX = 2;
 	public static final int QUANTITY_COLUMN_INDEX = 3;
-	public static final int UNIT_PRICE_COLUMN_INDEX = 4;
+	public static final int UNIT_COST_COLUMN_INDEX = 4;
 	public static final int AMOUNT_COLUMN_INDEX = 5;
 	private static final String SHOW_SELECTION_DIALOG_ACTION_NAME = "showSelectionDialog";
 	private static final String CANCEL_ACTION_NAME = "cancelAddMode";
@@ -72,7 +72,7 @@ public class AdjustmentOutItemsTable extends MagicTable {
 		columnModel.getColumn(PRODUCT_DESCRIPTION_COLUMN_INDEX).setPreferredWidth(300);
 		columnModel.getColumn(UNIT_COLUMN_INDEX).setPreferredWidth(70);
 		columnModel.getColumn(QUANTITY_COLUMN_INDEX).setPreferredWidth(70);
-		columnModel.getColumn(UNIT_PRICE_COLUMN_INDEX).setPreferredWidth(100);
+		columnModel.getColumn(UNIT_COST_COLUMN_INDEX).setPreferredWidth(100);
 		columnModel.getColumn(AMOUNT_COLUMN_INDEX).setPreferredWidth(100);
 		
 		MagicTextField productCodeTextField = new MagicTextField();
@@ -353,7 +353,7 @@ public class AdjustmentOutItemsTable extends MagicTable {
 					public void run() {
 						switch (column) {
 						case PRODUCT_CODE_COLUMN_INDEX:
-							model.fireTableCellUpdated(row, UNIT_PRICE_COLUMN_INDEX);
+							model.fireTableCellUpdated(row, UNIT_COST_COLUMN_INDEX);
 							model.fireTableCellUpdated(row, AMOUNT_COLUMN_INDEX);
 							selectAndEditCellAt(row, QUANTITY_COLUMN_INDEX);
 							break;

@@ -78,7 +78,7 @@ public class AdjustmentOutServiceImpl implements AdjustmentOutService {
 				product.subtractUnitQuantity(item.getUnit(), item.getQuantity());
 				product2Repository.subtractAvailableQuantity(item.getProduct().getId(), item.getUnit(), item.getQuantity());
 				
-				item.setUnitPrice(product.getUnitPrice(item.getUnit()));
+				item.setCost(product.getFinalCost(item.getUnit()));
 				adjustmentOutItemDao.save(item);
 			}
 		}
