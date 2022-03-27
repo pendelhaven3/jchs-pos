@@ -79,6 +79,12 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 		</dependency>
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>itext7-core</artifactId>
+            <version>7.2.1</version>
+            <type>pom</type>
+        </dependency>
 		
 		<!-- test dependencies -->
 		<dependency>

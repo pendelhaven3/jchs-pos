@@ -1,6 +1,7 @@
 package com.pj.magic.gui.panels;
 
 import java.awt.Cursor;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -31,8 +32,6 @@ import javax.swing.filechooser.FileFilter;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -49,6 +48,8 @@ import com.pj.magic.gui.tables.ReceivingReceiptItemsTable;
 import com.pj.magic.model.ReceivingReceipt;
 import com.pj.magic.report.excel.RRCostCheckExcelGenerator;
 import com.pj.magic.report.excel.ReceivingReceiptExcelGenerator;
+import com.pj.magic.report.pdf.ReceivingReceiptNewPdfGenerator;
+import com.pj.magic.report.pdf.ReceivingReceiptPdfGenerator;
 import com.pj.magic.service.ExcelService;
 import com.pj.magic.service.PrintService;
 import com.pj.magic.service.ReceivingReceiptService;
@@ -59,17 +60,17 @@ import com.pj.magic.util.FileUtil;
 import com.pj.magic.util.FormatterUtil;
 import com.pj.magic.util.HtmlUtil;
 
+import lombok.extern.slf4j.Slf4j;
 import net.sourceforge.jdatepicker.impl.JDatePanelImpl;
 import net.sourceforge.jdatepicker.impl.JDatePickerImpl;
 import net.sourceforge.jdatepicker.impl.UtilCalendarModel;
 
 @Component
+@Slf4j
 public class ReceivingReceiptPanel extends StandardMagicPanel {
 
     private static final long serialVersionUID = 6012875814973521782L;
 
-    private static final Logger logger = LoggerFactory.getLogger(ReceivingReceiptPanel.class);
-	
 	@Autowired private ReceivingReceiptItemsTable itemsTable;
 	@Autowired private ReceivingReceiptService receivingReceiptService;
 	@Autowired private PrintService printService;
@@ -78,7 +79,7 @@ public class ReceivingReceiptPanel extends StandardMagicPanel {
 	@Autowired private SetDiscountsForAllItemsDialog setDiscountsForAllItemsDialog;
     @Autowired private ExcelService excelService;
     @Autowired private SupplierService supplierService;
-	
+    
 	private ReceivingReceipt receivingReceipt;
 	private JLabel receivingReceiptNumberField;
 	private JLabel relatedPurchaseOrderNumberField;
@@ -98,6 +99,7 @@ public class ReceivingReceiptPanel extends StandardMagicPanel {
 	private MagicToolBarButton setDiscountsForAllButton;
 	private JDatePickerImpl datePicker;
     private MagicFileChooser excelFileChooser;
+    private MagicFileChooser pdfFileChooser;
 	
 	@Override
 	protected void initializeComponents() {
@@ -134,6 +136,21 @@ public class ReceivingReceiptPanel extends StandardMagicPanel {
             @Override
             public boolean accept(File f) {
                 return FilenameUtils.getExtension(f.getName()).equals("xlsx");
+            }
+        });
+		
+        pdfFileChooser = new MagicFileChooser();
+        pdfFileChooser.setCurrentDirectory(new File(FileUtil.getDesktopFolderPath()));
+        pdfFileChooser.setFileFilter(new FileFilter() {
+            
+            @Override
+            public String getDescription() {
+                return "PDF (*.pdf)";
+            }
+            
+            @Override
+            public boolean accept(File f) {
+                return FilenameUtils.getExtension(f.getName()).equals("pdf");
             }
         });
 		
@@ -492,7 +509,7 @@ public class ReceivingReceiptPanel extends StandardMagicPanel {
 				showErrorMessage("Receiving Receipt already cancelled");
 				updateDisplay(receivingReceipt);
 			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
+				log.error(e.getMessage(), e);
 				showErrorMessage("Unexpected error occurred during posting!");
 				updateDisplay(receivingReceipt);
 			}
@@ -531,21 +548,23 @@ public class ReceivingReceiptPanel extends StandardMagicPanel {
 		});
 		toolBar.add(postButton);
 		
-        MagicToolBarButton toExcelButton = new MagicToolBarButton("excel", "Generate Excel spreadsheet");
-        toExcelButton.addActionListener(new ActionListener() {
-            
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                generateExcelSpreadsheet();
-            }
-        }); 
-        toolBar.add(toExcelButton);
+//        MagicToolBarButton toExcelButton = new MagicToolBarButton("excel", "Generate Excel spreadsheet");
+//        toExcelButton.addActionListener(new ActionListener() {
+//            
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                generateExcelSpreadsheet();
+//            }
+//        }); 
+//        toolBar.add(toExcelButton);
         
-        toolBar.add(new MagicToolBarButton("excel", "Generate new format Excel spreadsheet", e -> generateNewFormatExcelFile()));
+//        toolBar.add(new MagicToolBarButton("excel", "Generate new format Excel spreadsheet", e -> generateNewFormatExcelFile()));
+        toolBar.add(new MagicToolBarButton("pdf1", "Generate PDF report", e -> generateReceivingReceiptPdfReport()));
+        toolBar.add(new MagicToolBarButton("pdf2", "Generate new format PDF report", e -> generateReceivingReceiptNewPdfReport()));
         toolBar.add(new MagicToolBarButton("cost_check", "Generate cost check report", e -> generateCostCheckReport()));
 	}
 
-    protected void openSetDiscountsForAllItemsDialog() {
+	protected void openSetDiscountsForAllItemsDialog() {
 		setDiscountsForAllItemsDialog.updateDisplay(receivingReceipt);
 		setDiscountsForAllItemsDialog.setVisible(true);
 		
@@ -563,7 +582,7 @@ public class ReceivingReceiptPanel extends StandardMagicPanel {
 				showMessage("Receiving Receipt cancelled");
 				updateDisplay(receivingReceipt);
 			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
+				log.error(e.getMessage(), e);
 				showMessageForUnexpectedError();
 			}
 		}
@@ -672,5 +691,37 @@ public class ReceivingReceiptPanel extends StandardMagicPanel {
         	showMessageForUnexpectedError(e);
         }
 	}
+    
+    private void generateReceivingReceiptPdfReport() {
+    	pdfFileChooser.setSelectedFile(new File(generateDefaultSpreadsheetName() + ".pdf"));
+        if (!pdfFileChooser.selectSaveFile(this)) {
+        	return;
+        }
+        File file = pdfFileChooser.getSelectedFile();
+        
+    	try {
+    		new ReceivingReceiptPdfGenerator(file).generate(receivingReceipt);
+	        Desktop.getDesktop().open(file);
+    	} catch (Exception e) {
+    		log.error(e.getMessage(), e);
+        	showMessageForUnexpectedError(e);
+    	}
+    }
+    
+    private void generateReceivingReceiptNewPdfReport() {
+        pdfFileChooser.setSelectedFile(new File(generateDefaultSpreadsheetName() + ".pdf"));
+        if (!pdfFileChooser.selectSaveFile(this)) {
+        	return;
+        }
+        File file = pdfFileChooser.getSelectedFile();
+        
+    	try {
+    		new ReceivingReceiptNewPdfGenerator(file).generate(receivingReceipt);
+	        Desktop.getDesktop().open(file);
+    	} catch (Exception e) {
+    		log.error(e.getMessage(), e);
+        	showMessageForUnexpectedError(e);
+    	}
+    }
 
 }
