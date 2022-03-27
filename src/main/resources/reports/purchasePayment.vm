@@ -1,6 +1,6 @@
 #set( $charsPerLine = 56 )
 #set( $space = " " )
-$report.center("JC HARMONY SELLING INC", $charsPerLine)
+$report.center("JOSELLE CHRISTIAN GENERAL MERCHANDISE", $charsPerLine)
 $report.center("PAYMENT VOUCHER", $charsPerLine)
 
 PP #     : $report.field($payment.purchasePaymentNumber, 7)                     Date: $report.field($currentDate)

@@ -1,12 +1,14 @@
 package com.pj.magic.gui.panels;
 
 import java.awt.BorderLayout;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -20,16 +22,17 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import javax.swing.filechooser.FileFilter;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.pj.magic.Constants;
 import com.pj.magic.gui.MagicFrame;
 import com.pj.magic.gui.component.EllipsisButton;
+import com.pj.magic.gui.component.MagicFileChooser;
 import com.pj.magic.gui.component.MagicTextField;
 import com.pj.magic.gui.component.MagicToolBar;
 import com.pj.magic.gui.component.MagicToolBarButton;
@@ -47,20 +50,23 @@ import com.pj.magic.model.PurchasePayment;
 import com.pj.magic.model.PurchasePaymentReceivingReceipt;
 import com.pj.magic.model.ReceivingReceipt;
 import com.pj.magic.model.Supplier;
+import com.pj.magic.report.pdf.PurchasePaymentPdfGenerator;
 import com.pj.magic.service.LoginService;
 import com.pj.magic.service.PrintService;
 import com.pj.magic.service.PurchasePaymentService;
 import com.pj.magic.service.SupplierService;
 import com.pj.magic.util.ComponentUtil;
+import com.pj.magic.util.FileUtil;
 import com.pj.magic.util.FormatterUtil;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Component
+@Slf4j
 public class PurchasePaymentPanel extends StandardMagicPanel {
 
     private static final long serialVersionUID = -3780835355579100447L;
 
-    private static final Logger logger = LoggerFactory.getLogger(PurchasePaymentPanel.class);
-	
 	private static final String SAVE_SUPPLIER_ACTION_NAME = "saveSupplier";
 	private static final String OPEN_SELECT_SUPPLIER_DIALOG_ACTION_NAME = "openSelectSupplierDialog";
 	
@@ -113,6 +119,7 @@ public class PurchasePaymentPanel extends StandardMagicPanel {
 	private JButton printPreviewButton;
 	private JButton printButton;
 	private JTabbedPane tabbedPane;
+    private MagicFileChooser pdfFileChooser;
 	
 	@Override
 	protected void initializeComponents() {
@@ -130,6 +137,21 @@ public class PurchasePaymentPanel extends StandardMagicPanel {
 				openSelectSupplierDialog();
 			}
 		});;
+		
+        pdfFileChooser = new MagicFileChooser();
+        pdfFileChooser.setCurrentDirectory(new File(FileUtil.getDesktopFolderPath()));
+        pdfFileChooser.setFileFilter(new FileFilter() {
+            
+            @Override
+            public String getDescription() {
+                return "PDF (*.pdf)";
+            }
+            
+            @Override
+            public boolean accept(File f) {
+                return FilenameUtils.getExtension(f.getName()).equals("pdf");
+            }
+        });
 		
 		focusOnComponentWhenThisPanelIsDisplayed(supplierCodeField);
 		
@@ -562,6 +584,8 @@ public class PurchasePaymentPanel extends StandardMagicPanel {
         generateEwtButton = new MagicToolBarButton("ewt", "Generate EWT Adjustment");
         generateEwtButton.addActionListener(e -> generateEwtAdjustment());
         toolBar.add(generateEwtButton);
+        
+        toolBar.add(new MagicToolBarButton("pdf", "Generate PDF report", e -> generatePurchasePaymentPdfReport()));
 	}
 
 	private void printPaymentSummary() {
@@ -605,7 +629,7 @@ public class PurchasePaymentPanel extends StandardMagicPanel {
 				showMessage("Payment posted");
 				updateDisplay(purchasePayment);
 			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
+				log.error(e.getMessage(), e);
 				showErrorMessage("Unexpected error occurred during posting!");
 			}
 		}
@@ -1156,7 +1180,7 @@ public class PurchasePaymentPanel extends StandardMagicPanel {
 				showMessage("Payment unposted");
 				updateDisplay(purchasePayment);
 			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
+				log.error(e.getMessage(), e);
 				showMessageForUnexpectedError();
 			}
 		}
@@ -1171,7 +1195,7 @@ public class PurchasePaymentPanel extends StandardMagicPanel {
         try {
             purchasePaymentService.generateEwtAdjustment(purchasePayment);
         } catch (Exception e) {
-            logger.error("Error while generating EWT adjustment", e);
+            log.error("Error while generating EWT adjustment", e);
             showMessageForUnexpectedError();
             return;
         }
@@ -1184,6 +1208,24 @@ public class PurchasePaymentPanel extends StandardMagicPanel {
         } else {
             getMagicFrame().switchToPurchasePaymentAdjustmentListPanel();
         }
+    }
+    
+    private void generatePurchasePaymentPdfReport() {
+    	String filename = "Purchase Payment " + String.valueOf(purchasePayment.getPurchasePaymentNumber()) + ".pdf"; 
+    	
+    	pdfFileChooser.setSelectedFile(new File(filename));
+        if (!pdfFileChooser.selectSaveFile(this)) {
+        	return;
+        }
+        File file = pdfFileChooser.getSelectedFile();
+        
+    	try {
+    		new PurchasePaymentPdfGenerator(printService, file).generate(purchasePayment);
+	        Desktop.getDesktop().open(file);
+    	} catch (Exception e) {
+    		log.error(e.getMessage(), e);
+        	showMessageForUnexpectedError(e);
+    	}
     }
     
 }
