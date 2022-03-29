@@ -173,7 +173,7 @@ public class PurchasePaymentDaoImpl extends MagicDao implements PurchasePaymentD
 			if (rs.getLong("ENCODER") != 0) {
 				purchasePayment.setEncoder(new User(rs.getLong("ENCODER"), rs.getString("ENCODER_USERNAME")));
 			} else {
-				purchasePayment.setEncoder(new User(1L, "ADMIN"));
+				purchasePayment.setEncoder(new User(2L, "JOY"));
 			}
 			purchasePayment.setSupplier(mapSupplier(rs));
 			
