@@ -19,6 +19,7 @@ import com.pj.magic.dao.PurchasePaymentDao;
 import com.pj.magic.model.PaymentTerm;
 import com.pj.magic.model.PurchasePayment;
 import com.pj.magic.model.Supplier;
+import com.pj.magic.model.User;
 import com.pj.magic.model.search.PurchasePaymentSearchCriteria;
 import com.pj.magic.util.DbUtil;
 
@@ -31,10 +32,16 @@ public class PurchasePaymentDaoImpl extends MagicDao implements PurchasePaymentD
 			"select a.ID, PURCHASE_PAYMENT_NO, SUPPLIER_ID, ENCODER,"
 			+ " POST_IND, POST_DT, POST_BY,"
 			+ " b.CODE as SUPPLIER_CODE, b.NAME as SUPPLIER_NAME, "
+			+ " c.USERNAME as ENCODER_USERNAME,"
+			+ " d.USERNAME as POST_BY_USERNAME,"
 			+ " e.NAME as PAYMENT_TERM_NAME"
 			+ " from PURCHASE_PAYMENT a"
 			+ " join SUPPLIER b"
 			+ "   on b.ID = a.SUPPLIER_ID"
+			+ " left join USER c"
+			+ "   on c.ID = a.ENCODER"
+			+ " left join USER d"
+			+ "   on d.ID = a.POST_BY"
 			+ " left join PAYMENT_TERM e"
 			+ "   on e.ID = b.PAYMENT_TERM_ID";
 	
@@ -51,7 +58,7 @@ public class PurchasePaymentDaoImpl extends MagicDao implements PurchasePaymentD
 
 	private static final String INSERT_SQL =
 			"insert into PURCHASE_PAYMENT"
-			+ " (PURCHASE_PAYMENT_NO, SUPPLIER_ID, CREATE_DT) values (?, ?, curdate())";
+			+ " (PURCHASE_PAYMENT_NO, SUPPLIER_ID, CREATE_DT, ENCODER) values (?, ?, curdate(), ?)";
 	
 	private void insert(final PurchasePayment purchasePayment) {
 		KeyHolder holder = new GeneratedKeyHolder();
@@ -63,6 +70,7 @@ public class PurchasePaymentDaoImpl extends MagicDao implements PurchasePaymentD
 				PreparedStatement ps = con.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS);
 				ps.setLong(1, getNextPurchasePaymentNumber());
 				ps.setLong(2, purchasePayment.getSupplier().getId());
+				ps.setLong(3, purchasePayment.getEncoder().getId());
 				return ps;
 			}
 		}, holder);
@@ -162,11 +170,17 @@ public class PurchasePaymentDaoImpl extends MagicDao implements PurchasePaymentD
 			PurchasePayment purchasePayment = new PurchasePayment();
 			purchasePayment.setId(rs.getLong("ID"));
 			purchasePayment.setPurchasePaymentNumber(rs.getLong("PURCHASE_PAYMENT_NO"));
+			if (rs.getLong("ENCODER") != 0) {
+				purchasePayment.setEncoder(new User(rs.getLong("ENCODER"), rs.getString("ENCODER_USERNAME")));
+			} else {
+				purchasePayment.setEncoder(new User(1L, "ADMIN"));
+			}
 			purchasePayment.setSupplier(mapSupplier(rs));
 			
 			purchasePayment.setPosted("Y".equals(rs.getString("POST_IND")));
 			if (purchasePayment.isPosted()) {
 				purchasePayment.setPostDate(rs.getDate("POST_DT"));
+				purchasePayment.setPostedBy(new User(rs.getLong("POST_BY"), rs.getString("POST_BY_USERNAME")));
 			}
 			
 			return purchasePayment;

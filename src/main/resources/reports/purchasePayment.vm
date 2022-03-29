@@ -1,6 +1,6 @@
 #set( $charsPerLine = 56 )
 #set( $space = " " )
-$report.center("JOSELLE CHRISTIAN GENERAL MERCHANDISE", $charsPerLine)
+$report.center("JCHS GROCERY", $charsPerLine)
 $report.center("PAYMENT VOUCHER", $charsPerLine)
 
 PP #     : $report.field($payment.purchasePaymentNumber, 7)                     Date: $report.field($currentDate)
@@ -69,4 +69,8 @@ $report.field($bankTransfer.transferDate) $report.field($bankTransfer.bank, 16) 
 #end
 --------------------------------------------------------
 
-PREPARED BY:   JOY
+PREPARED BY:   $report.field($payment.encoder.username, 15)
+
+
+RECEIVED BY:   ____________________________
+                 Print Name and Signature
