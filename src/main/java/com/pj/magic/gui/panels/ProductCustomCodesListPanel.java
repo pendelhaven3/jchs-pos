@@ -28,7 +28,7 @@ import com.pj.magic.util.ComponentUtil;
 public class ProductCustomCodesListPanel extends StandardMagicPanel {
 
 	private static final int CODE_COLUMN_INDEX = 0;
-	private static final int REMARKS_COLUMN_INDEX = 1;
+	private static final int SUPPLIER_NAME_COLUMN_INDEX = 1;
 	
 	@Autowired
 	private Product2Service productService;
@@ -151,7 +151,7 @@ public class ProductCustomCodesListPanel extends StandardMagicPanel {
 
 	private class ProductCustomCodesTableModel extends ListBackedTableModel<ProductCustomCode> {
 
-        private final String[] columnNames = {"Code", "Remarks"};
+        private final String[] columnNames = {"Code", "Supplier"};
 	    
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
@@ -159,8 +159,8 @@ public class ProductCustomCodesListPanel extends StandardMagicPanel {
             switch (columnIndex) {
             case CODE_COLUMN_INDEX:
                 return customCode.getCode();
-            case REMARKS_COLUMN_INDEX:
-                return customCode.getRemarks();
+            case SUPPLIER_NAME_COLUMN_INDEX:
+                return customCode.getSupplier().getName();
             default:
                 throw new RuntimeException("Fetching invalid column index: " + columnIndex);
             }

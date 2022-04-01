@@ -10,6 +10,6 @@ public class ProductCustomCode {
 	private Long id;
 	private Product2 product;
 	private String code;
-	private String remarks;
+	private Supplier supplier;
 	
 }

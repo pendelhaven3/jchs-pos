@@ -18,12 +18,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.pj.magic.exception.ValidationException;
+import com.pj.magic.gui.component.MagicComboBox;
 import com.pj.magic.gui.component.MagicTextField;
 import com.pj.magic.gui.component.MagicToolBar;
 import com.pj.magic.gui.component.MagicToolBarButton;
 import com.pj.magic.model.ProductCustomCode;
+import com.pj.magic.model.Supplier;
 import com.pj.magic.service.Product2Service;
+import com.pj.magic.service.SupplierService;
 import com.pj.magic.util.ComponentUtil;
+import com.pj.magic.util.ListUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -37,12 +41,15 @@ public class MaintainProductCustomCodePanel extends StandardMagicPanel {
 	@Autowired
 	private Product2Service productService;
 	
+	@Autowired
+	private SupplierService supplierService;
+	
 	private ProductCustomCode customCode;
 	
 	private JLabel productIdLabel = new JLabel();
 	private JLabel descriptionLabel = new JLabel();
 	private MagicTextField codeField;
-	private MagicTextField remarksField;
+	private MagicComboBox<Supplier> supplierComboBox;
 	private JButton saveButton;
 	private JButton deleteButton;
 	
@@ -56,8 +63,7 @@ public class MaintainProductCustomCodePanel extends StandardMagicPanel {
 		codeField = new MagicTextField();
 		codeField.setMaximumLength(30);
 		
-		remarksField = new MagicTextField();
-		remarksField.setMaximumLength(100);
+		supplierComboBox = new MagicComboBox<Supplier>();
 		
 		saveButton = new JButton("Save");
 		saveButton.addActionListener(e -> saveCustomCode());
@@ -68,7 +74,7 @@ public class MaintainProductCustomCodePanel extends StandardMagicPanel {
 	@Override
 	protected void initializeFocusOrder(List<JComponent> focusOrder) {
 		focusOrder.add(codeField);
-		focusOrder.add(remarksField);
+		focusOrder.add(supplierComboBox);
 		focusOrder.add(saveButton);
 	}
 	
@@ -79,7 +85,7 @@ public class MaintainProductCustomCodePanel extends StandardMagicPanel {
 		
 		if (confirm("Save?")) {
 			customCode.setCode(codeField.getText());
-			customCode.setRemarks(remarksField.getText());
+			customCode.setSupplier((Supplier)supplierComboBox.getSelectedItem());
 			
 			try {
 				productService.save(customCode);
@@ -95,15 +101,16 @@ public class MaintainProductCustomCodePanel extends StandardMagicPanel {
 	private boolean validateCustomCode() {
 		try {
 			validateMandatoryField(codeField, "Code");
+			validateMandatoryField(supplierComboBox, "Supplier");
 		} catch (ValidationException e) {
 			return false;
 		}
 		
-		ProductCustomCode existing = productService.findCustomCode(customCode.getProduct().getId(), codeField.getText());
+		ProductCustomCode existing = productService.findCustomCode(customCode.getProduct(), (Supplier)supplierComboBox.getSelectedItem());
 		if (existing != null) {
 			if (customCode.getId() == null || !existing.getId().equals(customCode.getId())) {			
-				showErrorMessage("Custom Code is already defined for Product");
-				codeField.requestFocusInWindow();
+				showErrorMessage("Product Custom Code is already defined for Supplier");
+				supplierComboBox.requestFocusInWindow();
 				return false;
 			}	
 		}
@@ -177,14 +184,14 @@ public class MaintainProductCustomCodePanel extends StandardMagicPanel {
 		c.gridx = 1;
 		c.gridy = currentRow;
 		c.anchor = GridBagConstraints.WEST;
-		mainPanel.add(ComponentUtil.createLabel(100, "Remarks: "), c);
+		mainPanel.add(ComponentUtil.createLabel(100, "Supplier: "), c);
 		
 		c = new GridBagConstraints();
 		c.gridx = 2;
 		c.gridy = currentRow;
 		c.anchor = GridBagConstraints.WEST;
-		remarksField.setPreferredSize(new Dimension(300, 25));
-		mainPanel.add(remarksField, c);
+		supplierComboBox.setPreferredSize(new Dimension(300, 25));
+		mainPanel.add(supplierComboBox, c);
 		
 		currentRow++;
 		
@@ -234,14 +241,19 @@ public class MaintainProductCustomCodePanel extends StandardMagicPanel {
 	}
 
 	public void updateDisplay(ProductCustomCode customCode) {
+		List<Supplier> suppliers = supplierService.getAllSuppliers();
+		supplierComboBox.setModel(ListUtil.toDefaultComboBoxModel(suppliers, true));
+		
 		this.customCode = customCode;
 		if (customCode.getId() == null) {
 			clearDisplay();
 			return;
 		}
 		
+		productIdLabel.setText(String.valueOf(customCode.getProduct().getId()));
+		descriptionLabel.setText(customCode.getProduct().getDescription());
 		codeField.setText(customCode.getCode());
-		remarksField.setText(customCode.getRemarks());
+		supplierComboBox.setSelectedItem(customCode.getSupplier());
 		deleteButton.setEnabled(true);
 	}
 
@@ -249,7 +261,7 @@ public class MaintainProductCustomCodePanel extends StandardMagicPanel {
 		productIdLabel.setText(String.valueOf(customCode.getProduct().getId()));
 		descriptionLabel.setText(customCode.getProduct().getDescription());
 		codeField.setText(null);
-		remarksField.setText(null);
+		supplierComboBox.setSelectedIndex(0);
 		deleteButton.setEnabled(false);
 	}
 

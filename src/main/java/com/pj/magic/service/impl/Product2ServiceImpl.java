@@ -124,11 +124,6 @@ public class Product2ServiceImpl implements Product2Service {
 	}
 
 	@Override
-	public ProductCustomCode findCustomCode(Long productId, String code) {
-		return productCustomCodeRepository.findByProductIdAndCode(productId, code);
-	}
-
-	@Override
 	public void save(ProductCustomCode customCode) {
 		productCustomCodeRepository.save(customCode);
 	}
@@ -136,6 +131,11 @@ public class Product2ServiceImpl implements Product2Service {
 	@Override
 	public void delete(ProductCustomCode customCode) {
 		productCustomCodeRepository.delete(customCode);
+	}
+
+	@Override
+	public ProductCustomCode findCustomCode(Product2 product, Supplier supplier) {
+		return productCustomCodeRepository.findByProductAndSupplier(product, supplier);
 	}
 
 }

@@ -553,3 +553,14 @@ create table TRISYS_SALES_ITEM (
   constraint TRISYS_SALES_ITEMS$UK unique (TRISYS_SALES_ID, PRODUCT_CODE),
   constraint TRISYS_SALES_ITEM$FK foreign key (TRISYS_SALES_ID) references TRISYS_SALES (ID)
 );
+
+create table PRODUCT_CUSTOM_CODE (
+  ID integer auto_increment,
+  PRODUCT_ID integer not null,
+  CODE varchar(30) not null,
+  SUPPLIER_ID integer not null,
+  constraint PRODUCT_CUSTOM_CODE$PK primary key (ID),
+  constraint PRODUCT_CUSTOM_CODE$UK unique (PRODUCT_ID, SUPPLIER_ID),
+  constraint PRODUCT_CUSTOM_CODE$FK foreign key (PRODUCT_ID) references PRODUCT2 (ID),
+  constraint PRODUCT_CUSTOM_CODE$FK2 foreign key (SUPPLIER_ID) references SUPPLIER (ID)
+);

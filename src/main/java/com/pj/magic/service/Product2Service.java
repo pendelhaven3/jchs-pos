@@ -34,10 +34,10 @@ public interface Product2Service {
 
 	List<ProductCustomCode> getCustomCodes(Long id);
 
-	ProductCustomCode findCustomCode(Long productId, String text);
-
 	void save(ProductCustomCode customCode);
 
 	void delete(ProductCustomCode customCode);
+
+	ProductCustomCode findCustomCode(Product2 product, Supplier supplier);
 
 }
