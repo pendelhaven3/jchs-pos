@@ -2,6 +2,7 @@ package com.pj.magic.gui.panels;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.math.BigDecimal;
@@ -38,6 +39,15 @@ public class ReceivingReceiptListPanel extends StandardMagicPanel {
 	private JLabel totalItemsLabel;
 	private JLabel totalAmountLabel;
 	
+	private ReceivingReceiptSearchCriteria searchCriteria;
+	private int selectedRow;
+	private Rectangle visibleRect;
+	
+	@Override
+	public String getTitle() {
+		return "Receiving Receipt List";
+	}
+	
 	@Override
 	public void initializeComponents() {
 		focusOnComponentWhenThisPanelIsDisplayed(table);
@@ -47,8 +57,30 @@ public class ReceivingReceiptListPanel extends StandardMagicPanel {
 		List<ReceivingReceipt> receivingReceipts = receivingReceiptService.getNewReceivingReceipts();
 		updateFields(receivingReceipts);
 		searchReceivingReceiptsDialog.updateDisplay();
+		searchCriteria = null;
 	}
 
+	@Override
+	public void updateDisplayOnBack() {
+	    List<ReceivingReceipt> receivingReceipts = null;
+	    
+		if (searchCriteria != null) {
+			receivingReceipts = receivingReceiptService.search(searchCriteria);
+		} else {
+	        receivingReceipts = receivingReceiptService.getNewReceivingReceipts();
+	        searchReceivingReceiptsDialog.updateDisplay();
+		}
+		
+        table.setReceivingReceipts(receivingReceipts);
+        if (receivingReceipts.size() - 1 < selectedRow) {
+            selectedRow = receivingReceipts.size() - 1;
+        }
+        table.changeSelection(selectedRow, 0, false, false);
+        if (visibleRect != null) {
+            table.scrollRectToVisible(visibleRect);
+        }
+	}
+	
 	@Override
 	protected void layoutMainPanel(JPanel mainPanel) {
 		mainPanel.setLayout(new GridBagLayout());
@@ -95,6 +127,8 @@ public class ReceivingReceiptListPanel extends StandardMagicPanel {
 	}
 	
 	public void displayReceivingReceiptDetails(ReceivingReceipt receivingReceipt) {
+	    selectedRow = table.getSelectedRow();
+	    visibleRect = table.getVisibleRect();
 		getMagicFrame().switchToReceivingReceiptPanel(receivingReceipt);
 	}
 
@@ -117,6 +151,9 @@ public class ReceivingReceiptListPanel extends StandardMagicPanel {
 		
 		ReceivingReceiptSearchCriteria criteria = searchReceivingReceiptsDialog.getSearchCriteria();
 		if (criteria != null) {
+			searchCriteria = criteria;
+			selectedRow = 0;
+			visibleRect = null;
 			List<ReceivingReceipt> receivingReceipts = receivingReceiptService.search(criteria);
 			updateFields(receivingReceipts);
 			if (!receivingReceipts.isEmpty()) {
@@ -183,6 +220,11 @@ public class ReceivingReceiptListPanel extends StandardMagicPanel {
 		panel.add(totalAmountLabel, c);
 		
 		return panel;
+	}
+	
+	public void clearTableSelection() {
+	    selectedRow = 0;
+	    visibleRect = null;
 	}
 	
 }

@@ -774,7 +774,7 @@ public class MagicFrame extends JFrame {
 	}
 
 	public void switchToReceivingReceiptListPanel() {
-		addPanelNameToTitle("Receiving Receipt List");
+		addPanelNameToTitle(receivingReceiptListPanel.getTitle());
 		receivingReceiptListPanel.updateDisplay();
 		((CardLayout)panelHolder.getLayout()).show(panelHolder, RECEIVING_RECEIPT_LIST_PANEL);
 	}

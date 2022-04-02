@@ -37,6 +37,7 @@ import org.springframework.stereotype.Component;
 
 import com.pj.magic.exception.AlreadyCancelledException;
 import com.pj.magic.exception.AlreadyPostedException;
+import com.pj.magic.gui.MagicFrame;
 import com.pj.magic.gui.component.DatePickerFormatter;
 import com.pj.magic.gui.component.MagicFileChooser;
 import com.pj.magic.gui.component.MagicToolBar;
@@ -187,7 +188,7 @@ public class ReceivingReceiptPanel extends StandardMagicPanel {
 		if (itemsTable.isEditing()) {
 			itemsTable.getCellEditor().cancelCellEditing();
 		}
-		getMagicFrame().switchToReceivingReceiptListPanel();
+		getMagicFrame().back(MagicFrame.RECEIVING_RECEIPT_LIST_PANEL);
 	}
 	
 	private void updateTotalAmountFieldWhenItemsTableChanges() {
