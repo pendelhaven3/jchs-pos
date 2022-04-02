@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.pj.magic.model.PricingScheme;
 import com.pj.magic.model.Product;
+import com.pj.magic.model.ProductBySpecialCode;
 import com.pj.magic.model.Supplier;
 import com.pj.magic.model.search.ProductSearchCriteria;
 
@@ -40,5 +41,9 @@ public interface ProductDao {
 	void addAvailableQuantity(Product product, int quantity);
 
 	void removeProduct2Id(Long id);
+
+	List<ProductBySpecialCode> searchProductsBySpecialCode(String customCode, Supplier supplier);
+
+	ProductBySpecialCode findProductBySpecialCode(String productCode, Supplier supplier);
 	
 }

@@ -23,54 +23,7 @@ public class PurchaseOrderItem implements Comparable<PurchaseOrderItem> {
 	private boolean ordered;
 	
 	private String code; // derived field
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public PurchaseOrder getParent() {
-		return parent;
-	}
-
-	public void setParent(PurchaseOrder parent) {
-		this.parent = parent;
-	}
-
-	public String getUnit() {
-		return unit;
-	}
-
-	public void setUnit(String unit) {
-		this.unit = unit;
-	}
-
-	public Integer getQuantity() {
-		return quantity;
-	}
-
-	public void setQuantity(Integer quantity) {
-		this.quantity = quantity;
-	}
-
-	public BigDecimal getCost() {
-		return cost;
-	}
-
-	public void setCost(BigDecimal cost) {
-		this.cost = cost;
-	}
-
-	public Integer getActualQuantity() {
-		return actualQuantity;
-	}
-
-	public void setActualQuantity(Integer actualQuantity) {
-		this.actualQuantity = actualQuantity;
-	}
+	private String customCode; // derived field
 
 	public BigDecimal getAmount() {
 		if (actualQuantity != null) {
@@ -103,14 +56,6 @@ public class PurchaseOrderItem implements Comparable<PurchaseOrderItem> {
 			.isEquals();
 	}
 
-	public boolean isOrdered() {
-		return ordered;
-	}
-
-	public void setOrdered(boolean ordered) {
-		this.ordered = ordered;
-	}
-
 	@Override
 	public int compareTo(PurchaseOrderItem o) {
 		int result = product.compareTo(o.getProduct());
@@ -121,12 +66,4 @@ public class PurchaseOrderItem implements Comparable<PurchaseOrderItem> {
 		}
 	}
 
-	public BigDecimal getVatInclusiveCost() {
-		return vatInclusiveCost;
-	}
-
-	public void setVatInclusiveCost(BigDecimal vatInclusiveCost) {
-		this.vatInclusiveCost = vatInclusiveCost;
-	}
-	
 }

@@ -24,11 +24,16 @@ import com.pj.magic.model.PurchaseOrderItem;
 public class PurchaseOrderItemDaoImpl extends MagicDao implements PurchaseOrderItemDao {
 
 	private static final String BASE_SELECT_SQL =
-			"select a.ID, PURCHASE_ORDER_ID, PRODUCT_ID, UNIT, QUANTITY, COST, ACTUAL_QUANTITY, ORDER_IND, b.CODE"
+			"select a.ID, PURCHASE_ORDER_ID, a.PRODUCT_ID, UNIT, QUANTITY, COST, ACTUAL_QUANTITY, ORDER_IND, b.CODE, d.CODE as CUSTOM_CODE"
 			+ " from PURCHASE_ORDER_ITEM a"
 			+ " join PRODUCT b"
 			+ "   on b.PRODUCT2_ID = a.PRODUCT_ID"
-			+ "   and b.UOM_CODE = a.UNIT";
+			+ "   and b.UOM_CODE = a.UNIT"
+			+ " join PURCHASE_ORDER c"
+			+ "   on c.ID = a.PURCHASE_ORDER_ID"
+			+ " left join PRODUCT_CUSTOM_CODE d"
+			+ "   on d.PRODUCT_ID = a.PRODUCT_ID"
+			+ "   and d.SUPPLIER_ID = c.SUPPLIER_ID";
 	
 	private RowMapper<PurchaseOrderItem> rowMapper = new RowMapper<PurchaseOrderItem>() {
 
@@ -46,6 +51,7 @@ public class PurchaseOrderItemDaoImpl extends MagicDao implements PurchaseOrderI
 				item.setActualQuantity(rs.getInt("ACTUAL_QUANTITY"));
 			}
 			item.setOrdered("Y".equals(rs.getString("ORDER_IND")));
+			item.setCustomCode(rs.getString("CUSTOM_CODE"));
 			return item;
 		}
 		

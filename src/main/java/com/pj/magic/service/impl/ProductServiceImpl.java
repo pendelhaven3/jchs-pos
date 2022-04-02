@@ -19,6 +19,7 @@ import com.pj.magic.dao.SupplierDao;
 import com.pj.magic.model.PricingScheme;
 import com.pj.magic.model.Product;
 import com.pj.magic.model.Product2;
+import com.pj.magic.model.ProductBySpecialCode;
 import com.pj.magic.model.ProductPriceHistory;
 import com.pj.magic.model.Supplier;
 import com.pj.magic.model.search.ProductSearchCriteria;
@@ -186,6 +187,16 @@ public class ProductServiceImpl implements ProductService {
 	@Override
 	public void unlinkCodeFromProduct(Product product) {
 		productDao.removeProduct2Id(product.getId());
+	}
+
+	@Override
+	public List<ProductBySpecialCode> searchProductsBySpecialCode(String customCode, Supplier supplier) {
+		return productDao.searchProductsBySpecialCode(customCode, supplier);
+	}
+
+	@Override
+	public ProductBySpecialCode findProductBySpecialCode(String productCode, Supplier supplier) {
+		return productDao.findProductBySpecialCode(productCode, supplier);
 	}
 
 }

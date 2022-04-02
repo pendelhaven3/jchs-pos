@@ -38,8 +38,6 @@ import javax.swing.filechooser.FileFilter;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -52,6 +50,7 @@ import com.pj.magic.gui.component.MagicToolBarButton;
 import com.pj.magic.gui.dialog.PrintPreviewDialog;
 import com.pj.magic.gui.dialog.SelectSupplierDialog;
 import com.pj.magic.gui.tables.ProductInfoTable;
+import com.pj.magic.gui.tables.PurchaseOrderBySpecialCodesItemsTable;
 import com.pj.magic.gui.tables.PurchaseOrderItemsTable;
 import com.pj.magic.model.PaymentTerm;
 import com.pj.magic.model.Product2;
@@ -68,17 +67,16 @@ import com.pj.magic.util.ComponentUtil;
 import com.pj.magic.util.FileUtil;
 import com.pj.magic.util.FormatterUtil;
 
-@Component
-public class PurchaseOrderPanel extends StandardMagicPanel {
+import lombok.extern.slf4j.Slf4j;
 
-    private static final long serialVersionUID = -6676395278966161803L;
-    
+@Component
+@Slf4j
+public class PurchaseOrderBySpecialCodesPanel extends StandardMagicPanel {
+
     private static final String OPEN_SELECT_SUPPLIER_DIALOG_ACTION_NAME = "openSelectSupplierDialog";
 	private static final String FOCUS_NEXT_FIELD_ACTION_NAME = "focusNextField";
 	
-	private static final Logger logger = LoggerFactory.getLogger(PurchaseOrderPanel.class);
-	
-	@Autowired private PurchaseOrderItemsTable itemsTable;
+	@Autowired private PurchaseOrderBySpecialCodesItemsTable itemsTable;
 	@Autowired private Product2Service product2Service;
 	@Autowired private PurchaseOrderService purchaseOrderService;
 	@Autowired private SupplierService supplierService;
@@ -112,6 +110,11 @@ public class PurchaseOrderPanel extends StandardMagicPanel {
 	private JButton deleteButton;
 	private JFileChooser excelFileChooser;
 	private ProductInfoTable productInfoTable;
+	
+	@Override
+	public String getTitle() {
+		return "Purchase Order by Special Codes";
+	}
 	
 	@Override
 	protected void initializeComponents() {
@@ -218,8 +221,8 @@ public class PurchaseOrderPanel extends StandardMagicPanel {
 				purchaseOrderService.save(purchaseOrder);
 				updateDisplay(purchaseOrder);
 			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
-				showErrorMessage("Error occurred during saving!");
+				log.error(e.getMessage(), e);
+				showMessageForUnexpectedError(e);
 				return;
 			}
 		}
@@ -316,7 +319,7 @@ public class PurchaseOrderPanel extends StandardMagicPanel {
 		if (itemsTable.isEditing()) {
 			itemsTable.getCellEditor().cancelCellEditing();
 		}
-		getMagicFrame().switchToPurchaseOrderListPanel();
+		getMagicFrame().switchToPurchaseOrderBySpecialCodesListPanel();
 	}
 	
 	private void updateTotalsPanelWhenItemsTableChanges() {
@@ -798,8 +801,8 @@ public class PurchaseOrderPanel extends StandardMagicPanel {
 				updateDisplay(purchaseOrder);
 				itemsTable.highlightColumn(e.getItem(), itemsTable.getActualQuantityColumnIndex());
 			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
-				showErrorMessage("Unexpected error occurred during posting!");
+				log.error(e.getMessage(), e);
+				showMessageForUnexpectedError(e);
 			}
 		}
 	}
@@ -903,8 +906,8 @@ public class PurchaseOrderPanel extends StandardMagicPanel {
 				showMessage("Purchase Order deleted");
 				getMagicFrame().switchToPurchaseOrderListPanel();
 			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
-				showErrorMessage("Unexpected error occurred when deleting");
+				log.error(e.getMessage(), e);
+				showMessageForUnexpectedError(e);
 			}
 		}
 	}

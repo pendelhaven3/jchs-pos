@@ -22,5 +22,6 @@ public class ProductSearchCriteria {
 	private String codeOrDescriptionLike;
 	private Supplier supplier;
 	private Boolean withMoreThanTwoBarcodes;
+	private String customCode;
 	
 }

@@ -14,30 +14,44 @@ import javax.swing.JScrollPane;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.pj.magic.gui.component.CustomAction;
 import com.pj.magic.gui.component.MagicToolBar;
 import com.pj.magic.gui.component.MagicToolBarButton;
 import com.pj.magic.gui.dialog.SearchPurchaseOrdersDialog;
-import com.pj.magic.gui.tables.PurchaseOrdersTable;
+import com.pj.magic.gui.tables.MagicListTable;
+import com.pj.magic.gui.tables.models.ListBackedTableModel;
 import com.pj.magic.model.PurchaseOrder;
 import com.pj.magic.model.search.PurchaseOrderSearchCriteria;
 import com.pj.magic.service.PurchaseOrderService;
-import com.pj.magic.util.ComponentUtil;
 
 @Component
-public class PurchaseOrderListPanel extends StandardMagicPanel {
+public class PurchaseOrderBySpecialCodesListPanel extends StandardMagicPanel {
 	
-	@Autowired private PurchaseOrdersTable table;
 	@Autowired private SearchPurchaseOrdersDialog searchPurchaseOrdersDialog;
 	@Autowired private PurchaseOrderService purchaseOrderService;
 	
+	private MagicListTable table;
+	private PurchaseOrdersTableModel tableModel = new PurchaseOrdersTableModel();
+	
+	@Override
+	public String getTitle() {
+		return "Purchase Order by Special Codes List";
+	}
+	
 	@Override
 	public void initializeComponents() {
+		table = new MagicListTable(tableModel);
+		
 		focusOnComponentWhenThisPanelIsDisplayed(table);
 	}
 
 	public void updateDisplay() {
 		List<PurchaseOrder> purchaseOrders = purchaseOrderService.getAllNonPostedPurchaseOrders();
-		table.setPurchaseOrders(purchaseOrders);
+		tableModel.setItems(purchaseOrders);
+		if (!purchaseOrders.isEmpty()) {
+			table.selectFirstRow();
+		}
+		
 		searchPurchaseOrdersDialog.updateDisplay();
 	}
 
@@ -48,21 +62,12 @@ public class PurchaseOrderListPanel extends StandardMagicPanel {
 	@Override
 	protected void layoutMainPanel(JPanel mainPanel) {
 		mainPanel.setLayout(new GridBagLayout());
-		int currentRow = 0;
+		
 		GridBagConstraints c = new GridBagConstraints();
-		
-		c.fill = GridBagConstraints.NONE;
-		c.weightx = c.weighty = 0.0;
-		c.gridx = 0;
-		c.gridy = currentRow;
-		mainPanel.add(ComponentUtil.createFiller(1, 5), c);
-		
-		currentRow++;
-		
+		c.insets.top = 5;
 		c.fill = GridBagConstraints.BOTH;
 		c.weightx = c.weighty = 1.0;
-		c.gridx = 0;
-		c.gridy = currentRow;
+		c.gridx = c.gridy = 0;
 		
 		JScrollPane scrollPane = new JScrollPane(table);
 		mainPanel.add(scrollPane, c);
@@ -70,6 +75,14 @@ public class PurchaseOrderListPanel extends StandardMagicPanel {
 	
 	@Override
 	protected void registerKeyBindings() {
+		table.onEnterKeyAndDoubleClick(new CustomAction() {
+			
+			@Override
+			public void doAction() {
+				selectPurchaseOrder();
+			}
+		});
+		
 		onEscapeKey(new AbstractAction() {
 			
 			@Override
@@ -78,9 +91,17 @@ public class PurchaseOrderListPanel extends StandardMagicPanel {
 			}
 		});
 	}
+
+	protected void selectPurchaseOrder() {
+		getMagicFrame().switchToPurchaseOrderBySpecialCodesPanel(getSelectedItem());
+	}
+	
+	private PurchaseOrder getSelectedItem() {
+        return tableModel.getItem(table.getSelectedRow());
+    }
 	
 	private void switchToNewPurchaseOrderPanel() {
-		getMagicFrame().switchToPurchaseOrderPanel(purchaseOrderService.newPurchaseOrder());
+		getMagicFrame().switchToPurchaseOrderBySpecialCodesPanel(purchaseOrderService.newPurchaseOrder());
 	}
 
 	@Override
@@ -118,7 +139,7 @@ public class PurchaseOrderListPanel extends StandardMagicPanel {
 		PurchaseOrderSearchCriteria criteria = searchPurchaseOrdersDialog.getSearchCriteria();
 		if (criteria != null) {
 			List<PurchaseOrder> purchaseOrders = purchaseOrderService.search(criteria);
-			table.setPurchaseOrders(purchaseOrders);
+			tableModel.setItems(purchaseOrders);
 			if (!purchaseOrders.isEmpty()) {
 				table.changeSelection(0, 0, false, false);
 				table.requestFocusInWindow();
@@ -128,4 +149,34 @@ public class PurchaseOrderListPanel extends StandardMagicPanel {
 		}
 	}
 
+	private static final int PURCHASE_ORDER_NUMBER_COLUMN_INDEX = 0;
+	private static final int SUPPLIER_COLUMN_INDEX = 1;
+	private static final int STATUS_COLUMN_INDEX = 2;
+	
+	private static final String[] COLUMN_NAMES = {"PO No.", "Supplier", "Status"};
+	
+	private class PurchaseOrdersTableModel extends ListBackedTableModel<PurchaseOrder> {
+
+		@Override
+		public Object getValueAt(int rowIndex, int columnIndex) {
+			PurchaseOrder purchaseOrder = getItem(rowIndex);
+			switch (columnIndex) {
+			case PURCHASE_ORDER_NUMBER_COLUMN_INDEX:
+				return String.valueOf(purchaseOrder.getPurchaseOrderNumber());
+			case SUPPLIER_COLUMN_INDEX:
+				return purchaseOrder.getSupplier().getName();
+			case STATUS_COLUMN_INDEX:
+				return purchaseOrder.getStatus();
+			default:
+				throw new RuntimeException("Fetch invalid column index: " + columnIndex);
+			}
+		}
+
+		@Override
+		protected String[] getColumnNames() {
+			return COLUMN_NAMES;
+		}
+
+	}
+	
 }

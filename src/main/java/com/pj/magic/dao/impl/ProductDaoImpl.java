@@ -7,9 +7,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -21,6 +23,9 @@ import org.springframework.stereotype.Repository;
 import com.pj.magic.dao.ProductDao;
 import com.pj.magic.model.PricingScheme;
 import com.pj.magic.model.Product;
+import com.pj.magic.model.Product2;
+import com.pj.magic.model.ProductBySpecialCode;
+import com.pj.magic.model.ProductCustomCode;
 import com.pj.magic.model.Supplier;
 import com.pj.magic.model.Unit;
 import com.pj.magic.model.UnitConversion;
@@ -326,6 +331,85 @@ public class ProductDaoImpl extends MagicDao implements ProductDao {
 	@Override
 	public void removeProduct2Id(Long id) {
 		getJdbcTemplate().update("update PRODUCT set PRODUCT2_ID = null where ID = ?", id);
+	}
+
+	private static final String BY_SPECIAL_CODE_BASE_SELECT_SQL =
+			"select b.ID, a.CODE, c.CODE as CUSTOM_CODE, b.DESCRIPTION, a.UOM_CODE,"
+			+ " b.UNIT_IND_CASE, b.UNIT_IND_TIES, b.UNIT_IND_PACK, b.UNIT_IND_HDZN, b.UNIT_IND_PCS,"
+			+ " b.GROSS_COST_CASE, b.GROSS_COST_TIES, b.GROSS_COST_PACK, b.GROSS_COST_HDZN, b.GROSS_COST_PCS,"
+			+ " b.FINAL_COST_CASE, b.FINAL_COST_TIES, b.FINAL_COST_PACK, b.FINAL_COST_HDZN, b.FINAL_COST_PCS"
+			+ " from PRODUCT a"
+			+ " join PRODUCT2 b"
+			+ "   on b.ID = a.PRODUCT2_ID"
+			+ " join PRODUCT_CUSTOM_CODE c"
+			+ "   on c.PRODUCT_ID = b.ID";
+	
+	private static final String SEARCH_BY_SPECIAL_CODE_SQL = BY_SPECIAL_CODE_BASE_SELECT_SQL 
+			+ " where c.CODE like ?"
+			+ " and c.SUPPLIER_ID = ?"
+			+ " order by b.DESCRIPTION";
+	
+	private RowMapper<ProductBySpecialCode> productBySpecialCodeRowMapper = new RowMapper<ProductBySpecialCode>() {
+
+		@Override
+		public ProductBySpecialCode mapRow(ResultSet rs, int rowNum) throws SQLException {
+			Product product = new Product();
+			product.setCode(rs.getString("CODE"));
+			product.setUnits(Arrays.asList(rs.getString("UOM_CODE")));
+			
+			Product2 product2 = new Product2();
+			product2.setId(rs.getLong("ID"));
+			product2.setDescription(rs.getString("DESCRIPTION"));
+			
+			if ("Y".equals(rs.getString("UNIT_IND_CASE"))) {
+				product2.getUnits().add(Unit.CASE);
+				product2.getUnitCosts().add(new UnitCost(Unit.CASE, rs.getBigDecimal("GROSS_COST_CASE"), rs.getBigDecimal("FINAL_COST_CASE")));
+			}
+			if ("Y".equals(rs.getString("UNIT_IND_TIES"))) {
+				product2.getUnits().add(Unit.TIES);
+				product2.getUnitCosts().add(new UnitCost(Unit.TIES, rs.getBigDecimal("GROSS_COST_TIES"), rs.getBigDecimal("FINAL_COST_TIES")));
+			}
+			if ("Y".equals(rs.getString("UNIT_IND_PACK"))) {
+				product2.getUnits().add(Unit.PACK);
+				product2.getUnitCosts().add(new UnitCost(Unit.PACK, rs.getBigDecimal("GROSS_COST_PACK"), rs.getBigDecimal("FINAL_COST_PACK")));
+			}
+			if ("Y".equals(rs.getString("UNIT_IND_HDZN"))) {
+				product2.getUnits().add(Unit.HDZN);
+				product2.getUnitCosts().add(new UnitCost(Unit.HDZN, rs.getBigDecimal("GROSS_COST_HDZN"), rs.getBigDecimal("FINAL_COST_HDZN")));
+			}
+			if ("Y".equals(rs.getString("UNIT_IND_PCS"))) {
+				product2.getUnits().add(Unit.PIECES);
+				product2.getUnitCosts().add(new UnitCost(Unit.PIECES, rs.getBigDecimal("GROSS_COST_PCS"), rs.getBigDecimal("FINAL_COST_PCS")));
+			}
+			
+			ProductCustomCode customCode = new ProductCustomCode();
+			customCode.setCode(rs.getString("CUSTOM_CODE"));
+			customCode.setProduct(product2);
+			
+			ProductBySpecialCode productBySpecialCode = new ProductBySpecialCode();
+			productBySpecialCode.setProduct(product);
+			productBySpecialCode.setCustomCode(customCode);
+			
+			return productBySpecialCode;
+		}
+	};
+	
+	@Override
+	public List<ProductBySpecialCode> searchProductsBySpecialCode(String customCode, Supplier supplier) {
+        return getJdbcTemplate().query(SEARCH_BY_SPECIAL_CODE_SQL, productBySpecialCodeRowMapper, "%" + customCode + "%", supplier.getId());
+	}
+
+	private static final String FIND_BY_SPECIAL_CODE_SQL = BY_SPECIAL_CODE_BASE_SELECT_SQL 
+			+ " where a.CODE = ?"
+			+ " and c.SUPPLIER_ID = ?";
+	
+	@Override
+	public ProductBySpecialCode findProductBySpecialCode(String productCode, Supplier supplier) {
+        try {
+			return getJdbcTemplate().queryForObject(FIND_BY_SPECIAL_CODE_SQL, productBySpecialCodeRowMapper, productCode, supplier.getId());
+		} catch (DataAccessException e) {
+			return null;
+		}
 	}
 
 }

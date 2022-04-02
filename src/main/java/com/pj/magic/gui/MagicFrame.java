@@ -223,6 +223,8 @@ public class MagicFrame extends JFrame {
     public static final String EDIT_PRODUCT_COST_PANEL = "EDIT_PRODUCT_COST_PANEL";
     public static final String PRODUCT_CUSTOM_CODES_LIST_PANEL = "PRODUCT_CUSTOM_CODES_LIST_PANEL";
     public static final String MAINTAIN_PRODUCT_CUSTOM_CODE_PANEL = "MAINTAIN_PRODUCT_CUSTOM_CODE_PANEL";
+	public static final String PURCHASE_ORDER_BY_SPECIAL_CODES_LIST_PANEL = "PURCHASE_ORDER_BY_SPECIAL_CODES_LIST_PANEL";
+	public static final String PURCHASE_ORDER_BY_SPECIAL_CODES_PANEL = "PURCHASE_ORDER_BY_SPECIAL_CODES_PANEL";
 	
 	@Value("${application.title}")
 	private String baseTitle;
@@ -345,6 +347,8 @@ public class MagicFrame extends JFrame {
     @Autowired private EditProductCostPanel editProductCostPanel;
     @Autowired private ProductCustomCodesListPanel productCustomCodesListPanel;
     @Autowired private MaintainProductCustomCodePanel maintainProductCustomCodePanel;
+    @Autowired private PurchaseOrderBySpecialCodesListPanel purchaseOrderBySpecialCodesListPanel;
+    @Autowired private PurchaseOrderBySpecialCodesPanel purchaseOrderBySpecialCodesPanel;
 	
 	@Autowired private SystemService systemParameterService;
 	@Autowired private DataSource dataSource;
@@ -526,6 +530,8 @@ public class MagicFrame extends JFrame {
 		panelHolder.add(editProductCostPanel, EDIT_PRODUCT_COST_PANEL);
 		panelHolder.add(productCustomCodesListPanel, PRODUCT_CUSTOM_CODES_LIST_PANEL);
 		panelHolder.add(maintainProductCustomCodePanel, MAINTAIN_PRODUCT_CUSTOM_CODE_PANEL);
+		panelHolder.add(purchaseOrderBySpecialCodesListPanel, PURCHASE_ORDER_BY_SPECIAL_CODES_LIST_PANEL);
+		panelHolder.add(purchaseOrderBySpecialCodesPanel, PURCHASE_ORDER_BY_SPECIAL_CODES_PANEL);
         getContentPane().add(panelHolder);
 
         switchToLoginPanel();
@@ -1407,6 +1413,18 @@ public class MagicFrame extends JFrame {
         addPanelNameToTitle(maintainProductCustomCodePanel.getTitle());
         maintainProductCustomCodePanel.updateDisplay(customCode);
         ((CardLayout)panelHolder.getLayout()).show(panelHolder, MAINTAIN_PRODUCT_CUSTOM_CODE_PANEL);
+	}
+
+	public void switchToPurchaseOrderBySpecialCodesListPanel() {
+        addPanelNameToTitle(purchaseOrderBySpecialCodesListPanel.getTitle());
+		purchaseOrderBySpecialCodesListPanel.updateDisplay();
+		((CardLayout)panelHolder.getLayout()).show(panelHolder, PURCHASE_ORDER_BY_SPECIAL_CODES_LIST_PANEL);
+	}
+
+	public void switchToPurchaseOrderBySpecialCodesPanel(PurchaseOrder purchaseOrder) {
+        addPanelNameToTitle(purchaseOrderBySpecialCodesPanel.getTitle());
+        purchaseOrderBySpecialCodesPanel.updateDisplay(purchaseOrder);
+		((CardLayout)panelHolder.getLayout()).show(panelHolder, PURCHASE_ORDER_BY_SPECIAL_CODES_PANEL);
 	}
 
 }
