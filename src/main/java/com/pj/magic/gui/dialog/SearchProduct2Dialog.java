@@ -113,7 +113,7 @@ public class SearchProduct2Dialog extends MagicDialog {
 		c.gridx = 0;
 		c.gridy = currentRow;
 		c.anchor = GridBagConstraints.WEST;
-		add(ComponentUtil.createLabel(140, "Code/Description:"), c);
+		add(ComponentUtil.createLabel(140, "Description:"), c);
 
 		c.weightx = 1.0;
 		c.weighty = 0.0;
