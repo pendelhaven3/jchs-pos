@@ -1,6 +1,7 @@
 package com.pj.magic.gui.panels;
 
 import java.awt.BorderLayout;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -10,6 +11,7 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.io.File;
 
 import javax.swing.AbstractAction;
 import javax.swing.Box;
@@ -21,13 +23,14 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import javax.swing.filechooser.FileFilter;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.pj.magic.gui.component.MagicCheckBox;
+import com.pj.magic.gui.component.MagicFileChooser;
 import com.pj.magic.gui.component.MagicTextField;
 import com.pj.magic.gui.component.MagicToolBar;
 import com.pj.magic.gui.component.MagicToolBarButton;
@@ -35,17 +38,20 @@ import com.pj.magic.gui.tables.AdjustmentInItemsTable;
 import com.pj.magic.gui.tables.ProductInfoTable;
 import com.pj.magic.model.AdjustmentIn;
 import com.pj.magic.model.Product2;
+import com.pj.magic.report.pdf.AdjustmentInPdfGenerator;
 import com.pj.magic.service.AdjustmentInService;
 import com.pj.magic.service.LoginService;
 import com.pj.magic.service.Product2Service;
 import com.pj.magic.util.ComponentUtil;
+import com.pj.magic.util.FileUtil;
 import com.pj.magic.util.FormatterUtil;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Component
+@Slf4j
 public class AdjustmentInPanel extends StandardMagicPanel {
 
-	private static final Logger logger = LoggerFactory.getLogger(AdjustmentInPanel.class);
-	
 	@Autowired private AdjustmentInItemsTable itemsTable;
 	@Autowired private AdjustmentInService adjustmentInService;
 	@Autowired private LoginService loginService;
@@ -64,6 +70,7 @@ public class AdjustmentInPanel extends StandardMagicPanel {
 	private JButton addItemButton;
 	private JButton deleteItemButton;
 	private ProductInfoTable productInfoTable;
+    private MagicFileChooser pdfFileChooser;
 	
 	@Override
 	protected void initializeComponents() {
@@ -88,6 +95,21 @@ public class AdjustmentInPanel extends StandardMagicPanel {
 			}
 		});
 		
+        pdfFileChooser = new MagicFileChooser();
+        pdfFileChooser.setCurrentDirectory(new File(FileUtil.getDesktopFolderPath()));
+        pdfFileChooser.setFileFilter(new FileFilter() {
+            
+            @Override
+            public String getDescription() {
+                return "PDF (*.pdf)";
+            }
+            
+            @Override
+            public boolean accept(File f) {
+                return FilenameUtils.getExtension(f.getName()).equals("pdf");
+            }
+        });
+		
 		focusOnComponentWhenThisPanelIsDisplayed(remarksField);
 		updateTotalAmountFieldWhenItemsTableChanges();
 		initializeUnitPricesAndQuantitiesTable();
@@ -110,8 +132,8 @@ public class AdjustmentInPanel extends StandardMagicPanel {
 			try {
 				adjustmentInService.save(adjustmentIn);
 			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
-				showErrorMessage("Unexpected error on saving");
+				log.error(e.getMessage(), e);
+				showMessageForUnexpectedError(e);
 				return;
 			}
 			
@@ -129,8 +151,8 @@ public class AdjustmentInPanel extends StandardMagicPanel {
 		try {
 			adjustmentInService.save(adjustmentIn);
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			showErrorMessage("Unexpected error on saving");
+			log.error(e.getMessage(), e);
+			showMessageForUnexpectedError(e);
 		}
 	}
 	
@@ -463,8 +485,8 @@ public class AdjustmentInPanel extends StandardMagicPanel {
 				JOptionPane.showMessageDialog(this, "Post successful!");
 				updateDisplay(adjustmentIn);
 			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
-				showErrorMessage("Unexpected error occurred during posting!");
+				log.error(e.getMessage(), e);
+				showMessageForUnexpectedError(e);
 			}
 		}
 	}
@@ -480,6 +502,31 @@ public class AdjustmentInPanel extends StandardMagicPanel {
 			}
 		});
 		toolBar.add(postButton);
+		
+        toolBar.add(new MagicToolBarButton("pdf", "Generate PDF report", e -> generatePdfReport()));
+	}
+
+	private void generatePdfReport() {
+		String filename = new StringBuilder()
+	            .append("ADJUSTMENT IN - ")
+	            .append(String.valueOf(adjustmentIn.getAdjustmentInNumber()))
+	            .append(".pdf")
+	            .toString();
+
+		
+    	pdfFileChooser.setSelectedFile(new File(filename));
+        if (!pdfFileChooser.selectSaveFile(this)) {
+        	return;
+        }
+        File file = pdfFileChooser.getSelectedFile();
+        
+    	try {
+    		new AdjustmentInPdfGenerator(file).generate(adjustmentIn);
+	        Desktop.getDesktop().open(file);
+    	} catch (Exception e) {
+    		log.error(e.getMessage(), e);
+        	showMessageForUnexpectedError(e);
+    	}
 	}
 
 }
