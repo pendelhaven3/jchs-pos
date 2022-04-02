@@ -27,7 +27,7 @@ public class ReceivingReceiptNewPdfGenerator {
         
         Document document = new Document(pdf);
         
-        Paragraph para = new Paragraph("JOSELLE CHRISTIAN GENERAL MERCHANDISE\nRECEIVING REPORT").setTextAlignment(TextAlignment.CENTER);
+        Paragraph para = new Paragraph("JCHS GROCERY\nRECEIVING REPORT").setTextAlignment(TextAlignment.CENTER);
         document.add(para);
 
         document.add(new Paragraph("\n"));
