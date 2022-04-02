@@ -24,7 +24,6 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.pj.magic.Constants;
 import com.pj.magic.gui.component.DatePickerFormatter;
 import com.pj.magic.gui.component.EllipsisButton;
 import com.pj.magic.gui.component.MagicTextField;
@@ -56,7 +55,7 @@ public class ProductCanvassPanel extends StandardMagicPanel {
 	@Override
 	protected void initializeComponents() {
 		productCodeField = new MagicTextField();
-		productCodeField.setMaximumLength(Constants.PRODUCT_CODE_MAXIMUM_LENGTH);
+		productCodeField.setMaximumLength(14);
 		
 		dateFromModel = new UtilCalendarModel();
 		dateToModel = new UtilCalendarModel();

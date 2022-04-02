@@ -195,7 +195,9 @@ public class ReceivingReceiptDaoImpl extends MagicDao implements ReceivingReceip
 			+ "   on b.ID = a.RECEIVING_RECEIPT_ID"
 			+ " join SUPPLIER c"
 			+ "   on c.ID = b.SUPPLIER_ID"
-			+ " where a.PRODUCT_ID = ?"
+			+ " join PRODUCT d"
+			+ "   on d.PRODUCT2_ID = a.PRODUCT_ID"
+			+ " where d.ID = ?"
 			+ " and b.POST_IND = 'Y'";
 	
 	@Override
