@@ -8,7 +8,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
@@ -383,11 +382,6 @@ public class Product2RepositoryImpl extends MagicDao implements Product2Reposito
 		if (criteria.getActive() != null) {
 			sql.append(" and ACTIVE_IND = ?");
 			params.add(criteria.getActive() ? "Y" : "N");
-		}
-		
-		if (!StringUtils.isEmpty(criteria.getId())) {
-			sql.append(" and ID = ?");
-			params.add(criteria.getId());
 		}
 		
 		if (criteria.getDescriptionLike() != null) {

@@ -22,7 +22,6 @@ import com.pj.magic.util.KeyUtil;
 @Component
 public class SearchProduct2Dialog extends MagicDialog {
 
-	private MagicTextField idField;
 	private MagicTextField descriptionField;
 	private MagicComboBox<String> activeIndicatorComboBox;
 	private JButton searchButton;
@@ -40,9 +39,6 @@ public class SearchProduct2Dialog extends MagicDialog {
 	}
 
 	private void initializeComponents() {
-		idField = new MagicTextField();
-		idField.setNumbersOnly(true);
-		
 		descriptionField = new MagicTextField();
 		
 		activeIndicatorComboBox = new MagicComboBox<>();
@@ -62,7 +58,6 @@ public class SearchProduct2Dialog extends MagicDialog {
 
 	private void saveSearchCriteria() {
 		searchCriteria = new Product2SearchCriteria();
-		searchCriteria.setId(idField.getText());
 		searchCriteria.setDescriptionLike(descriptionField.getText());
 		
 		if (activeIndicatorComboBox.getSelectedIndex() != 0) {
@@ -73,14 +68,6 @@ public class SearchProduct2Dialog extends MagicDialog {
 	}
 
 	private void registerKeyBindings() {
-		idField.onEnterKey(new AbstractAction() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-                saveSearchCriteria();
-			}
-		});
-		
 		descriptionField.onEnterKey(new AbstractAction() {
 			
 			@Override
@@ -152,15 +139,6 @@ public class SearchProduct2Dialog extends MagicDialog {
 		searchButton.setPreferredSize(new Dimension(100, 25));
 		add(searchButton, c);
 		
-//		currentRow++;
-//		
-//		c.fill = GridBagConstraints.BOTH;
-//		c.weightx = 0.0;
-//		c.weighty = 1.0; // bottom space filler
-//		c.gridx = 0;
-//		c.gridy = currentRow;
-//		add(Box.createGlue(), c);
-		
 		pack();
         setLocationRelativeTo(null);
 	}
@@ -173,7 +151,6 @@ public class SearchProduct2Dialog extends MagicDialog {
 	
 	public void updateDisplay() {
 		searchCriteria = null;
-		idField.setText(null);
 		descriptionField.setText(null);
 		activeIndicatorComboBox.setSelectedIndex(1);
 	}

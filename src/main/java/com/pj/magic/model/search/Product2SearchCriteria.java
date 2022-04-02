@@ -8,7 +8,6 @@ import lombok.Setter;
 public class Product2SearchCriteria {
 
 	private Boolean active;
-	private String id;
 	private String descriptionLike;
 	
 }
