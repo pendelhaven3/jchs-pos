@@ -13,7 +13,6 @@ import javax.swing.JButton;
 
 import org.springframework.stereotype.Component;
 
-import com.pj.magic.Constants;
 import com.pj.magic.gui.component.MagicComboBox;
 import com.pj.magic.gui.component.MagicTextField;
 import com.pj.magic.model.search.ProductSearchCriteria;
@@ -60,7 +59,7 @@ public class SearchProductsDialog extends MagicDialog {
 
 	private void saveProductCodeCriteria() {
 		searchCriteria = new ProductSearchCriteria();
-		searchCriteria.setCodeOrDescriptionLike(codeOrDescriptionField.getText());
+		searchCriteria.setCodeOrDescriptionLike(codeOrDescriptionField.getText().trim());
 		
 		if (activeIndicatorComboBox.getSelectedIndex() != 0) {
 			searchCriteria.setActive(activeIndicatorComboBox.getSelectedIndex() == 1);
