@@ -1,6 +1,7 @@
 package com.pj.magic.service.impl;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -201,6 +202,14 @@ public class ProductServiceImpl implements ProductService {
 	@Override
 	public ProductBySpecialCode findProductBySpecialCode(String productCode, Supplier supplier) {
 		return productDao.findProductBySpecialCode(productCode, supplier);
+	}
+
+	@Override
+	public List<String> getAllInactiveCodes() {
+		ProductSearchCriteria criteria = new ProductSearchCriteria();
+		criteria.setActive(Boolean.FALSE);
+		
+		return productDao.search(criteria).stream().map(product -> product.getCode()).collect(Collectors.toList());
 	}
 
 }

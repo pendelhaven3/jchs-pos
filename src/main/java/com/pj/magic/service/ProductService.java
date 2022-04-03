@@ -53,4 +53,6 @@ public interface ProductService {
 
 	ProductBySpecialCode findProductBySpecialCode(String productCode, Supplier supplier);
 
+	List<String> getAllInactiveCodes();
+
 }

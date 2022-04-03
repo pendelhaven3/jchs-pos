@@ -232,12 +232,20 @@ public class TrisysProductListPanel extends StandardMagicPanel {
             return;
         }
         
+        List<String> inactiveCodes = productService.getAllInactiveCodes();
+        
         try (
             CSVReader reader = new CSVReaderBuilder(new StringReader(csvString)).withSkipLines(1).build();
         ) {
             String[] nextLine = null;
             while ((nextLine = reader.readNext()) != null) {
-            	System.out.println("updating product code " + nextLine[0]);
+            	String code = nextLine[0];
+            	
+            	if (inactiveCodes.contains(code)) {
+            		continue;
+            	}
+            	
+            	System.out.println("updating product code " + code);
             	
                 String unit1 = nextLine[8];
                 String unit2 = nextLine[9];
@@ -246,12 +254,12 @@ public class TrisysProductListPanel extends StandardMagicPanel {
                 }
 
                 if (!VALID_UNITS.contains(unit1)) { // TODO: Remove
-                	System.out.println("rejected1: " + nextLine[0] + " - " + unit1);
+                	System.out.println("rejected1: " + code + " - " + unit1);
                 	continue;
                 }
                 
                 if (!StringUtils.isEmpty(unit2) && !VALID_UNITS.contains(unit2)) {  // TODO: Remove
-                	System.out.println("rejected2: " + nextLine[0] + " - " + unit2);
+                	System.out.println("rejected2: " + code + " - " + unit2);
                 	continue;
                 }
                 
@@ -262,7 +270,7 @@ public class TrisysProductListPanel extends StandardMagicPanel {
                 }
                 
                 Product product = new Product();
-                product.setCode(nextLine[0]);
+                product.setCode(code);
                 product.setDescription(nextLine[3]);
                 product.getUnits().add(unit1);
                 if (!StringUtils.isEmpty(unit2)) {
