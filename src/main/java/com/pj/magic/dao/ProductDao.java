@@ -45,5 +45,7 @@ public interface ProductDao {
 	List<ProductBySpecialCode> searchProductsBySpecialCode(String customCode, Supplier supplier);
 
 	ProductBySpecialCode findProductBySpecialCode(String productCode, Supplier supplier);
+
+	void updateDescriptionByProduct2Id(Long product2Id, String description);
 	
 }

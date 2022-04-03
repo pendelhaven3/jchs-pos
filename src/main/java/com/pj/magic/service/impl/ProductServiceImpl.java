@@ -170,6 +170,10 @@ public class ProductServiceImpl implements ProductService {
 	            product.setProduct2Id(existing.getProduct2Id());
 		    	product.setProduct2Id(product2Service.saveFromTrisys(product));
 	            productDao.save(product);
+	            
+	            if (!existing.getDescription().equals(product.getDescription())) {
+	            	productDao.updateDescriptionByProduct2Id(product.getProduct2Id(), product.getDescription());
+	            }
 			} else {
 				Product2 product2 = product2Service.getProduct(existing.getProduct2Id());
 				if (!product2.hasActiveUnit(product.getUnits().get(0))) {

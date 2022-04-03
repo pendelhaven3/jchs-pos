@@ -412,4 +412,12 @@ public class ProductDaoImpl extends MagicDao implements ProductDao {
 		}
 	}
 
+	private static final String UPDATE_DESCRIPTION_BY_PRODUCT2_ID_SQL =
+			"update PRODUCT set DESCRIPTION = ? where PRODUCT2_ID = ? AND DESCRIPTION <> ?";
+	
+	@Override
+	public void updateDescriptionByProduct2Id(Long product2Id, String description) {
+		getJdbcTemplate().update(UPDATE_DESCRIPTION_BY_PRODUCT2_ID_SQL, description, product2Id, description);
+	}
+
 }
