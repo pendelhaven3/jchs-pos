@@ -18,14 +18,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.pj.magic.gui.component.MagicComboBox;
+import com.pj.magic.gui.component.MagicTextField;
 import com.pj.magic.gui.component.MagicToolBar;
 import com.pj.magic.gui.tables.MagicListTable;
-import com.pj.magic.model.Manufacturer;
+import com.pj.magic.model.Supplier;
 import com.pj.magic.model.report.InventoryReport;
 import com.pj.magic.model.report.InventoryReportItem;
 import com.pj.magic.model.search.InventoryReportCriteria;
-import com.pj.magic.service.ManufacturerService;
 import com.pj.magic.service.ReportService;
+import com.pj.magic.service.SupplierService;
 import com.pj.magic.util.ComponentUtil;
 import com.pj.magic.util.FormatterUtil;
 import com.pj.magic.util.ListUtil;
@@ -41,23 +42,27 @@ public class InventoryReportPanel extends StandardMagicPanel {
 	private static final int TOTAL_COST_COLUMN_INDEX = 5;
 	
 	@Autowired private ReportService reportService;
-	@Autowired private ManufacturerService manufacturerService;
+	@Autowired private SupplierService supplierService;
 	
 	private JLabel totalCostLabel;
 	private JTable table;
 	private InventoryReportItemsTableModel tableModel;
-	private MagicComboBox<Manufacturer> manufacturerComboBox;
+	private MagicTextField codeOrDescriptionTextField;
+	private MagicComboBox<Supplier> supplierComboBox;
 	private JButton generateButton;
 	
 	public void updateDisplay() {
-//		manufacturerComboBox.setSelectedIndex(0);
+		codeOrDescriptionTextField.setText(null);
+		supplierComboBox.setSelectedIndex(0);
 		generateReport();
 	}
 
 	@Override
 	protected void initializeComponents() {
-		manufacturerComboBox = new MagicComboBox<>();
-//		manufacturerComboBox.setModel(ListUtil.toDefaultComboBoxModel(manufacturerService.getAllManufacturers(), true));
+		codeOrDescriptionTextField = new MagicTextField();
+		
+		supplierComboBox = new MagicComboBox<>();
+		supplierComboBox.setModel(ListUtil.toDefaultComboBoxModel(supplierService.getAllSuppliers(), true));
 		
 		generateButton = new JButton("Generate");
 		generateButton.addActionListener(e -> generateReport());
@@ -65,12 +70,13 @@ public class InventoryReportPanel extends StandardMagicPanel {
 		totalCostLabel = new JLabel();
 		
 		initializeTable();
-		focusOnComponentWhenThisPanelIsDisplayed(table);
+		focusOnComponentWhenThisPanelIsDisplayed(codeOrDescriptionTextField);
 	}
 
 	private void generateReport() {
 		InventoryReportCriteria criteria = new InventoryReportCriteria();
-//		criteria.setManufacturer((Manufacturer)manufacturerComboBox.getSelectedItem());
+		criteria.setCodeOrDescriptionLike(codeOrDescriptionTextField.getText());
+		criteria.setSupplier((Supplier)supplierComboBox.getSelectedItem());
 		
 		InventoryReport report = reportService.getInventoryReport(criteria);
 		tableModel.setItems(report.getItems());
@@ -94,48 +100,48 @@ public class InventoryReportPanel extends StandardMagicPanel {
 		
 		int currentRow = 0;
 		
-//		GridBagConstraints c = new GridBagConstraints();
-//		c.gridx = 0;
-//		c.gridy = currentRow;
-//		mainPanel.add(Box.createHorizontalStrut(50), c);
-//		
-//		c = new GridBagConstraints();
-//		c.gridx = 1;
-//		c.gridy = currentRow;
-//		c.anchor = GridBagConstraints.WEST;
-//		mainPanel.add(ComponentUtil.createLabel(150, "Manufacturer:"), c);
-//		
-//		c = new GridBagConstraints();
-//		c.gridx = 2;
-//		c.gridy = currentRow;
-//		c.anchor = GridBagConstraints.WEST;
-//		manufacturerComboBox.setPreferredSize(new Dimension(200, 25));
-//		mainPanel.add(manufacturerComboBox, c);
-//		
-//		c = new GridBagConstraints();
-//		c.gridx = 3;
-//		c.gridy = currentRow;
-//		c.weightx = 1.0;
-//		mainPanel.add(Box.createGlue(), c);
-//		
-//		currentRow++;
-//		
-//		c = new GridBagConstraints();
-//		c.gridx = 0;
-//		c.gridy = currentRow;
-//		mainPanel.add(Box.createVerticalStrut(20), c);
-//		
-//		currentRow++;
-//		
-//		c = new GridBagConstraints();
-//		c.gridx = 2;
-//		c.gridy = currentRow;
-//		generateButton.setPreferredSize(new Dimension(120, 25));
-//		mainPanel.add(generateButton, c);
+		GridBagConstraints c = new GridBagConstraints();
+		c.gridx = 0;
+		c.gridy = currentRow;
+		mainPanel.add(Box.createHorizontalStrut(50), c);
+		
+		c = new GridBagConstraints();
+		c.gridx = 1;
+		c.gridy = currentRow;
+		c.anchor = GridBagConstraints.WEST;
+		mainPanel.add(ComponentUtil.createLabel(150, "Code/Description:"), c);
+		
+		c = new GridBagConstraints();
+		c.gridx = 2;
+		c.gridy = currentRow;
+		c.anchor = GridBagConstraints.WEST;
+		codeOrDescriptionTextField.setPreferredSize(new Dimension(200, 25));
+		mainPanel.add(codeOrDescriptionTextField, c);
+		
+		c = new GridBagConstraints();
+		c.gridx = 3;
+		c.gridy = currentRow;
+		c.weightx = 1.0;
+		mainPanel.add(Box.createGlue(), c);
 		
 		currentRow++;
 		
-		GridBagConstraints c = new GridBagConstraints();
+		c = new GridBagConstraints();
+		c.gridx = 1;
+		c.gridy = currentRow;
+		c.anchor = GridBagConstraints.WEST;
+		mainPanel.add(ComponentUtil.createLabel(150, "Supplier:"), c);
+		
+		c = new GridBagConstraints();
+		c.gridx = 2;
+		c.gridy = currentRow;
+		c.anchor = GridBagConstraints.WEST;
+		supplierComboBox.setPreferredSize(new Dimension(300, 25));
+		mainPanel.add(supplierComboBox, c);
+		
+		currentRow++;
+		
+		c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = currentRow;
 		mainPanel.add(Box.createVerticalStrut(20), c);
@@ -143,12 +149,29 @@ public class InventoryReportPanel extends StandardMagicPanel {
 		currentRow++;
 		
 		c = new GridBagConstraints();
-		c.fill = GridBagConstraints.BOTH;
+		c.gridx = 2;
+		c.gridy = currentRow;
+		generateButton.setPreferredSize(new Dimension(120, 25));
+		mainPanel.add(generateButton, c);
+		
+		currentRow++;
+		
+		c = new GridBagConstraints();
+		c.gridx = 0;
+		c.gridy = currentRow;
+		mainPanel.add(Box.createVerticalStrut(20), c);
+		
+		currentRow++;
+		
+		c = new GridBagConstraints();
 		c.weightx = c.weighty = 1.0;
+		c.fill = GridBagConstraints.BOTH;
 		c.gridx = 0;
 		c.gridy = currentRow;
 		c.gridwidth = 4;
-		mainPanel.add(new JScrollPane(table), c);
+		JScrollPane itemsTableScrollPanel = new JScrollPane(table);
+		itemsTableScrollPanel.setPreferredSize(new Dimension(600, 100));
+		mainPanel.add(itemsTableScrollPanel, c);
 		
 		currentRow++;
 		
@@ -164,7 +187,6 @@ public class InventoryReportPanel extends StandardMagicPanel {
 
 	@Override
 	protected void registerKeyBindings() {
-		// none
 	}
 
 	@Override

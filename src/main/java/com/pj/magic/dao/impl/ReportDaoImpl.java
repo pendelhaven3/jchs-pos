@@ -170,9 +170,9 @@ public class ReportDaoImpl extends MagicDao implements ReportDao {
 	}
 
 	private static final String GET_ALL_INVENTORY_REPORT_ITEMS_SQL =
-			" select CODE, DESCRIPTION, UNIT, QUANTITY, COST"
+			" select CODE, DESCRIPTION, UNIT, QUANTITY, COST, PRODUCT_ID"
 			+ " from ("
-			+ "   select b.CODE, a.DESCRIPTION, 'CASE' as UNIT, a.AVAIL_QTY_CASE as QUANTITY, a.FINAL_COST_CASE as COST"
+			+ "   select b.CODE, a.DESCRIPTION, 'CASE' as UNIT, a.AVAIL_QTY_CASE as QUANTITY, a.FINAL_COST_CASE as COST, a.ID as PRODUCT_ID"
 			+ "   from PRODUCT2 a"
 			+ "   join PRODUCT b"
 			+ "     on b.PRODUCT2_ID = a.ID"
@@ -180,7 +180,7 @@ public class ReportDaoImpl extends MagicDao implements ReportDao {
 			+ "   where a.UNIT_IND_CASE = 'Y'"
 			+ "   and a.AVAIL_QTY_CASE > 0"
 			+ "   union all"
-			+ "   select b.CODE, a.DESCRIPTION, 'TIES' as UNIT, a.AVAIL_QTY_TIES as QUANTITY, a.FINAL_COST_TIES as COST"
+			+ "   select b.CODE, a.DESCRIPTION, 'TIES' as UNIT, a.AVAIL_QTY_TIES as QUANTITY, a.FINAL_COST_TIES as COST, a.ID as PRODUCT_ID"
 			+ "   from PRODUCT2 a"
 			+ "   join PRODUCT b"
 			+ "     on b.PRODUCT2_ID = a.ID"
@@ -188,7 +188,7 @@ public class ReportDaoImpl extends MagicDao implements ReportDao {
 			+ "   where a.UNIT_IND_TIES = 'Y'"
 			+ "   and a.AVAIL_QTY_TIES > 0"
 			+ "   union all"
-			+ "   select b.CODE, a.DESCRIPTION, 'PACK' as UNIT, a.AVAIL_QTY_PACK as QUANTITY, a.FINAL_COST_PACK as COST"
+			+ "   select b.CODE, a.DESCRIPTION, 'PACK' as UNIT, a.AVAIL_QTY_PACK as QUANTITY, a.FINAL_COST_PACK as COST, a.ID as PRODUCT_ID"
 			+ "   from PRODUCT2 a"
 			+ "   join PRODUCT b"
 			+ "     on b.PRODUCT2_ID = a.ID"
@@ -196,7 +196,7 @@ public class ReportDaoImpl extends MagicDao implements ReportDao {
 			+ "   where a.UNIT_IND_PACK = 'Y'"
 			+ "   and a.AVAIL_QTY_PACK > 0"
 			+ "   union all"
-			+ "   select b.CODE, a.DESCRIPTION, 'HDZN' as UNIT, a.AVAIL_QTY_HDZN as QUANTITY, a.FINAL_COST_HDZN as COST"
+			+ "   select b.CODE, a.DESCRIPTION, 'HDZN' as UNIT, a.AVAIL_QTY_HDZN as QUANTITY, a.FINAL_COST_HDZN as COST, a.ID as PRODUCT_ID"
 			+ "   from PRODUCT2 a"
 			+ "   join PRODUCT b"
 			+ "     on b.PRODUCT2_ID = a.ID"
@@ -204,22 +204,32 @@ public class ReportDaoImpl extends MagicDao implements ReportDao {
 			+ "   where a.UNIT_IND_HDZN = 'Y'"
 			+ "   and a.AVAIL_QTY_HDZN > 0"
 			+ "   union all"
-			+ "   select b.CODE, a.DESCRIPTION, 'PCS' as UNIT, a.AVAIL_QTY_PCS as QUANTITY, a.FINAL_COST_PCS as COST"
+			+ "   select b.CODE, a.DESCRIPTION, 'PCS' as UNIT, a.AVAIL_QTY_PCS as QUANTITY, a.FINAL_COST_PCS as COST, a.ID as PRODUCT_ID"
 			+ "   from PRODUCT2 a"
 			+ "   join PRODUCT b"
 			+ "     on b.PRODUCT2_ID = a.ID"
 			+ "     and b.UOM_CODE = 'PCS'"
 			+ "   where a.UNIT_IND_PCS = 'Y'"
 			+ "   and a.AVAIL_QTY_PCS > 0"
-			+ " ) a";
+			+ " ) a"
+			+ " where 1 = 1";
 	
 	@Override
 	public List<InventoryReportItem> getInventoryReportItems(InventoryReportCriteria criteria) {
 		List<Object> params = new ArrayList<>();
 		
 		StringBuilder sql = new StringBuilder(GET_ALL_INVENTORY_REPORT_ITEMS_SQL);
+		if (!StringUtils.isEmpty(criteria.getCodeOrDescriptionLike())) {
+			sql.append(" and (a.CODE like ? or a.DESCRIPTION like ?)");
+			params.add(criteria.getCodeOrDescriptionLike() + "%");
+			params.add("%" + criteria.getCodeOrDescriptionLike() + "%");
+		}
+		if (criteria.getSupplier() != null) {
+			sql.append(" and exists(select 1 from SUPPLIER_PRODUCT sp where sp.PRODUCT_ID = a.PRODUCT_ID and sp.SUPPLIER_ID = ?)");
+			params.add(criteria.getSupplier().getId());
+		}
 		if (criteria.getManufacturer() != null) {
-			sql.append(" where a.MANUFACTURER_ID = ?");
+			sql.append(" and a.MANUFACTURER_ID = ?");
 			params.add(criteria.getManufacturer().getId());
 		}
 		sql.append(" order by DESCRIPTION");
