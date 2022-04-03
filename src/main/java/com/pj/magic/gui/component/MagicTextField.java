@@ -109,4 +109,9 @@ public class MagicTextField extends JTextField {
 		}
 	}
 	
+	@Override
+	public String getText() {
+		return super.getText().trim();
+	}
+	
 }

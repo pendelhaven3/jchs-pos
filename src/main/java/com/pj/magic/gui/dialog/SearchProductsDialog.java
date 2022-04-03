@@ -59,7 +59,7 @@ public class SearchProductsDialog extends MagicDialog {
 
 	private void saveProductCodeCriteria() {
 		searchCriteria = new ProductSearchCriteria();
-		searchCriteria.setCodeOrDescriptionLike(codeOrDescriptionField.getText().trim());
+		searchCriteria.setCodeOrDescriptionLike(codeOrDescriptionField.getText());
 		
 		if (activeIndicatorComboBox.getSelectedIndex() != 0) {
 			searchCriteria.setActive(activeIndicatorComboBox.getSelectedIndex() == 1);
