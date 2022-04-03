@@ -991,7 +991,7 @@ public class MaintainProductPanel extends StandardMagicPanel {
 
 	@Override
 	protected void addToolBarButtons(MagicToolBar toolBar) {
-        JButton customCodesButton = new MagicToolBarButton("search", "Custom Codes", e -> goToCustomCodesPanel());
+        JButton customCodesButton = new MagicToolBarButton("add_special", "Custom Codes", e -> goToCustomCodesPanel());
 		toolBar.add(customCodesButton);
 	}
 
