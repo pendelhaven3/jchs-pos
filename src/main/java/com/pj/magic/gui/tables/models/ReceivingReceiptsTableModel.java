@@ -51,7 +51,7 @@ public class ReceivingReceiptsTableModel extends AbstractTableModel {
 		case REFERENCE_NUMBER_COLUMN_INDEX:
 			return receivingReceipt.getReferenceNumber();
 		case NET_AMOUNT_COLUMN_INDEX:
-			return FormatterUtil.formatAmount(receivingReceipt.getTotalNetAmount());
+			return FormatterUtil.formatAmount(receivingReceipt.getTotalNetAmountWithVat());
 		case STATUS_COLUMN_INDEX:
 			return receivingReceipt.getStatus();
 		default:
