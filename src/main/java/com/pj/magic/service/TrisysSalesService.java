@@ -17,5 +17,6 @@ public interface TrisysSalesService {
 	TrisysSales getTrisysSales(Long id);
 	void saveSalesItem(TrisysSalesItem item);
 	void importTrisysSales(File file) throws Exception;
+	void deleteTrisysSalesImport(Long id);
 	
 }

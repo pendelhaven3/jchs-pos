@@ -17,6 +17,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.pj.magic.model.TrisysSalesImport;
@@ -24,6 +25,7 @@ import com.pj.magic.model.TrisysSalesItem;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.pj.magic.exception.FileAlreadyImportedException;
+import com.pj.magic.exception.TrisysSalesImportException;
 import com.pj.magic.model.Product;
 import com.pj.magic.model.Product2;
 import com.pj.magic.model.TrisysSales;
@@ -52,6 +54,7 @@ public class TrisysSalesServiceImpl implements TrisysSalesService {
 	@Autowired private SystemService systemService;
 	@Autowired private ProductService productService;
 	@Autowired private Product2Service product2Service;
+	@Autowired private TrisysSalesService trisysSalesService;
 	
 	@Override
 	public List<TrisysSalesImport> getAllTrisysSalesImports() {
@@ -99,18 +102,25 @@ public class TrisysSalesServiceImpl implements TrisysSalesService {
 	@Override
 	public void importTrisysSales(File file) throws Exception {
         String filename = FilenameUtils.getBaseName(file.getName());
-        if (findByFile(filename) != null) {
-        	throw new FileAlreadyImportedException();
+        
+        TrisysSalesImport existingSalesImport = findByFile(filename);
+        if (existingSalesImport != null) {
+        	String status = existingSalesImport.getStatus();
+        	if ("SUCCESS".equals(status)) {
+               	throw new FileAlreadyImportedException();
+           	} else {
+           		trisysSalesService.deleteTrisysSalesImport(existingSalesImport.getId());
+           	}
         }
         
         String csvString = convertDbfToCsv(file);
 		
         TrisysSalesImport salesImport = null;
         TrisysSales sales = null;
+        String[] nextLine = null;
         try (
             CSVReader reader = new CSVReaderBuilder(new StringReader(csvString)).withSkipLines(1).build();
         ) {
-            String[] nextLine = null;
             while ((nextLine = reader.readNext()) != null) {
         		Date salesDate = new SimpleDateFormat("yyyyMMdd").parse(nextLine[1]);
             	String terminal = nextLine[11];
@@ -119,6 +129,7 @@ public class TrisysSalesServiceImpl implements TrisysSalesService {
                     salesImport.setFile(filename);
                     salesImport.setImportDate(systemService.getCurrentDateTime());
                     salesImport.setImportBy(loginService.getLoggedInUser());
+                    salesImport.setStatus("SUCCESS");
                     saveTrisysSalesImport(salesImport);
             	}
             	
@@ -154,52 +165,53 @@ public class TrisysSalesServiceImpl implements TrisysSalesService {
             		continue;
             	}
             	
-            	try {
-                	Product product = productService.findProductByCode(productCode);
-                	if (product != null) {
-                    	if (product.getUnits().size() > 1 && !allowedUnits.contains(product.getUnits().get(1))) { // debug line
-                    		continue;
-                    	}
-                		
-                    	TrisysSalesItem item = new TrisysSalesItem();
-                    	item.setSales(sales);
-                    	item.setProductCode(productCode);
-                    	item.setQuantity(total.divide(sellPrice, 2, RoundingMode.HALF_EVEN).intValue());
-                    	item.setUnit(unit);
-                    	item.setUnitCost(unitCost);
-                    	item.setSellPrice(sellPrice);
-                    	saveSalesItem(item);
-                		
-                    	product2Service.subtractAvailableQuantity(product.getProduct2Id(), item.getUnit(), item.getQuantity());
-                    	
-                    	// auto conversion
-        				Product2 product2 = product2Service.getProduct(product.getProduct2Id());
-        				int availableQuantity = product2.getUnitQuantity(item.getUnit());
-        				if (availableQuantity < 0 && !product.isWholesale()) {
-        	            	Product wholesaleProduct = productService.findProductByCode(productCode + "01");
-        	            	if (wholesaleProduct != null) {
-        	            		String wholesaleUnit = wholesaleProduct.getUnits().get(0);
-        	            		int availableWholesaleQuantity = product2.getUnitQuantity(wholesaleUnit);
-        	            		if (availableWholesaleQuantity > 0) {
-        	            			int unitConversion = product2.getUnitConversion(wholesaleUnit);
-                					int quantityToConvert = 1;
-                					while (quantityToConvert >= availableWholesaleQuantity &&
-                							availableQuantity + (unitConversion * quantityToConvert) < 0) {
-                						quantityToConvert++;
-                					}
-                					product2Service.subtractAvailableQuantity(product.getProduct2Id(), wholesaleUnit, quantityToConvert);
-                					product2Service.addAvailableQuantity(product.getProduct2Id(), item.getUnit(), quantityToConvert * unitConversion);
-        	            		}
-        	            	}
-        				}
-                	} else {
-                		log.warn("Product code not found: " + productCode);
+            	Product product = productService.findProductByCode(productCode);
+            	if (product != null) {
+                	if (product.getUnits().size() > 1 && !allowedUnits.contains(product.getUnits().get(1))) { // debug line
+                		continue;
                 	}
-            	} catch (Exception e) {
-            		log.error(StringUtils.join(nextLine, ','));
-            		throw e;
+            		
+                	TrisysSalesItem item = new TrisysSalesItem();
+                	item.setSales(sales);
+                	item.setProductCode(productCode);
+                	item.setQuantity(total.divide(sellPrice, 2, RoundingMode.HALF_EVEN).intValue());
+                	item.setUnit(unit);
+                	item.setUnitCost(unitCost);
+                	item.setSellPrice(sellPrice);
+                	saveSalesItem(item);
+            		
+                	product2Service.subtractAvailableQuantity(product.getProduct2Id(), item.getUnit(), item.getQuantity());
+                	
+                	// auto conversion
+    				Product2 product2 = product2Service.getProduct(product.getProduct2Id());
+    				int availableQuantity = product2.getUnitQuantity(item.getUnit());
+    				if (availableQuantity < 0 && !product.isWholesale()) {
+    	            	Product wholesaleProduct = productService.findProductByCode(productCode + "01");
+    	            	if (wholesaleProduct != null) {
+    	            		String wholesaleUnit = wholesaleProduct.getUnits().get(0);
+    	            		int availableWholesaleQuantity = product2.getUnitQuantity(wholesaleUnit);
+    	            		if (availableWholesaleQuantity > 0) {
+    	            			int unitConversion = product2.getUnitConversion(wholesaleUnit);
+            					int quantityToConvert = 1;
+            					while (quantityToConvert >= availableWholesaleQuantity &&
+            							availableQuantity + (unitConversion * quantityToConvert) < 0) {
+            						quantityToConvert++;
+            					}
+            					product2Service.subtractAvailableQuantity(product.getProduct2Id(), wholesaleUnit, quantityToConvert);
+            					product2Service.addAvailableQuantity(product.getProduct2Id(), item.getUnit(), quantityToConvert * unitConversion);
+    	            		}
+    	            	}
+    				}
+            	} else {
+            		log.warn("Product code not found: " + productCode);
             	}
             }
+        } catch (Exception e) {
+        	if (nextLine != null) {
+        		throw new TrisysSalesImportException(StringUtils.join(Arrays.asList(nextLine[2], nextLine[6]), ", "), e);
+        	} else {
+        		throw e;
+        	}
         }
 	}
 
@@ -238,5 +250,11 @@ public class TrisysSalesServiceImpl implements TrisysSalesService {
             return sb.toString();
         }
     }
+
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	@Override
+	public void deleteTrisysSalesImport(Long id) {
+		trisysSalesImportRepository.delete(id);
+	}
 	
 }

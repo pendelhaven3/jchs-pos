@@ -11,18 +11,22 @@ import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.table.TableColumnModel;
 
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.pj.magic.exception.FileAlreadyImportedException;
-import com.pj.magic.exception.NotEnoughStocksException;
+import com.pj.magic.exception.TrisysSalesImportException;
 import com.pj.magic.gui.component.MagicFileChooser;
 import com.pj.magic.gui.component.MagicToolBar;
 import com.pj.magic.gui.component.MagicToolBarButton;
 import com.pj.magic.gui.tables.MagicListTable;
 import com.pj.magic.gui.tables.models.ListBackedTableModel;
 import com.pj.magic.model.TrisysSalesImport;
+import com.pj.magic.service.LoginService;
+import com.pj.magic.service.SystemService;
 import com.pj.magic.service.TrisysSalesService;
 import com.pj.magic.util.ComponentUtil;
 import com.pj.magic.util.DbfFileFilter;
@@ -37,8 +41,12 @@ public class TrisysSalesImportListPanel extends StandardMagicPanel {
     private static final int FILE_COLUMN_INDEX = 0;
     private static final int IMPORT_DATE_COLUMN_INDEX = 1;
     private static final int IMPORT_BY_COLUMN_INDEX = 2;
+    private static final int STATUS_COLUMN_INDEX = 3;
+    private static final int FAILED_LINE_COLUMN_INDEX = 4;
     
 	@Autowired private TrisysSalesService trisysSalesService;
+	@Autowired private LoginService loginService;
+	@Autowired private SystemService systemService;
 	
 	private MagicListTable table;
 	private TrisysSalesImportTableModel tableModel = new TrisysSalesImportTableModel();
@@ -60,7 +68,18 @@ public class TrisysSalesImportListPanel extends StandardMagicPanel {
 	@Override
 	protected void initializeComponents() {
 		table = new MagicListTable(tableModel);
+		initializeTable();
+		
 		focusOnComponentWhenThisPanelIsDisplayed(table);
+	}
+
+	private void initializeTable() {
+		TableColumnModel columnModel = table.getColumnModel();
+		columnModel.getColumn(FILE_COLUMN_INDEX).setPreferredWidth(200);
+		columnModel.getColumn(IMPORT_DATE_COLUMN_INDEX).setPreferredWidth(200);
+		columnModel.getColumn(IMPORT_BY_COLUMN_INDEX).setPreferredWidth(100);
+		columnModel.getColumn(STATUS_COLUMN_INDEX).setPreferredWidth(100);
+		columnModel.getColumn(FAILED_LINE_COLUMN_INDEX).setPreferredWidth(200);
 	}
 
 	@Override
@@ -101,7 +120,9 @@ public class TrisysSalesImportListPanel extends StandardMagicPanel {
 	protected void selectSalesImport() {
 		if (table.getSelectedRow() != -1) {
 			TrisysSalesImport salesImport = tableModel.getItem(table.getSelectedRow());
-			getMagicFrame().switchToTrisysSalesImportPanel(salesImport);
+			if (!salesImport.isError()) {
+				getMagicFrame().switchToTrisysSalesImportPanel(salesImport);
+			}
 		}
 	}
 
@@ -130,42 +151,36 @@ public class TrisysSalesImportListPanel extends StandardMagicPanel {
             return;
         }
         
-        /*
-        try (
-            CSVReader reader = new CSVReaderBuilder(new StringReader(csvString)).withSkipLines(1).build();
-        ) {
-            String[] nextLine = null;
-            while ((nextLine = reader.readNext()) != null) {
-            	String productCode = nextLine[2];
-            	if (productService.findProductByCode(productCode) == null) {
-            		showErrorMessage("Product code not defined: " + productCode);
-            		return;
-            	}
-            }
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            showMessageForUnexpectedError();
-            return;
-        }
-        */
-        
         try {
             trisysSalesService.importTrisysSales(fileChooser.getSelectedFile());
             showMessage("Trisys sales file imported");
             updateDisplay();
         } catch (FileAlreadyImportedException e) {
         	showErrorMessage("File already imported");
-        } catch (NotEnoughStocksException e) {
-        	showErrorMessage("Not enough stocks for product " + e.getProductCode());
-        } catch (Exception e) {
+        } catch (TrisysSalesImportException e) {
             log.error(e.getMessage(), e);
             showMessageForUnexpectedError();
+            saveFailedImport(fileChooser.getSelectedFile().getName(), e);
+            updateDisplay();
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            showMessageForUnexpectedError(e);
         }
     }
 	
-    private class TrisysSalesImportTableModel extends ListBackedTableModel<TrisysSalesImport> {
+    private void saveFailedImport(String filename, TrisysSalesImportException e) {
+        TrisysSalesImport salesImport = new TrisysSalesImport();
+        salesImport.setFile(FilenameUtils.getBaseName(filename));
+        salesImport.setImportDate(systemService.getCurrentDateTime());
+        salesImport.setImportBy(loginService.getLoggedInUser());
+        salesImport.setStatus("ERROR");
+        salesImport.setFailedLine(e.getLine());
+        trisysSalesService.saveTrisysSalesImport(salesImport);
+	}
 
-        private final String[] columnNames = {"File", "Import Date", "Import By"};
+	private class TrisysSalesImportTableModel extends ListBackedTableModel<TrisysSalesImport> {
+
+        private final String[] columnNames = {"File", "Import Date", "Import By", "Status", "Failed Line"};
 	    
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
@@ -177,6 +192,10 @@ public class TrisysSalesImportListPanel extends StandardMagicPanel {
                 return FormatterUtil.formatDateTime(salesImport.getImportDate());
             case IMPORT_BY_COLUMN_INDEX:
             	return salesImport.getImportBy().getUsername();
+            case STATUS_COLUMN_INDEX:
+            	return salesImport.getStatus();
+            case FAILED_LINE_COLUMN_INDEX:
+            	return salesImport.getFailedLine();
             default:
                 throw new RuntimeException("Fetching invalid column index: " + columnIndex);
             }

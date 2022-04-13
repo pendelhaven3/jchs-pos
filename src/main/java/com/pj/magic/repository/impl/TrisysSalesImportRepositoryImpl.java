@@ -23,7 +23,7 @@ import com.pj.magic.repository.TrisysSalesImportRepository;
 public class TrisysSalesImportRepositoryImpl extends MagicDao implements TrisysSalesImportRepository {
 
 	private static final String BASE_SELECT_SQL =
-			"select a.ID, a.FILE, a.IMPORT_DT, a.IMPORT_BY,"
+			"select a.ID, a.FILE, a.IMPORT_DT, a.IMPORT_BY, a.STATUS, a.FAILED_LINE,"
 			+ " b.USERNAME as IMPORT_BY_USERNAME"
 			+ " from TRISYS_SALES_IMPORT a"
 			+ " join USER b"
@@ -38,6 +38,8 @@ public class TrisysSalesImportRepositoryImpl extends MagicDao implements TrisysS
 			salesImport.setFile(rs.getString("FILE"));
 			salesImport.setImportDate(rs.getTimestamp("IMPORT_DT"));
 			salesImport.setImportBy(new User(rs.getLong("IMPORT_BY"), rs.getString("IMPORT_BY_USERNAME")));
+			salesImport.setStatus(rs.getString("STATUS"));
+			salesImport.setFailedLine(rs.getString("FAILED_LINE"));
 			return salesImport;
 		}
 	};
@@ -58,9 +60,9 @@ public class TrisysSalesImportRepositoryImpl extends MagicDao implements TrisysS
 
 	private static final String INSERT_SQL =
 			"insert into TRISYS_SALES_IMPORT"
-			+ " (FILE, IMPORT_DT, IMPORT_BY)"
+			+ " (FILE, IMPORT_DT, IMPORT_BY, STATUS, FAILED_LINE)"
 			+ " values"
-			+ " (?, current_timestamp(), ?)";
+			+ " (?, current_timestamp(), ?, ?, ?)";
 
 	@Override
 	public void save(TrisysSalesImport salesImport) {
@@ -73,6 +75,8 @@ public class TrisysSalesImportRepositoryImpl extends MagicDao implements TrisysS
 				PreparedStatement ps = con.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS);
 				ps.setString(1, salesImport.getFile());
 				ps.setLong(2, salesImport.getImportBy().getId());
+				ps.setString(3,  salesImport.getStatus());
+				ps.setString(4, salesImport.getFailedLine());
 				return ps;
 			}
 		}, holder);
@@ -81,7 +85,7 @@ public class TrisysSalesImportRepositoryImpl extends MagicDao implements TrisysS
 	}
 
 	private static final String FIND_BY_FILE_SQL = BASE_SELECT_SQL + " where a.FILE = ?";
-	
+
 	@Override
 	public TrisysSalesImport findByFile(String file) {
 		try {
@@ -89,6 +93,13 @@ public class TrisysSalesImportRepositoryImpl extends MagicDao implements TrisysS
 		} catch (IncorrectResultSizeDataAccessException e) {
 			return null;
 		}
+	}
+
+	private static final String DELETE_SQL = "delete from TRISYS_SALES_IMPORT where ID = ?";
+	
+	@Override
+	public void delete(long id) {
+		getJdbcTemplate().update(DELETE_SQL, id);
 	}
 	
 }

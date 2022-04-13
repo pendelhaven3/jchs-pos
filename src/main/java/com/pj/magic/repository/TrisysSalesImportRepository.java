@@ -10,5 +10,6 @@ public interface TrisysSalesImportRepository {
 	TrisysSalesImport get(long id);
 	void save(TrisysSalesImport salesImport);
 	TrisysSalesImport findByFile(String file);
+	void delete(long id);
 	
 }
