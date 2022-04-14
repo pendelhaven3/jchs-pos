@@ -526,6 +526,8 @@ create table TRISYS_SALES_IMPORT (
   FILE varchar(100) not null,
   IMPORT_DT datetime null,
   IMPORT_BY integer null,
+  STATUS varchar(20) not null,
+  FAILED_LINE varchar(500) null,
   constraint TRISYS_SALES_IMPORT$PK primary key (ID),
   constraint TRISYS_SALES_IMPORT$UK unique (FILE),
   constraint TRISYS_SALES_IMPORT$FK foreign key (IMPORT_BY) references USER (ID)
