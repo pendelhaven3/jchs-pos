@@ -3,65 +3,39 @@ package com.pj.magic.model;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
-
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
-import com.pj.magic.model.util.BooleanToStringConverter;
-
-@Entity
 public class Customer implements Serializable {
 
     private static final long serialVersionUID = 4994363059129213047L;
     
-    @Id
-	@GeneratedValue
 	private Long id;
 	private String code;
 	private String name;
 
-	@Column(name = "BUSINESS_ADDRESS")
 	private String businessAddress;
 
-	@Column(name = "DELIVERY_ADDRESS")
 	private String deliveryAddress;
 
-	@Column(name = "CONTACT_PERSON")
 	private String contactPerson;
 
-	@Column(name = "CONTACT_NUMBER")
 	private String contactNumber;
 
 	private String tin;
 
-	@Column(name = "APPROVED_CREDIT_LINE")
 	private BigDecimal approvedCreditLine;
 
-	@OneToOne
-	@JoinColumn(name = "PAYMENT_TERM_ID")
 	private PaymentTerm paymentTerm;
 
-	@Column(name = "BUSINESS_TYPE")
 	private String businessType;
 
 	private String owners;
 
-	@Column(name = "BANK_REFERENCES")
 	private String bankReferences;
 
-	@Convert(converter = BooleanToStringConverter.class)
-	@Column(name = "HOLD_IND")
 	private Boolean hold = false;
 	
-	@Convert(converter = BooleanToStringConverter.class)
-	@Column(name = "ACTIVE_IND")
 	private Boolean active = false;
 
 	private String remarks;

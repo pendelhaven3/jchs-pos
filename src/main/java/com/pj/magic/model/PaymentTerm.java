@@ -2,27 +2,16 @@ package com.pj.magic.model;
 
 import java.io.Serializable;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
-@Entity
-@Table(name="PAYMENT_TERM")
 public class PaymentTerm implements Serializable {
 
     private static final long serialVersionUID = -1020994733634274429L;
     
-    @Id
-	@GeneratedValue
 	private Long id;
 	private String name;
 	
-	@Column(name="NUMBER_OF_DAYS")
 	private int numberOfDays;
 
 	public PaymentTerm() {

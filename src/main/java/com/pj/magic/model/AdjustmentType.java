@@ -1,23 +1,14 @@
 package com.pj.magic.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
-@Entity
-@Table(name = "ADJUSTMENT_TYPE")
 public class AdjustmentType {
 
 	public static final String SALES_RETURN_CODE = "SR";
 	public static final String BAD_STOCK_RETURN_CODE = "BSR";
 	public static final String NO_MORE_STOCK_ADJUSTMENT_CODE = "NMS";
 	
-	@Id
-	@GeneratedValue
 	private Long id;
 	
 	private String code;

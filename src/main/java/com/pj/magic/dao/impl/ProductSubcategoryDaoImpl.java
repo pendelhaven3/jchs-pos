@@ -1,8 +1,5 @@
 package com.pj.magic.dao.impl;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-
 import org.springframework.stereotype.Repository;
 
 import com.pj.magic.dao.ProductSubcategoryDao;
@@ -11,6 +8,25 @@ import com.pj.magic.model.ProductSubcategory;
 @Repository
 public class ProductSubcategoryDaoImpl implements ProductSubcategoryDao {
 
+	@Override
+	public void save(ProductSubcategory subcategory) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public ProductSubcategory get(long id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void delete(ProductSubcategory subcategory) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/*
 	@PersistenceContext
 	private EntityManager entityManager;
 	
@@ -32,5 +48,6 @@ public class ProductSubcategoryDaoImpl implements ProductSubcategoryDao {
 	public void delete(ProductSubcategory subcategory) {
 		entityManager.remove(get(subcategory.getId()));
 	}
+	*/
 
 }
