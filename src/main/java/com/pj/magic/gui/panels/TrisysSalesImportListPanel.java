@@ -3,12 +3,11 @@ package com.pj.magic.gui.panels;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.util.List;
 
 import javax.swing.AbstractAction;
-import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.table.TableColumnModel;
@@ -133,16 +132,8 @@ public class TrisysSalesImportListPanel extends StandardMagicPanel {
 
 	@Override
 	protected void addToolBarButtons(MagicToolBar toolBar) {
-        JButton addButton = new MagicToolBarButton("up", "Import Trisys Sales");
-        addButton.addActionListener(new ActionListener() {
-            
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                importTrisysSales();
-            }
-
-        });
-        toolBar.add(addButton);
+//        toolBar.add(new MagicToolBarButton("up", "Import Trisys Sales", e -> importTrisysSales()));
+        toolBar.add(new MagicToolBarButton("up_all", "Import All Trisys Sales", e -> importAllTrisysSales()));
 	}
 
     private void importTrisysSales() {
@@ -176,6 +167,42 @@ public class TrisysSalesImportListPanel extends StandardMagicPanel {
         salesImport.setStatus("ERROR");
         salesImport.setFailedLine(e.getLine());
         trisysSalesService.saveTrisysSalesImport(salesImport);
+	}
+
+    private void importAllTrisysSales() {
+    	File location = new File("C:\\Trisys\\Magic");
+    	for (final File fileEntry : location.listFiles()) {
+    		if (fileEntry.isDirectory()) {
+    			continue;
+    		}
+    		
+            try {
+        		log.info("Importing {}", fileEntry.getName());
+                trisysSalesService.importTrisysSales(fileEntry);
+        		log.info("Importing {} success", fileEntry.getName());
+        		moveFileToProcessedFolder(location, fileEntry);
+            } catch (FileAlreadyImportedException e) {
+        		log.info("{} already imported", fileEntry.getName());
+        		moveFileToProcessedFolder(location, fileEntry);
+            	continue;
+            } catch (TrisysSalesImportException e) {
+                log.error(e.getMessage(), e);
+                saveFailedImport(fileEntry.getName(), e);
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
+    	}
+    	showMessage("Done importing all available Trisys Sales Files");
+    	updateDisplay();
+    }
+    
+	private void moveFileToProcessedFolder(File directory, File fileEntry) {
+		File newFile = new File(directory.getAbsolutePath() + "\\processed\\" + fileEntry.getName());
+		if (!newFile.exists()) {
+			fileEntry.renameTo(newFile);
+		} else {
+			fileEntry.delete();
+		}
 	}
 
 	private class TrisysSalesImportTableModel extends ListBackedTableModel<TrisysSalesImport> {

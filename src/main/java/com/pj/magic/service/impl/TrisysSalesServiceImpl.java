@@ -154,12 +154,6 @@ public class TrisysSalesServiceImpl implements TrisysSalesService {
             	BigDecimal sellPrice = new BigDecimal(nextLine[8]);
             	BigDecimal total = new BigDecimal(nextLine[10]);
             	
-            	if ("000000000315".equals(productCode)) {
-            		if ("PCS".equals(unit)) {
-            			productCode = "480901600801";
-            		}
-            	}
-            	
             	List<String> allowedUnits = Arrays.asList("CASE", "TIES", "PACK", "HDZN", "PCS");
             	if (!allowedUnits.contains(unit)) {
             		continue;
