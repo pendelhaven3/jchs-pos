@@ -112,7 +112,7 @@
 				<configuration>
 					<archive>
 						<manifestEntries>
-							<SplashScreen-Image>BOOT-INF/classes/images/logo.jpg</SplashScreen-Image>
+							<SplashScreen-Image>BOOT-INF/classes/images/splash.jpg</SplashScreen-Image>
 						</manifestEntries>
 					</archive>
 				</configuration>
