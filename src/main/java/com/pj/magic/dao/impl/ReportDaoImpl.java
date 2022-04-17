@@ -50,7 +50,7 @@ public class ReportDaoImpl extends MagicDao implements ReportDao {
 		sql.append(" where 1 = 1");
 		
 		Map<String, Object> params = new HashMap<>();
-		params.put("product", criteria.getProduct().getId());
+		params.put("product_code", criteria.getProduct().getCode());
 		
 		if (criteria.getFromDateTime() != null) {
 			sql.append(" and POST_DT >= :fromDate");
@@ -105,7 +105,7 @@ public class ReportDaoImpl extends MagicDao implements ReportDao {
 				item.setAmount(salesInvoiceItem.getAmount());
 				item.setAddQuantity(rs.getInt("QUANTITY"));
 				break;
-			case "SALES INVOICE":
+			case "SALES":
 				salesInvoiceItem = new SalesInvoiceItem();
 				salesInvoiceItem.setQuantity(rs.getInt("QUANTITY"));
 				salesInvoiceItem.setUnitPrice(rs.getBigDecimal("UNIT_COST_OR_PRICE"));
@@ -137,6 +137,9 @@ public class ReportDaoImpl extends MagicDao implements ReportDao {
 			case "SALES RETURN - CANCEL":
 				item.setTransactionType("CANCELLED SALES RETURN");
 				item.setLessQuantity(rs.getInt("QUANTITY"));
+				break;
+			case "INVENTORY CHECK":
+				item.setAddQuantity(rs.getInt("QUANTITY"));
 				break;
 			case "INVENTORY CHECK BEFORE":
 				item.setLessQuantity(rs.getInt("QUANTITY"));
