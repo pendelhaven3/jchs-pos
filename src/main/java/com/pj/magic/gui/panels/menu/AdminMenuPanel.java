@@ -90,8 +90,6 @@ public class AdminMenuPanel extends MenuPanel {
 		case "Payment Terminal Assignments":
 			getMagicFrame().switchToPaymentTerminalAssignmentListPanel();
 			break;
-		case "Miscellaneous":
-			getMagicFrame().switchToAdminMiscellaneousPanel();
 		}
 	}
 
@@ -104,9 +102,8 @@ public class AdminMenuPanel extends MenuPanel {
 
 		private final List<String> menuItems = Arrays.asList(
 				"User List",
-				"Reset Password",
+				"Reset Password"
 //				"Payment Terminal Assignments",
-				"Miscellaneous"
 		);
 		
 		@Override
