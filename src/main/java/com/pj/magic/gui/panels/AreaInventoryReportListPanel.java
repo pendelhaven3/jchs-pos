@@ -125,6 +125,14 @@ public class AreaInventoryReportListPanel extends StandardMagicPanel {
 				selectAreaInventoryReport();
 			}
 		});
+		
+		onEscapeKey(new AbstractAction() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				doOnBack();
+			}
+		});
 	}
 	
 	private void selectAreaInventoryReport() {

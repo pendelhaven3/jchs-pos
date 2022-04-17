@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.net.URL;
 import java.util.List;
 
+import javax.swing.AbstractAction;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -82,6 +83,14 @@ public class UserListPanel extends StandardMagicPanel {
 			@Override
 			public void doAction() {
 				selectUser();
+			}
+		});
+		
+		onEscapeKey(new AbstractAction() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				doOnBack();
 			}
 		});
 	}

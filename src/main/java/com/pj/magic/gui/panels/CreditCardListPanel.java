@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.AbstractAction;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -77,6 +78,14 @@ public class CreditCardListPanel extends StandardMagicPanel {
 			@Override
 			public void doAction() {
 				selectCreditCard();
+			}
+		});
+		
+		onEscapeKey(new AbstractAction() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				doOnBack();
 			}
 		});
 	}

@@ -109,6 +109,14 @@ public class ProductListPanel extends StandardMagicPanel {
         });
 	    
 	    table.addDoubleClickMouseListener(() -> selectProduct());
+	    
+		onEscapeKey(new AbstractAction() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				doOnBack();
+			}
+		});
 	}
 
 	protected void selectProduct() {

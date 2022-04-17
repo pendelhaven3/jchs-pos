@@ -93,6 +93,14 @@ public class AreaListPanel extends StandardMagicPanel {
 				}
 			}
 		});
+		
+		onEscapeKey(new AbstractAction() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				doOnBack();
+			}
+		});
 	}
 
 	protected void selectArea() {
