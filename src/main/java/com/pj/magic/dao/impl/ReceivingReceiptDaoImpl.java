@@ -262,7 +262,7 @@ public class ReceivingReceiptDaoImpl extends MagicDao implements ReceivingReceip
 			+ "   where pprr.RECEIVING_RECEIPT_ID = a.ID"
 			+ "   and pp.POST_IND = 'Y'"
 			+ " )"
-			+ " and a.RECEIVED_DT >= '2020-01-01'";
+			+ " and a.RECEIVED_DT >= '2022-01-01'";
 	
 	@Override
 	public List<ReceivingReceipt> search(ReceivingReceiptSearchCriteria criteria) {
