@@ -217,7 +217,6 @@ public class MagicFrame extends JFrame {
     public static final String TRISYS_SALES_IMPORT_LIST_PANEL = "TRISYS_SALES_IMPORT_LIST_PANEL";
     public static final String TRISYS_SALES_IMPORT_PANEL = "TRISYS_SALES_IMPORT_PANEL";
     public static final String TRISYS_SALES_PANEL = "TRISYS_SALES_PANEL";
-    public static final String ADMIN_MISCELLANEOUS_PANEL = "ADMIN_MISCELLANEOUS_PANEL";
     public static final String MAINTAIN_TRISYS_PRODUCT_PANEL = "MAINTAIN_TRISYS_PRODUCT_PANEL";
     public static final String PRODUCT_COST_LIST_PANEL = "PRODUCT_COST_LIST_PANEL";
     public static final String EDIT_PRODUCT_COST_PANEL = "EDIT_PRODUCT_COST_PANEL";
@@ -339,7 +338,6 @@ public class MagicFrame extends JFrame {
     @Autowired private TrisysSalesImportListPanel importTrisysSalesListPanel;
     @Autowired private TrisysSalesImportPanel trisysSalesImportPanel;
     @Autowired private TrisysSalesPanel trisysSalesPanel;
-    @Autowired private AdminMiscellaneousPanel adminMiscellaneousPanel;
     @Autowired private AreaListPanel areaListPanel;
     @Autowired private MaintainAreaPanel maintainAreaPanel;
     @Autowired private MaintainTrisysProductPanel maintainTrisysProductPanel;
@@ -522,7 +520,6 @@ public class MagicFrame extends JFrame {
         panelHolder.add(importTrisysSalesListPanel, TRISYS_SALES_IMPORT_LIST_PANEL);
         panelHolder.add(trisysSalesImportPanel, TRISYS_SALES_IMPORT_PANEL);
         panelHolder.add(trisysSalesPanel, TRISYS_SALES_PANEL);
-        panelHolder.add(adminMiscellaneousPanel, ADMIN_MISCELLANEOUS_PANEL);
 		panelHolder.add(areaListPanel, AREA_LIST_PANEL);
 		panelHolder.add(maintainAreaPanel, MAINTAIN_AREA_PANEL);
 		panelHolder.add(maintainTrisysProductPanel, MAINTAIN_TRISYS_PRODUCT_PANEL);
@@ -1342,11 +1339,6 @@ public class MagicFrame extends JFrame {
         ((CardLayout)panelHolder.getLayout()).show(panelHolder, TRISYS_SALES_PANEL);
 	}
 
-	public void switchToAdminMiscellaneousPanel() {
-        addPanelNameToTitle("Admin Miscellaneous");
-        ((CardLayout)panelHolder.getLayout()).show(panelHolder, ADMIN_MISCELLANEOUS_PANEL);
-	}
-    
 	public void switchToAreaListPanel() {
 		addPanelNameToTitle("Area List");
 		areaListPanel.updateDisplay();

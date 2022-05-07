@@ -1,15 +1,8 @@
 package com.pj.magic.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
-@Entity
-@Table(name = "PURCHASE_PAYMENT_ADJ_TYPE")
 public class PurchasePaymentAdjustmentType {
 
 	public static final String PURCHASE_RETURN_GOOD_STOCK_CODE = "RETURN - GS";
@@ -17,8 +10,6 @@ public class PurchasePaymentAdjustmentType {
     public static final String EWT_CODE = "EWT";
     public static final String DISCOUNT_CODE = "DISC";
 	
-	@Id
-	@GeneratedValue
 	private Long id;
 
 	private String code;

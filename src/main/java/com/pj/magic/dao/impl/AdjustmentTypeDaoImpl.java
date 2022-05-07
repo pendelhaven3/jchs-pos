@@ -2,13 +2,6 @@ package com.pj.magic.dao.impl;
 
 import java.util.List;
 
-import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.PersistenceContext;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
-
 import org.springframework.stereotype.Repository;
 
 import com.pj.magic.dao.AdjustmentTypeDao;
@@ -17,6 +10,31 @@ import com.pj.magic.model.AdjustmentType;
 @Repository
 public class AdjustmentTypeDaoImpl extends MagicDao implements AdjustmentTypeDao {
 
+	@Override
+	public void save(AdjustmentType type) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public List<AdjustmentType> getAll() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public AdjustmentType get(long id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public AdjustmentType findByCode(String code) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/*
 	@PersistenceContext
 	private EntityManager entityManager;
 	
@@ -53,5 +71,6 @@ public class AdjustmentTypeDaoImpl extends MagicDao implements AdjustmentTypeDao
 			return null;
 		}
 	}
+	*/
 
 }

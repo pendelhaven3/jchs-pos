@@ -144,6 +144,14 @@ public class TrisysProductListPanel extends StandardMagicPanel {
         });
 	    
 	    table.addDoubleClickMouseListener(() -> selectProduct());
+	    
+		onEscapeKey(new AbstractAction() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				doOnBack();
+			}
+		});
 	}
 
 	protected void selectProduct() {

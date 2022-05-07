@@ -95,6 +95,14 @@ public class PaymentTermListPanel extends StandardMagicPanel {
 				}
 			}
 		});
+		
+		onEscapeKey(new AbstractAction() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				doOnBack();
+			}
+		});
 	}
 
 	protected void selectPaymentTerm() {

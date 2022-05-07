@@ -159,7 +159,7 @@ public class ProductCostListPanel extends StandardMagicPanel {
 
 	@Override
 	protected void doOnBack() {
-		getMagicFrame().switchToInventoryMenuPanel();
+		getMagicFrame().switchToPurchasesMenuPanel();
 	}
 
 	@Override

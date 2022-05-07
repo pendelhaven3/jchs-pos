@@ -1,26 +1,65 @@
 package com.pj.magic.dao.impl;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-
-import org.apache.commons.lang.StringUtils;
-import org.springframework.dao.IncorrectResultSizeDataAccessException;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import com.pj.magic.dao.CustomerDao;
 import com.pj.magic.model.Customer;
-import com.pj.magic.model.PaymentTerm;
 import com.pj.magic.model.search.CustomerSearchCriteria;
 
 @Repository
 public class CustomerDaoImpl extends MagicDao implements CustomerDao {
 
+	@Override
+	public void save(Customer customer) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public List<Customer> getAll() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Customer get(long id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Customer findFirstWithCodeLike(String code) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Customer findByCode(String code) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Customer> findAllWithNameLike(String code) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Customer> search(CustomerSearchCriteria criteria) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void delete(Customer customer) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/*
 	private static final String BASE_SELECT_SQL =
 			"select a.ID, CODE, a.NAME, BUSINESS_ADDRESS, DELIVERY_ADDRESS, CONTACT_PERSON, CONTACT_NUMBER,"
 			+ " TIN, APPROVED_CREDIT_LINE, BUSINESS_TYPE, OWNERS, BANK_REFERENCES, HOLD_IND, REMARKS, ACTIVE_IND,"
@@ -142,5 +181,6 @@ public class CustomerDaoImpl extends MagicDao implements CustomerDao {
 	public void delete(Customer customer) {
 		getJdbcTemplate().update(DELETE_CUSTOMER_SQL, customer.getId());
 	}
+	*/
 	
 }

@@ -1,29 +1,17 @@
 package com.pj.magic.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
-@Entity
-@Table(name="CREDIT_CARD")
 public class CreditCard {
 
-	@Id
-	@GeneratedValue
 	private Long id;
 	
 	private String user;
 	private String bank;
 	
-	@Column(name = "CARD_NUMBER")
 	private String cardNumber;
 
-	@Column(name = "CUSTOMER_NUMBER")
 	private String customerNumber;
 	
 	public CreditCard() {

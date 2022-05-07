@@ -15,11 +15,6 @@ import java.math.RoundingMode;
 import java.util.Calendar;
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
-
 import org.apache.commons.lang.time.DateUtils;
 
 import lombok.Getter;
@@ -29,14 +24,10 @@ import lombok.Setter;
 @Setter
 public class BirForm2307Report {
 
-    @Id
-    @GeneratedValue
     private Long id;
     
-    @Column(name = "REPORT_NO")
     private Long reportNumber;
     
-    @OneToOne
     private Supplier supplier;
     
     private Date fromDate;

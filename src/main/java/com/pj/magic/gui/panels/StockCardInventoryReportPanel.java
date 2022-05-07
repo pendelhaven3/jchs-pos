@@ -11,7 +11,6 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Box;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -28,9 +27,9 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.pj.magic.Constants;
 import com.pj.magic.gui.component.DatePickerFormatter;
 import com.pj.magic.gui.component.EllipsisButton;
+import com.pj.magic.gui.component.MagicButton;
 import com.pj.magic.gui.component.MagicTextField;
 import com.pj.magic.gui.component.MagicToolBar;
 import com.pj.magic.gui.dialog.SelectProductDialog;
@@ -67,7 +66,7 @@ public class StockCardInventoryReportPanel extends StandardMagicPanel {
 	private JLabel productDescriptionLabel;
 	private UtilCalendarModel fromDateModel;
 	private UtilCalendarModel toDateModel;
-	private JButton generateButton;
+	private MagicButton generateButton;
 	private EllipsisButton selectProductButton;
 	private JComboBox<String> unitComboBox;
 	private JCheckBox fromLastInventoryCheckCheckBox;
@@ -90,7 +89,7 @@ public class StockCardInventoryReportPanel extends StandardMagicPanel {
 	@Override
 	protected void initializeComponents() {
 		productCodeField = new MagicTextField();
-		productCodeField.setMaximumLength(Constants.PRODUCT_CODE_MAXIMUM_LENGTH);
+		productCodeField.setMaximumLength(14);
 		
 		productDescriptionLabel = new JLabel();
 		
@@ -109,6 +108,7 @@ public class StockCardInventoryReportPanel extends StandardMagicPanel {
 		
 		unitComboBox = new JComboBox<>(
 				new String[] {null, Unit.PIECES, Unit.HDZN, Unit.PACK, Unit.TIES, Unit.CASE});
+		unitComboBox.setEnabled(false);
 		fromLastInventoryCheckCheckBox = new JCheckBox();
 		
 		salesInvoiceTransactionTypeCheckBox = new JCheckBox();
@@ -121,7 +121,7 @@ public class StockCardInventoryReportPanel extends StandardMagicPanel {
 		promoRedemptionTransactionTypeCheckBox = new JCheckBox();
 		purchaseReturnTransactionTypeCheckBox = new JCheckBox();
 		
-		generateButton = new JButton("Generate");
+		generateButton = new MagicButton("Generate");
 		generateButton.addActionListener(new ActionListener() {
 			
 			@Override
@@ -162,6 +162,7 @@ public class StockCardInventoryReportPanel extends StandardMagicPanel {
 		if (product != null) {
 			productCodeField.setText(product.getCode());
 			productDescriptionLabel.setText(product.getDescription());
+			unitComboBox.setSelectedItem(product.getUnits().get(0));
 		}
 	}
 
@@ -219,7 +220,7 @@ public class StockCardInventoryReportPanel extends StandardMagicPanel {
 	private void setTransactionTypeCriteria(StockCardInventoryReportCriteria criteria) {
 		List<String> transactionTypes = criteria.getTransactionTypes();
 		if (salesInvoiceTransactionTypeCheckBox.isSelected()) {
-			transactionTypes.add("SALES INVOICE");
+			transactionTypes.add("SALES");
 		}
 		if (stockQuantityConversionTransactionTypeCheckBox.isSelected()) {
 			transactionTypes.add("STOCK QTY CONVERSION");
@@ -346,7 +347,7 @@ public class StockCardInventoryReportPanel extends StandardMagicPanel {
 		c.gridx = 2;
 		c.gridy = currentRow;
 		c.anchor = GridBagConstraints.WEST;
-		unitComboBox.setPreferredSize(new Dimension(60, 25));
+		unitComboBox.setPreferredSize(new Dimension(100, 25));
 		mainPanel.add(unitComboBox, c);
 		
 		c = new GridBagConstraints();
@@ -354,10 +355,10 @@ public class StockCardInventoryReportPanel extends StandardMagicPanel {
 		c.gridy = currentRow;
 		c.gridwidth = 2;
 		c.anchor = GridBagConstraints.WEST;
-		mainPanel.add(
-				ComponentUtil.createGenericPanel(
-						ComponentUtil.createLabel(280, "From Last Inventory Check: "),
-						fromLastInventoryCheckCheckBox), c);
+//		mainPanel.add(
+//				ComponentUtil.createGenericPanel(
+//						ComponentUtil.createLabel(280, "From Last Inventory Check: "),
+//						fromLastInventoryCheckCheckBox), c);
 		
 		currentRow++;
 		
@@ -430,39 +431,33 @@ public class StockCardInventoryReportPanel extends StandardMagicPanel {
 		
 		c.gridy = currentRow;
 		panel.add(salesInvoiceTransactionTypeCheckBox, c);
-		panel.add(new JLabel("Sales Invoice"), c);
-		panel.add(receivingReceiptTransactionTypeCheckBox, c);
-		panel.add(new JLabel("Receiving Receipt"), c);
-		
-		currentRow++;
-		
-		c.gridy = currentRow;
-		panel.add(stockQuantityConversionTransactionTypeCheckBox, c);
-		panel.add(new JLabel("Stock Quantity Conversion"), c);
-		panel.add(salesReturnTransactionTypeCheckBox, c);
-		panel.add(new JLabel("Sales Return"), c);
-		
-		currentRow++;
-		
-		c.gridy = currentRow;
-		panel.add(adjustmentInTransactionTypeCheckBox, c);
-		panel.add(new JLabel("Adjustment In"), c);
+		panel.add(new JLabel("Sales"), c);
 		panel.add(inventoryCheckTransactionTypeCheckBox, c);
 		panel.add(new JLabel("Inventory Check"), c);
 		
 		currentRow++;
 		
 		c.gridy = currentRow;
-		panel.add(adjustmentOutTransactionTypeCheckBox, c);
-		panel.add(new JLabel("Adjustment Out"), c);
-		panel.add(promoRedemptionTransactionTypeCheckBox, c);
-		panel.add(new JLabel("Promo Redemption"), c);
+		panel.add(receivingReceiptTransactionTypeCheckBox, c);
+		panel.add(new JLabel("Receiving Receipt"), c);
 		
 		currentRow++;
 		
 		c.gridy = currentRow;
 		panel.add(purchaseReturnTransactionTypeCheckBox, c);
 		panel.add(new JLabel("Purchase Return"), c);
+		
+		currentRow++;
+		
+		c.gridy = currentRow;
+		panel.add(adjustmentInTransactionTypeCheckBox, c);
+		panel.add(new JLabel("Adjustment In"), c);
+		
+		currentRow++;
+		
+		c.gridy = currentRow;
+		panel.add(adjustmentOutTransactionTypeCheckBox, c);
+		panel.add(new JLabel("Adjustment Out"), c);
 		
 		return panel;
 	}
@@ -510,6 +505,26 @@ public class StockCardInventoryReportPanel extends StandardMagicPanel {
 				openSelectProductDialog();
 			}
 		});
+		
+		productCodeField.onEnterKey(new AbstractAction() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Product product = productService.findProductByCode(productCodeField.getText());
+				if (product != null) {
+					productCodeField.setText(product.getCode());
+					productDescriptionLabel.setText(product.getDescription());
+					unitComboBox.setSelectedItem(product.getUnits().get(0));
+					generateButton.requestFocusInWindow();
+				} else {
+					productDescriptionLabel.setText(null);
+					unitComboBox.setSelectedItem(null);
+				}
+			}
+			
+		});
+		
+		generateButton.onEnterKey(() -> generateStockCardInventoryReport());
 	}
 
 	public void updateDisplay() {
