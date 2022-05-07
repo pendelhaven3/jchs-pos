@@ -20,26 +20,6 @@ create table USER (
   constraint USER$UK unique (USERNAME)
 );
 
-create table PRODUCT (
-  ID integer auto_increment,
-  CODE varchar(14) not null,
-  DESCRIPTION varchar(40) not null,
-  UOM_CODE varchar(10) not null,
-  UOM_CODE1 varchar(10) null,
-  UOM_QTY numeric(10) not null,
-  UOM_QTY1 numeric(10) null,
-  GROSS_COST numeric(9,2) default 0 not null,
-  GROSS_COST1 numeric(9,2) null,
-  FINAL_COST numeric(9,2) default 0 not null,
-  FINAL_COST1 numeric(9,2) null,
-  MAX_STOCK_LEVEL integer(4) default 0,
-  MIN_STOCK_LEVEL integer(4) default 0,
-  ACTIVE_IND char(1) default 'Y',
-  CREATE_DT datetime default current_timestamp,
-  constraint PRODUCT$PK primary key (ID),
-  constraint PRODUCT$UK unique (CODE)
-);
-
 create table PRODUCT2 (
   ID integer auto_increment,
   DESCRIPTION varchar(50) not null,
@@ -77,6 +57,28 @@ create table PRODUCT2 (
   FINAL_COST_HDZN numeric(10, 2) default 0 not null,
   FINAL_COST_PCS numeric(10, 2) default 0 not null,
   constraint PRODUCT2$PK primary key (ID)
+);
+
+create table PRODUCT (
+  ID integer auto_increment,
+  CODE varchar(14) not null,
+  DESCRIPTION varchar(40) not null,
+  UOM_CODE varchar(10) not null,
+  UOM_CODE1 varchar(10) null,
+  UOM_QTY numeric(10) not null,
+  UOM_QTY1 numeric(10) null,
+  GROSS_COST numeric(9,2) default 0 not null,
+  GROSS_COST1 numeric(9,2) null,
+  FINAL_COST numeric(9,2) default 0 not null,
+  FINAL_COST1 numeric(9,2) null,
+  MAX_STOCK_LEVEL integer(4) default 0,
+  MIN_STOCK_LEVEL integer(4) default 0,
+  ACTIVE_IND char(1) default 'Y',
+  CREATE_DT datetime default current_timestamp,
+  PRODUCT2_ID integer,
+  constraint PRODUCT$PK primary key (ID),
+  constraint PRODUCT$UK unique (CODE),
+  constraint PRODUCT$FK foreign key (PRODUCT2_ID) references PRODUCT2 (ID)
 );
 
 create table PAYMENT_TERM (
