@@ -554,7 +554,7 @@ public class PurchasePaymentPanel extends StandardMagicPanel {
 				unpostPayment();
 			}
 		});
-//		toolBar.add(unpostButton);
+		toolBar.add(unpostButton);
 		
 		printPreviewButton = new MagicToolBarButton("print_preview", "Print Preview");
 		printPreviewButton.addActionListener(new ActionListener() {
