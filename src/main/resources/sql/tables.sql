@@ -358,7 +358,7 @@ create table PURCHASE_PAYMENT_BANK_TRANSFER (
   ID integer auto_increment,
   PURCHASE_PAYMENT_ID integer not null,
   BANK varchar(20) not null,
-  REFERENCE_NO varchar(20) not null,
+  REFERENCE_NO varchar(25) not null,
   AMOUNT numeric(10, 2) not null,
   TRANSFER_DT date not null,
   constraint PURCHASE_PAYMENT_BANK_TRANSFER$PK primary key (ID),
