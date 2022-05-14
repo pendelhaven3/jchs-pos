@@ -10,7 +10,7 @@ import com.pj.magic.Constants;
 public class FormatterUtil {
 
 	private static final String DATE_IN_FILENAME_FORMAT = "MMM-dd-yyyy";
-	private static final String DATE_IN_CHEQUE_FORMAT = "MMMM dd, yyyy";
+	private static final String DATE_IN_CHEQUE_FORMAT = "MM-dd-yyyy";
 	
 	public static final String formatDate(Date date) {
 		return new SimpleDateFormat(Constants.DATE_FORMAT).format(date);
