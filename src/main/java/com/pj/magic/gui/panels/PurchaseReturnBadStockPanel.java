@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.pj.magic.gui.MagicFrame;
 import com.pj.magic.gui.component.DatePickerFormatter;
 import com.pj.magic.gui.component.EllipsisButton;
 import com.pj.magic.gui.component.MagicTextField;
@@ -241,7 +242,7 @@ public class PurchaseReturnBadStockPanel extends StandardMagicPanel {
 		if (itemsTable.isEditing()) {
 			itemsTable.getCellEditor().cancelCellEditing();
 		}
-		getMagicFrame().switchToPurchaseReturnBadStockListPanel();
+		getMagicFrame().back(MagicFrame.PURCHASE_RETURN_BAD_STOCK_LIST_PANEL);
 	}
 	
 	private void updateTotalAmountFieldWhenItemsTableChanges() {

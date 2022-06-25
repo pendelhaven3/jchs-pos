@@ -2,6 +2,7 @@ package com.pj.magic.gui.panels;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -44,6 +45,10 @@ public class PurchaseReturnBadStockListPanel extends StandardMagicPanel {
 	private MagicListTable table;
 	private PurchaseReturnBadStocksTableModel tableModel;
 	
+	private PurchaseReturnBadStockSearchCriteria searchCriteria;
+	private int selectedRow;
+	private Rectangle visibleRect;
+	
 	@Override
 	public void initializeComponents() {
 		initializeTable();
@@ -65,9 +70,32 @@ public class PurchaseReturnBadStockListPanel extends StandardMagicPanel {
 		}
 	
 		searchPurchaseReturnBadStocksDialog.updateDisplay();
+		searchCriteria = null;
 	}
 
+	@Override
+	public void updateDisplayOnBack() {
+	    List<PurchaseReturnBadStock> purchaseReturnBadStocks = null;
+	    
+		if (searchCriteria != null) {
+			purchaseReturnBadStocks = purchaseReturnBadStockService.search(searchCriteria);
+		} else {
+	        purchaseReturnBadStocks = purchaseReturnBadStockService.getAllNewPurchaseReturnBadStocks();
+	        searchPurchaseReturnBadStocksDialog.updateDisplay();
+		}
+		tableModel.setPurchaseReturnBadStocks(purchaseReturnBadStocks);
+        if (purchaseReturnBadStocks.size() - 1 < selectedRow) {
+            selectedRow = purchaseReturnBadStocks.size() - 1;
+        }
+        table.changeSelection(selectedRow, 0, false, false);
+        if (visibleRect != null) {
+            table.scrollRectToVisible(visibleRect);
+        }
+	}
+	
 	public void displayPurchaseReturnBadStockDetails(PurchaseReturnBadStock purchaseReturnBadStock) {
+	    selectedRow = table.getSelectedRow();
+	    visibleRect = table.getVisibleRect();
 		getMagicFrame().switchToPurchaseReturnBadStockPanel(purchaseReturnBadStock);
 	}
 	
@@ -167,6 +195,9 @@ public class PurchaseReturnBadStockListPanel extends StandardMagicPanel {
 		
 		PurchaseReturnBadStockSearchCriteria criteria = searchPurchaseReturnBadStocksDialog.getSearchCriteria();
 		if (criteria != null) {
+			searchCriteria = criteria;
+			selectedRow = 0;
+			visibleRect = null;
 			List<PurchaseReturnBadStock> purchaseReturnBadStocks = purchaseReturnBadStockService.search(criteria);
 			tableModel.setPurchaseReturnBadStocks(purchaseReturnBadStocks);
 			if (!purchaseReturnBadStocks.isEmpty()) {
