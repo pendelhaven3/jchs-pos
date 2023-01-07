@@ -98,6 +98,7 @@ public class ReceivingReceiptServiceImpl implements ReceivingReceiptService {
 			BigDecimal currentCost = product.getFinalCost(item.getUnit());
 			
 			try {
+				System.out.println(item.getProduct().getDescription());
 				product.setGrossCost(item.getUnit(), 
 						item.getCost().multiply(costMultipler).setScale(2, RoundingMode.HALF_UP));
 				product.setFinalCost(item.getUnit(), 
