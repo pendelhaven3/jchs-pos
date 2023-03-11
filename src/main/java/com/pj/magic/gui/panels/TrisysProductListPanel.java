@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -16,10 +17,12 @@ import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.filechooser.FileFilter;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +43,7 @@ import com.pj.magic.model.UnitConversion;
 import com.pj.magic.model.search.ProductSearchCriteria;
 import com.pj.magic.service.ProductService;
 import com.pj.magic.util.ComponentUtil;
+import com.pj.magic.util.FileUtil;
 
 import net.iryndin.jdbf.core.DbfMetadata;
 import net.iryndin.jdbf.core.DbfRecord;
@@ -202,6 +206,10 @@ public class TrisysProductListPanel extends StandardMagicPanel {
         JButton alertButton = new MagicToolBarButton("alert", "Products with more than 2 barcodes");
         alertButton.addActionListener(e -> showProductsWithMultipleBarcodes());
         toolBar.add(alertButton);
+        
+        JButton generateCsvButton = new MagicToolBarButton("csv", "Generate CSV");
+        generateCsvButton.addActionListener(e -> generateCsv());
+        toolBar.add(generateCsvButton);
 	}
 
 	private void showActiveProducts() {
@@ -351,6 +359,43 @@ public class TrisysProductListPanel extends StandardMagicPanel {
 		}
 	}
 
+	private void generateCsv() {
+		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setCurrentDirectory(new File(FileUtil.getDesktopFolderPath()));
+		fileChooser.setFileFilter(new FileFilter() {
+			
+			@Override
+			public String getDescription() {
+				return "CSV file";
+			}
+			
+			@Override
+			public boolean accept(File f) {
+				return FilenameUtils.getExtension(f.getName()).equals("csv");
+			}
+		});
+		fileChooser.setSelectedFile(new File("products.csv"));
+        
+        int returnVal = fileChooser.showSaveDialog(this);
+        if (returnVal != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+        
+        try (
+    		PrintWriter writer = new PrintWriter(fileChooser.getSelectedFile());
+        ) {
+            for (Product product : productService.getAllActiveProducts()) {
+            	writer.println(product.getCode() + "|" + product.getDescription());
+            	writer.flush();
+            }
+        } catch (Exception e) {
+        	showMessageForUnexpectedError(e);
+        	return;
+        }
+        
+        showMessage("CSV file generated");
+	}
+	
     private class ProductsTableModel extends ListBackedTableModel<Product>{
 
         private final String[] columnNames = {"Code", "Description", "UOM 1", "UOM 2", "UOM Qty 1", "UOM Qty 2", "Active?", "Product ID"};
