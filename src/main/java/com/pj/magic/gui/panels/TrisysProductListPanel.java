@@ -385,7 +385,7 @@ public class TrisysProductListPanel extends StandardMagicPanel {
     		PrintWriter writer = new PrintWriter(fileChooser.getSelectedFile());
         ) {
             for (Product product : productService.getAllActiveProducts()) {
-            	writer.println(product.getCode() + "|" + product.getDescription());
+            	writer.println(product.getCode() + "|" + product.getDescription() + "|" + product.getUnits().get(0));
             	writer.flush();
             }
         } catch (Exception e) {
