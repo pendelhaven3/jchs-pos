@@ -32,6 +32,7 @@ public class PurchasesMenuPanel extends MenuPanel {
 	private static final String BAD_PURCHASE_RETURN = "Purchase Return - Bad Stock";
 	private static final String PRODUCT_COST_LIST = "Product Cost List";
 	private static final String PURCHASE_ORDER_BY_SPECIAL_CODES = "Purchase Order by Special Codes";
+	private static final String RECEIVE_DELIVERY = "Receive Delivery";
 
 	private MagicListTable table;
 	private MainMenuTableModel tableModel;
@@ -112,6 +113,9 @@ public class PurchasesMenuPanel extends MenuPanel {
 		case PURCHASE_ORDER_BY_SPECIAL_CODES:
 			getMagicFrame().switchToPurchaseOrderBySpecialCodesListPanel();
 			break;
+		case RECEIVE_DELIVERY:
+			getMagicFrame().switchToReceiveDeliveryPanel();
+			break;
 		}
 	}
 
@@ -131,7 +135,8 @@ public class PurchasesMenuPanel extends MenuPanel {
 				PURCHASE_RETURN,
 				BAD_PURCHASE_RETURN,
 				PRODUCT_COST_LIST,
-				PURCHASE_ORDER_BY_SPECIAL_CODES
+				PURCHASE_ORDER_BY_SPECIAL_CODES,
+				RECEIVE_DELIVERY
 		);
 		
 		@Override

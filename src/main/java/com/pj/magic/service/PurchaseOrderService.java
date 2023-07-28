@@ -31,5 +31,7 @@ public interface PurchaseOrderService {
 	List<PurchaseOrder> search(PurchaseOrderSearchCriteria criteria);
 	
 	PurchaseOrder newPurchaseOrder();
+
+	void receiveDelivery(PurchaseOrder purchaseOrder, List<PurchaseOrderItem> deliveredItems);
 	
 }

@@ -224,6 +224,7 @@ public class MagicFrame extends JFrame {
     public static final String MAINTAIN_PRODUCT_CUSTOM_CODE_PANEL = "MAINTAIN_PRODUCT_CUSTOM_CODE_PANEL";
 	public static final String PURCHASE_ORDER_BY_SPECIAL_CODES_LIST_PANEL = "PURCHASE_ORDER_BY_SPECIAL_CODES_LIST_PANEL";
 	public static final String PURCHASE_ORDER_BY_SPECIAL_CODES_PANEL = "PURCHASE_ORDER_BY_SPECIAL_CODES_PANEL";
+	public static final String RECEIVE_DELIVERY_PANEL = "RECEIVE_DELIVERY_PANEL";
 	
 	@Value("${application.title}")
 	private String baseTitle;
@@ -347,6 +348,7 @@ public class MagicFrame extends JFrame {
     @Autowired private MaintainProductCustomCodePanel maintainProductCustomCodePanel;
     @Autowired private PurchaseOrderBySpecialCodesListPanel purchaseOrderBySpecialCodesListPanel;
     @Autowired private PurchaseOrderBySpecialCodesPanel purchaseOrderBySpecialCodesPanel;
+    @Autowired private ReceiveDeliveryPanel receiveDeliveryPanel;
 	
 	@Autowired private SystemService systemParameterService;
 	@Autowired private DataSource dataSource;
@@ -529,6 +531,7 @@ public class MagicFrame extends JFrame {
 		panelHolder.add(maintainProductCustomCodePanel, MAINTAIN_PRODUCT_CUSTOM_CODE_PANEL);
 		panelHolder.add(purchaseOrderBySpecialCodesListPanel, PURCHASE_ORDER_BY_SPECIAL_CODES_LIST_PANEL);
 		panelHolder.add(purchaseOrderBySpecialCodesPanel, PURCHASE_ORDER_BY_SPECIAL_CODES_PANEL);
+		panelHolder.add(receiveDeliveryPanel, RECEIVE_DELIVERY_PANEL);
         getContentPane().add(panelHolder);
 
         switchToLoginPanel();
@@ -1417,6 +1420,12 @@ public class MagicFrame extends JFrame {
         addPanelNameToTitle(purchaseOrderBySpecialCodesPanel.getTitle());
         purchaseOrderBySpecialCodesPanel.updateDisplay(purchaseOrder);
 		((CardLayout)panelHolder.getLayout()).show(panelHolder, PURCHASE_ORDER_BY_SPECIAL_CODES_PANEL);
+	}
+
+	public void switchToReceiveDeliveryPanel() {
+        addPanelNameToTitle(receiveDeliveryPanel.getTitle());
+        receiveDeliveryPanel.updateDisplay();
+		((CardLayout)panelHolder.getLayout()).show(panelHolder, RECEIVE_DELIVERY_PANEL);
 	}
 
 }

@@ -1,12 +1,10 @@
 package com.pj.magic.gui.tables.models;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
-@SuppressWarnings("serial")
 public abstract class ListBackedTableModel<T> extends AbstractTableModel {
 
 	private List<T> items = new ArrayList<>();
@@ -49,7 +47,17 @@ public abstract class ListBackedTableModel<T> extends AbstractTableModel {
 	}
 	
 	public void clear() {
-		items = Collections.emptyList();
+		items = new ArrayList<>();
+		fireTableDataChanged();
+	}
+	
+	public void addItem(T item) {
+		items.add(item);
+		fireTableDataChanged();
+	}
+	
+	public void removeItem(int index) {
+		items.remove(index);
 		fireTableDataChanged();
 	}
 	

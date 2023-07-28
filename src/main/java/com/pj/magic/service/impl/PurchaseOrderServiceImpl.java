@@ -1,12 +1,12 @@
 package com.pj.magic.service.impl;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.pj.magic.dao.ProductDao;
 import com.pj.magic.dao.PurchaseOrderDao;
 import com.pj.magic.dao.PurchaseOrderItemDao;
 import com.pj.magic.dao.SystemDao;
@@ -129,6 +129,53 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 		PurchaseOrder purchaseOrder = new PurchaseOrder();
 		purchaseOrder.setVatRate(systemService.getVatRate());
 		return purchaseOrder;
+	}
+
+	@Transactional
+	@Override
+	public void receiveDelivery(PurchaseOrder purchaseOrder, List<PurchaseOrderItem> deliveredItems) {
+		purchaseOrder = getPurchaseOrder(purchaseOrder.getId());
+		
+		for (PurchaseOrderItem item : purchaseOrder.getItems()) {
+			boolean itemDelivered = false;
+			for (PurchaseOrderItem deliveredItem : deliveredItems) {
+				if (item.getProduct().equals(deliveredItem.getProduct())
+						&& item.getUnit().equals(deliveredItem.getUnit())) {
+					item.setActualQuantity(deliveredItem.getQuantity());
+					purchaseOrderItemDao.save(item);
+					itemDelivered = true;
+				}
+			}
+			
+			if (!itemDelivered) {
+				item.setActualQuantity(0);
+				purchaseOrderItemDao.save(item);
+			}
+		}
+		
+		if (!purchaseOrder.isDelivered()) {
+			markAsDelivered(purchaseOrder);
+		}
+		
+		for (PurchaseOrderItem deliveredItem : deliveredItems) {
+			boolean itemOrdered = false;
+			for (PurchaseOrderItem item : purchaseOrder.getItems()) {
+				if (item.getProduct().equals(deliveredItem.getProduct())
+						&& item.getUnit().equals(deliveredItem.getUnit())) {
+					itemOrdered = true;
+				}
+			}
+			
+			if (!itemOrdered) {
+				deliveredItem.setParent(purchaseOrder);
+				deliveredItem.setActualQuantity(deliveredItem.getQuantity());
+				deliveredItem.setQuantity(0);
+				deliveredItem.setCost(BigDecimal.ZERO);
+				purchaseOrderItemDao.save(deliveredItem);
+				purchaseOrderItemDao.save(deliveredItem);
+				purchaseOrder.getItems().add(deliveredItem);
+			}
+		}
 	}
 	
 }
