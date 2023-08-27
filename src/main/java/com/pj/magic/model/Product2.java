@@ -38,7 +38,6 @@ public class Product2 implements Comparable<Product2>, Serializable {
 	private List<UnitConversion> unitConversions = new ArrayList<>();
 	private List<UnitCost> unitCosts = new ArrayList<>();
 	private BigDecimal companyListPrice;
-	private int availableQuantity;
 	private List<UnitSku> unitSkus = new ArrayList<>();
 
 	public Product2() {
