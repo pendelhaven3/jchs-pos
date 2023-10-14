@@ -24,6 +24,7 @@ import com.pj.magic.dao.PurchaseReturnBadStockDao;
 import com.pj.magic.dao.PurchaseReturnDao;
 import com.pj.magic.dao.ReceivingReceiptItemDao;
 import com.pj.magic.dao.SystemDao;
+import com.pj.magic.exception.UnpostedReceivingReceiptException;
 import com.pj.magic.model.PurchasePayment;
 import com.pj.magic.model.PurchasePaymentAdjustment;
 import com.pj.magic.model.PurchasePaymentAdjustmentType;
@@ -109,6 +110,9 @@ public class PurchasePaymentServiceImpl implements PurchasePaymentService {
 	@Override
 	public void post(PurchasePayment purchasePayment) {
 		PurchasePayment updated = getPurchasePayment(purchasePayment.getId());
+		
+		validateReceivingReceiptsArePosted(updated);
+		
 		updated.setPosted(true);
 		updated.setPostDate(systemDao.getCurrentDateTime());
 		updated.setPostedBy(loginService.getLoggedInUser());
@@ -129,6 +133,14 @@ public class PurchasePaymentServiceImpl implements PurchasePaymentService {
 				purchasePaymentAdjustmentService.post(
 						purchasePaymentAdjustmentDao.findByPurchasePaymentAdjustmentNumber(referenceNumber));
 				break;
+			}
+		}
+	}
+
+	private void validateReceivingReceiptsArePosted(PurchasePayment purchasePayment) {
+		for (PurchasePaymentReceivingReceipt receivingReceipt : purchasePayment.getReceivingReceipts()) {
+			if (!receivingReceipt.getReceivingReceipt().isPosted()) {
+				throw new UnpostedReceivingReceiptException(receivingReceipt.getReceivingReceipt().getReceivingReceiptNumber());
 			}
 		}
 	}

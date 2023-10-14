@@ -330,7 +330,8 @@ public class ReceivingReceiptDaoImpl extends MagicDao implements ReceivingReceip
 			+ "   where pprr.RECEIVING_RECEIPT_ID = a.ID"
 			+ "   and pp.CANCEL_IND = 'N'"
 			+ " )"
-			+ " and a.RECEIVED_DT >= '2015-01-01'";
+			+ " and a.RECEIVED_DT >= '2015-01-01'"
+			+ " and a.POST_IND = 'Y'";
 	
 	@Override
 	public List<ReceivingReceipt> findAllForPaymentBySupplier(Supplier supplier) {

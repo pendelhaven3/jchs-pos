@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.pj.magic.Constants;
+import com.pj.magic.exception.UnpostedReceivingReceiptException;
 import com.pj.magic.gui.MagicFrame;
 import com.pj.magic.gui.component.EllipsisButton;
 import com.pj.magic.gui.component.MagicFileChooser;
@@ -628,6 +629,9 @@ public class PurchasePaymentPanel extends StandardMagicPanel {
 				purchasePaymentService.post(purchasePayment);
 				showMessage("Payment posted");
 				updateDisplay(purchasePayment);
+			} catch (UnpostedReceivingReceiptException e) {
+				showErrorMessage("Cannot post purchase payment with unposted receiving receipt (RR " + 
+						String.valueOf(e.getReceivingReceiptNumber()) + ")");
 			} catch (Exception e) {
 				log.error(e.getMessage(), e);
 				showErrorMessage("Unexpected error occurred during posting!");
