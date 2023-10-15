@@ -16,56 +16,75 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+import javax.swing.table.TableColumnModel;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.pj.magic.exception.InvalidProductCodeException;
+import com.pj.magic.gui.component.DoubleClickMouseAdapter;
+import com.pj.magic.gui.component.EllipsisButton;
 import com.pj.magic.gui.component.MagicTextField;
 import com.pj.magic.gui.component.MagicToolBar;
 import com.pj.magic.gui.component.MagicToolBarButton;
-import com.pj.magic.gui.dialog.SelectPurchaseOrderDialog;
+import com.pj.magic.gui.dialog.SelectSupplierDialog;
 import com.pj.magic.gui.tables.MagicListTable;
 import com.pj.magic.gui.tables.models.ListBackedTableModel;
 import com.pj.magic.model.Product;
 import com.pj.magic.model.PurchaseOrder;
-import com.pj.magic.model.PurchaseOrderItem;
-import com.pj.magic.service.Product2Service;
+import com.pj.magic.model.ReceiveDelivery;
+import com.pj.magic.model.ReceiveDeliveryItem;
+import com.pj.magic.model.Supplier;
 import com.pj.magic.service.ProductService;
-import com.pj.magic.service.PurchaseOrderService;
+import com.pj.magic.service.ReceiveDeliveryService;
 import com.pj.magic.util.ComponentUtil;
+import com.pj.magic.util.FormatterUtil;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Component
+@Slf4j
 public class ReceiveDeliveryPanel extends StandardMagicPanel {
 
     private static final long serialVersionUID = -6676395278966161803L;
     
-    private static final int PRODUCT_CODE_COLUMN_INDEX = 0;
-    private static final int PRODUCT_DESCRIPTION_COLUMN_INDEX = 1;
-    private static final int UNIT_COLUMN_INDEX = 2;
-    private static final int QUANTITY_COLUMN_INDEX = 3;
+    public static final int PRODUCT_CODE_COLUMN_INDEX = 0;
+    public static final int PRODUCT_DESCRIPTION_COLUMN_INDEX = 1;
+    public static final int UNIT_COLUMN_INDEX = 2;
+    public static final int QUANTITY_COLUMN_INDEX = 3;
+    public static final int EXISTING_PRODUCT_COLUMN_INDEX = 4;
     
+	@Autowired private SelectSupplierDialog selectSupplierDialog;
+	@Autowired private ReceiveDeliveryService receiveDeliveryService;
 	@Autowired private ProductService productService;
-	@Autowired private Product2Service product2Service;
-	@Autowired private PurchaseOrderService purchaseOrderService;
-	@Autowired private SelectPurchaseOrderDialog selectPurchaseOrderDialog;
 	
 	private Product product = null;
 	private MagicListTable table;
-	private ReceiveDeliveryTableModel tableModel;
+	private ReceiveDeliveryItemsTableModel tableModel = new ReceiveDeliveryItemsTableModel();
 	
+	private MagicTextField supplierCodeField;
+	private JLabel supplierNameField;
+	private JButton selectSupplierButton;
+	private JLabel idLabel = new JLabel();
+	private JLabel receiveDateLabel = new JLabel();
+	private JLabel receivedByLabel = new JLabel();
 	private MagicTextField codeField;
-	private JLabel productDescriptionLabel = new JLabel();
-	private JLabel unitLabel = new JLabel(); 
+	private JTextField productDescriptionField = new JTextField();
+	private MagicTextField unitField = new MagicTextField(); 
 	private MagicTextField quantityField;
 	private JButton toCaseButton = new JButton("Toggle CASE");
 	private JButton addButton = new JButton("Add");
 	private JButton clearButton = new JButton("Clear");
 	private JLabel totalItemsField;
+	private MagicToolBarButton deleteButton;
 	private MagicToolBarButton postButton;
 	private MagicToolBarButton deleteItemButton;
+	
+	private ReceiveDelivery receiveDelivery;
 	
 	public ReceiveDeliveryPanel() {
 		setTitle("Receive Delivery");
@@ -73,8 +92,13 @@ public class ReceiveDeliveryPanel extends StandardMagicPanel {
 	
 	@Override
 	protected void initializeComponents() {
-		tableModel = new ReceiveDeliveryTableModel();
 		table = new MagicListTable(tableModel);
+		initializeTable();
+		
+		supplierCodeField = new MagicTextField();
+		supplierCodeField.setMaximumLength(15);
+		
+		productDescriptionField.setEditable(false);
 		
 		codeField = new MagicTextField();
 		codeField.addKeyListener(new KeyAdapter() {
@@ -85,44 +109,109 @@ public class ReceiveDeliveryPanel extends StandardMagicPanel {
 				if (value.length() == 12) {
 					product = productService.findProductByCode(value);
 					if (product != null) {
-						productDescriptionLabel.setText(product.getDescription());
-						unitLabel.setText(product.getUnits().get(0));
+						productDescriptionField.setText(product.getDescription());
+						unitField.setText(product.getUnits().get(0));
 						quantityField.setText(null);
 						quantityField.requestFocusInWindow();
 					} else {
 						showErrorMessage("Invalid product code: " + value);
-						codeField.setText(null);
-						codeField.requestFocusInWindow();
+						unitField.requestFocusInWindow();
+						codeField.setText(value);
 					}
 				}
 			}
 			
 		});
-		codeField.addFocusListener(new FocusAdapter() {
-			
-			@Override
-			public void focusGained(FocusEvent e) {
-				codeField.setText(null);
-				codeField.setText(null);
-				productDescriptionLabel.setText(null);
-				unitLabel.setText(null);
-				quantityField.setText(null);
-				product = null;
-			}
-			
-		});
+//		codeField.addFocusListener(new FocusAdapter() {
+//			
+//			@Override
+//			public void focusGained(FocusEvent e) {
+//				codeField.setText(null);
+//				productDescriptionField.setText(null);
+//				unitField.setText(null);
+//				quantityField.setText(null);
+//				product = null;
+//			}
+//			
+//		});
 		
 		quantityField = new MagicTextField();
 		quantityField.setNumbersOnly(true);
 		
 		toCaseButton.addActionListener(e -> convertToCaseUnit());
 		addButton.addActionListener(e -> addItem());
-		clearButton.addActionListener(e -> codeField.requestFocusInWindow());
+		clearButton.addActionListener(e -> {
+			codeField.setText(null);
+			productDescriptionField.setText(null);
+			unitField.setText(null);
+			quantityField.setText(null);
+			codeField.requestFocusInWindow();
+		});
 		
-		focusOnComponentWhenThisPanelIsDisplayed(codeField);
-		updateTotalsPanelWhenItemsTableChanges();		
+		updateTotalsPanelWhenItemsTableChanges();
+		
+		selectSupplierButton = new EllipsisButton();
+		selectSupplierButton.setToolTipText("Select Supplier (F5)");
+		selectSupplierButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				selectSupplier();
+			}
+			
+		});
 	}
 
+	private void initializeTable() {
+		TableColumnModel columnModel = table.getColumnModel();
+		columnModel.getColumn(PRODUCT_CODE_COLUMN_INDEX).setPreferredWidth(100);
+		columnModel.getColumn(PRODUCT_DESCRIPTION_COLUMN_INDEX).setPreferredWidth(200);
+		columnModel.getColumn(UNIT_COLUMN_INDEX).setPreferredWidth(100);
+		columnModel.getColumn(QUANTITY_COLUMN_INDEX).setPreferredWidth(100);
+		
+		table.addMouseListener(new DoubleClickMouseAdapter() {
+			
+			@Override
+			protected void onDoubleClick() {
+				int selectedRow = table.getSelectedRow();
+				if (selectedRow != -1) {
+					ReceiveDeliveryItem item = tableModel.getItem(table.getSelectedRow());
+					codeField.setText(item.getCode());
+					unitField.setText(item.getUnit());
+					quantityField.setText(String.valueOf(item.getQuantity()));
+					Product product = productService.findProductByCode(item.getCode());
+					if (product != null) {
+						productDescriptionField.setText(product.getDescription());
+					}
+					quantityField.requestFocusInWindow();
+				}
+			}
+		});
+		
+	}
+	
+	private void selectSupplier() {
+		selectSupplierDialog.searchSuppliers(supplierCodeField.getText());
+		selectSupplierDialog.setVisible(true);
+		
+		Supplier selectedSupplier = selectSupplierDialog.getSelectedSupplier();
+		if (selectedSupplier != null) {
+			receiveDelivery.setSupplier(selectedSupplier);
+			supplierCodeField.setText(selectedSupplier.getCode());
+			supplierNameField.setText(selectedSupplier.getName());
+			
+			try {
+				receiveDeliveryService.save(receiveDelivery);
+			} catch (Exception e) {
+				log.error(e.getMessage(), e);
+				showErrorMessage("Error occurred during saving! " + e.getMessage());
+				return;
+			}
+			
+			updateDisplay(receiveDelivery);
+		}
+	}
+	
 	private void convertToCaseUnit() {
 		String code = codeField.getText();
 		if (!StringUtils.isEmpty(code)) {
@@ -140,8 +229,8 @@ public class ReceiveDeliveryPanel extends StandardMagicPanel {
 		product = productService.findProductByCode(code);
 		if (product != null) {
 			codeField.setText(code);
-			productDescriptionLabel.setText(product.getDescription());
-			unitLabel.setText(product.getUnits().get(0));
+			productDescriptionField.setText(product.getDescription());
+			unitField.setText(product.getUnits().get(0));
 			quantityField.requestFocusInWindow();
 		} else {
 			showErrorMessage("No product defined for CASE unit");
@@ -149,8 +238,16 @@ public class ReceiveDeliveryPanel extends StandardMagicPanel {
 	}
 	
 	private void addItem() {
-		if (StringUtils.isEmpty(codeField.getText()) || product == null) {
+		String code = codeField.getText();
+		if (StringUtils.isEmpty(code)) {
 			codeField.requestFocusInWindow();
+			return;
+		}
+		
+		String unit = unitField.getText();
+		if (StringUtils.isEmpty(unit)) {
+			showErrorMessage("Unit is empty");
+			unitField.requestFocusInWindow();
 			return;
 		}
 		
@@ -160,30 +257,52 @@ public class ReceiveDeliveryPanel extends StandardMagicPanel {
 			return;
 		}
 		
-		PurchaseOrderItem item = new PurchaseOrderItem();
-		item.setCode(product.getCode());
-		item.setProduct(product2Service.getProduct(product.getProduct2Id()));
-		item.setUnit(product.getUnits().get(0));
-		item.setQuantity(quantityField.getTextAsInteger());
-		
-		if (tableModel.getItems().contains(item)) {
-			if (confirm("Item already exists. Overwrite?")) {
-				tableModel.getItems().remove(item);
-			} else {
-				codeField.setText(null);
-				productDescriptionLabel.setText(null);
-				unitLabel.setText(null);
-				quantityField.setText(null);
-				codeField.requestFocusInWindow();
+		product = productService.findProductByCode(code);
+		if (product != null) {
+			if (!unit.equals(product.getUnits().get(0))) {
+				showErrorMessage("Unit does not match existing code");
+				unitField.requestFocusInWindow();
 				return;
 			}
 		}
 		
-		tableModel.addItem(item);
+		ReceiveDeliveryItem item = new ReceiveDeliveryItem();
+		item.setParent(receiveDelivery);
+		item.setCode(code);
+		item.setProduct(product);
+		item.setUnit(unit);
+		item.setQuantity(quantityField.getTextAsInteger());
+		
+		if (tableModel.getItems().contains(item)) {
+			if (confirm("Item already exists. Overwrite?")) {
+				ReceiveDeliveryItem selectedItem = null;
+				for (ReceiveDeliveryItem tableItem : tableModel.getItems()) {
+					if (tableItem.equals(item)) {
+						selectedItem = tableItem;
+					}
+				}
+				item.setId(selectedItem.getId());
+
+				try {
+					receiveDeliveryService.save(item);
+				} catch (Exception e) {
+					log.error(e.getMessage(), e);
+					showErrorMessage("Error occurred during saving! " + e.getMessage());
+					return;
+				}
+				
+				selectedItem.setQuantity(item.getQuantity());
+				tableModel.fireTableDataChanged();
+			} else {
+				return;
+			}
+		} else {
+			tableModel.addItem(item);
+		}
 		
 		codeField.setText(null);
-		productDescriptionLabel.setText(null);
-		unitLabel.setText(null);
+		productDescriptionField.setText(null);
+		unitField.setText(null);
 		quantityField.setText(null);
 		codeField.requestFocusInWindow();
 	}
@@ -204,20 +323,53 @@ public class ReceiveDeliveryPanel extends StandardMagicPanel {
 
 	@Override
 	protected void doOnBack() {
-		getMagicFrame().switchToPurchasesMenuPanel();
+		getMagicFrame().switchToReceiveDeliveryListPanel();
 	}
 	
-	public void updateDisplay() {
-		clearDisplay();
+	public void updateDisplay(ReceiveDelivery receiveDelivery) {
+		if (receiveDelivery.getId() == null) {
+			this.receiveDelivery = receiveDelivery;
+			clearDisplay();
+			focusOnComponentWhenThisPanelIsDisplayed(supplierCodeField);
+		} else {
+			this.receiveDelivery = receiveDelivery = receiveDeliveryService.getDeliveryService(receiveDelivery.getId());
+			tableModel.setItems(receiveDelivery.getItems());
+			idLabel.setText(String.valueOf(receiveDelivery.getId()));
+			supplierCodeField.setText(receiveDelivery.getSupplier().getCode());
+			supplierNameField.setText(receiveDelivery.getSupplier().getName());
+			receiveDateLabel.setText(FormatterUtil.formatDateTime(receiveDelivery.getReceiveDate()));
+			receivedByLabel.setText(receiveDelivery.getReceivedBy().getUsername());
+			codeField.setEnabled(true);
+			quantityField.setEnabled(true);
+			toCaseButton.setEnabled(true);
+			addButton.setEnabled(true);
+			clearButton.setEnabled(true);
+			deleteButton.setEnabled(true);
+			postButton.setEnabled(true);
+			focusOnComponentWhenThisPanelIsDisplayed(codeField);
+		}
 	}
 
 	private void clearDisplay() {
+		idLabel.setText(null);
+		supplierCodeField.setText(null);
+		supplierCodeField.setEnabled(true);
+		supplierNameField.setText(null);
+		receiveDateLabel.setText(null);
+		receivedByLabel.setText(null);
 		codeField.setText(null);
-		productDescriptionLabel.setText(null);
-		unitLabel.setText(null);
+		codeField.setEnabled(false);
+		productDescriptionField.setText(null);
+		unitField.setText(null);
 		quantityField.setText(null);
+		quantityField.setEnabled(false);
 		totalItemsField.setText("0");
 		tableModel.clear();
+		toCaseButton.setEnabled(false);
+		addButton.setEnabled(false);
+		clearButton.setEnabled(false);
+		deleteButton.setEnabled(false);
+		postButton.setEnabled(false);
 	}
 
 	@Override
@@ -239,6 +391,36 @@ public class ReceiveDeliveryPanel extends StandardMagicPanel {
 		c.gridx = 1;
 		c.gridy = currentRow;
 		c.anchor = GridBagConstraints.WEST;
+		mainPanel.add(ComponentUtil.createLabel(100, "Supplier:"), c);
+		
+		c.weightx = c.weighty = 0.0;
+		c.gridx = 2;
+		c.gridy = currentRow;
+		c.anchor = GridBagConstraints.WEST;
+		mainPanel.add(createSupplierPanel(), c);
+		
+		c.weightx = c.weighty = 0.0;
+		c.weighty = 0.0;
+		c.gridx = 3;
+		c.gridy = currentRow;
+		c.anchor = GridBagConstraints.WEST;
+		mainPanel.add(ComponentUtil.createLabel(100, "ID:"), c);
+		
+		c.weightx = 1.0;
+		c.weighty = 0.0;
+		c.gridx = 4;
+		c.gridy = currentRow;
+		c.anchor = GridBagConstraints.WEST;
+		idLabel.setPreferredSize(new Dimension(100, 25));
+		mainPanel.add(idLabel, c);
+		
+		currentRow++;
+		
+		c.weightx = c.weighty = 0.0;
+		c.fill = GridBagConstraints.NONE;
+		c.gridx = 1;
+		c.gridy = currentRow;
+		c.anchor = GridBagConstraints.WEST;
 		mainPanel.add(ComponentUtil.createLabel(150, "Scan barcode:"), c);
 		
 		c.weightx = c.weighty = 0.0;
@@ -246,17 +428,24 @@ public class ReceiveDeliveryPanel extends StandardMagicPanel {
 		c.gridy = currentRow;
 		c.anchor = GridBagConstraints.WEST;
 		codeField.setPreferredSize(new Dimension(150, 25));
-//		mainPanel.add(codeField, c);
 		mainPanel.add(ComponentUtil.createGenericPanel(
 				codeField,
 				Box.createHorizontalStrut(5),
 				toCaseButton), c);
 		
-		c.weightx = 1.0;
+		c.weightx = c.weighty = 0.0;
 		c.weighty = 0.0;
 		c.gridx = 3;
 		c.gridy = currentRow;
-		mainPanel.add(Box.createGlue(), c);
+		c.anchor = GridBagConstraints.WEST;
+		mainPanel.add(ComponentUtil.createLabel(120, "Receive Date:"), c);
+		
+		c.weightx = 1.0;
+		c.weighty = 0.0;
+		c.gridx = 4;
+		c.gridy = currentRow;
+		c.anchor = GridBagConstraints.WEST;
+		mainPanel.add(receiveDateLabel, c);
 		
 		currentRow++;
 		
@@ -271,8 +460,21 @@ public class ReceiveDeliveryPanel extends StandardMagicPanel {
 		c.gridx = 2;
 		c.gridy = currentRow;
 		c.anchor = GridBagConstraints.WEST;
-		productDescriptionLabel.setPreferredSize(new Dimension(300, 25));
-		mainPanel.add(productDescriptionLabel, c);
+		productDescriptionField.setPreferredSize(new Dimension(300, 25));
+		mainPanel.add(productDescriptionField, c);
+		
+		c.weightx = c.weighty = 0.0;
+		c.weighty = 0.0;
+		c.gridx = 3;
+		c.gridy = currentRow;
+		mainPanel.add(ComponentUtil.createLabel(100, "Received By:"), c);
+		
+		c.weightx = 1.0;
+		c.weighty = 0.0;
+		c.gridx = 4;
+		c.gridy = currentRow;
+		receivedByLabel.setPreferredSize(new Dimension(150, 25));
+		mainPanel.add(receivedByLabel, c);
 		
 		currentRow++;
 		
@@ -287,8 +489,8 @@ public class ReceiveDeliveryPanel extends StandardMagicPanel {
 		c.gridx = 2;
 		c.gridy = currentRow;
 		c.anchor = GridBagConstraints.WEST;
-		unitLabel.setPreferredSize(new Dimension(100, 25));
-		mainPanel.add(unitLabel, c);
+		unitField.setPreferredSize(new Dimension(100, 25));
+		mainPanel.add(unitField, c);
 		
 		currentRow++;
 		
@@ -330,7 +532,7 @@ public class ReceiveDeliveryPanel extends StandardMagicPanel {
 		c.weightx = c.weighty = 1.0;
 		c.gridx = 0;
 		c.gridy = currentRow;
-		c.gridwidth = 4;
+		c.gridwidth = 5;
 		c.anchor = GridBagConstraints.CENTER;
 		JScrollPane itemsTableScrollPane = new JScrollPane(table);
 		itemsTableScrollPane.setPreferredSize(new Dimension(600, 100));
@@ -341,11 +543,48 @@ public class ReceiveDeliveryPanel extends StandardMagicPanel {
 		c = new GridBagConstraints();
 		c.gridx = 0;
 		c.gridy = currentRow;
-		c.gridwidth = 4;
+		c.gridwidth = 5;
 		c.anchor = GridBagConstraints.EAST;
 		mainPanel.add(createTotalsPanel(), c);
 	}
 	
+	private JPanel createSupplierPanel() {
+		JPanel panel = new JPanel();
+		panel.setLayout(new GridBagLayout());
+		
+		GridBagConstraints c = new GridBagConstraints();
+		
+		c.weightx = c.weighty = 0.0;
+		c.gridx = 0;
+		c.gridy = 0;
+		c.anchor = GridBagConstraints.WEST;
+		supplierCodeField.setPreferredSize(new Dimension(120, 25));
+		panel.add(supplierCodeField, c);
+		
+		c.weightx = c.weighty = 0.0;
+		c.gridx = 1;
+		c.gridy = 0;
+		c.anchor = GridBagConstraints.WEST;
+		panel.add(selectSupplierButton, c);
+		
+		c.weightx = 0.0;
+		c.weighty = 0.0;
+		c.gridx = 2;
+		c.gridy = 0;
+		c.anchor = GridBagConstraints.WEST;
+		panel.add(ComponentUtil.createFiller(10, 20), c);
+		
+		c.weightx = 0.0;
+		c.weighty = 0.0;
+		c.gridx = 3;
+		c.gridy = 0;
+		c.anchor = GridBagConstraints.WEST;
+		supplierNameField = ComponentUtil.createLabel(300, "");
+		panel.add(supplierNameField, c);
+		
+		return panel;
+	}
+
 	private JPanel createTotalsPanel() {
 		JPanel panel = new JPanel();
 		panel.setLayout(new GridBagLayout());
@@ -385,21 +624,28 @@ public class ReceiveDeliveryPanel extends StandardMagicPanel {
 	}
 
 	private void postReceiveDelivery() {
-		selectPurchaseOrderDialog.searchUnpostedPurchaseOrders();
-		selectPurchaseOrderDialog.setVisible(true);
-		PurchaseOrder purchaseOrder = selectPurchaseOrderDialog.getSelectedPurchaseOrder();
-		if (purchaseOrder != null) {
-			try {
-				purchaseOrderService.receiveDelivery(purchaseOrder, tableModel.getItems());
-				getMagicFrame().switchToPurchaseOrderPanel(purchaseOrder);
-			} catch (Exception e) {
-				showErrorMessage("Unexpected error occurred: " + e.getMessage());
-			}
+		try {
+			PurchaseOrder purchaseOrder = receiveDeliveryService.post(receiveDelivery);
+			showMessage("Receive Delivery posted!");
+			getMagicFrame().switchToPurchaseOrderPanel(purchaseOrder);
+		} catch (InvalidProductCodeException e) {
+			showErrorMessage("Invalid product code: " + e.getCode());
+			return;
 		}
 	}
 
 	@Override
 	protected void addToolBarButtons(MagicToolBar toolBar) {
+		deleteButton = new MagicToolBarButton("trash", "Delete");
+		deleteButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				deleteReceiveDelivery();
+			}
+		});
+		toolBar.add(deleteButton);
+		
 		postButton = new MagicToolBarButton("post", "Post");
 		postButton.addActionListener(new ActionListener() {
 			
@@ -412,9 +658,22 @@ public class ReceiveDeliveryPanel extends StandardMagicPanel {
 		
 	}
 	
-	private static final String[] columnNames = {"Code", "Description", "Unit", "Quantity"};
+	private void deleteReceiveDelivery() {
+		if (confirm("Do you really want to delete this Receive Delivery?")) {
+			try {
+				receiveDeliveryService.delete(receiveDelivery);
+				showMessage("Receive Delivery deleted");
+				getMagicFrame().switchToReceiveDeliveryListPanel();
+			} catch (Exception e) {
+				log.error(e.getMessage(), e);
+				showErrorMessage("Unexpected error occurred when deleting: " + e.getMessage());
+			}
+		}
+	}
+
+	private static final String[] columnNames = {"Code", "Description", "Unit", "Quantity", "Existing Code?"};
 	
-	private class ReceiveDeliveryTableModel extends ListBackedTableModel<PurchaseOrderItem> {
+	private class ReceiveDeliveryItemsTableModel extends ListBackedTableModel<ReceiveDeliveryItem> {
 
 		@Override
 		public int getColumnCount() {
@@ -428,16 +687,18 @@ public class ReceiveDeliveryPanel extends StandardMagicPanel {
 		
 		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
-			PurchaseOrderItem item = getItems().get(rowIndex);
+			ReceiveDeliveryItem item = getItems().get(rowIndex);
 			switch (columnIndex) {
 			case PRODUCT_CODE_COLUMN_INDEX:
 				return item.getCode();
 			case PRODUCT_DESCRIPTION_COLUMN_INDEX:
-				return item.getProduct().getDescription();
+				return item.getProduct() != null ? item.getProduct().getDescription() : null;
 			case UNIT_COLUMN_INDEX:
 				return item.getUnit();
 			case QUANTITY_COLUMN_INDEX:
 				return item.getQuantity();
+			case EXISTING_PRODUCT_COLUMN_INDEX:
+				return item.getProduct() != null ? "Yes" : "No";
 			default:
 				throw new RuntimeException("Fetching invalid column index: " + columnIndex);
 			}
@@ -446,6 +707,18 @@ public class ReceiveDeliveryPanel extends StandardMagicPanel {
 		@Override
 		protected String[] getColumnNames() {
 			return columnNames;
+		}
+		
+		@Override
+		public void addItem(ReceiveDeliveryItem item) {
+			receiveDeliveryService.save(item);
+			super.addItem(item);
+		}
+		
+		@Override
+		public void removeItem(int index) {
+			receiveDeliveryService.delete(getItem(index));
+			super.removeItem(index);
 		}
 		
 	}

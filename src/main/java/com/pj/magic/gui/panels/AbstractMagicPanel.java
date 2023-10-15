@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -127,6 +128,11 @@ public abstract class AbstractMagicPanel extends JPanel {
 	}
 	
 	protected void focusOnComponentWhenThisPanelIsDisplayed(JComponent component) {
+		ComponentListener[] componentListeners = getComponentListeners();
+		if (componentListeners.length > 0) {
+			removeComponentListener(componentListeners[0]);
+		}
+		
 		final JComponent target = component;
 		addComponentListener(new ComponentAdapter() {
 

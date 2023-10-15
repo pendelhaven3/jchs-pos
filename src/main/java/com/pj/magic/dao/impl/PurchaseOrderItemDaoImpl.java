@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.List;
 
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
@@ -68,8 +69,8 @@ public class PurchaseOrderItemDaoImpl extends MagicDao implements PurchaseOrderI
 
 	private static final String INSERT_SQL =
 			"insert into PURCHASE_ORDER_ITEM"
-			+ " (PURCHASE_ORDER_ID, PRODUCT_ID, UNIT, QUANTITY, COST)"
-			+ " values (?, ?, ?, ?, ?)";
+			+ " (PURCHASE_ORDER_ID, PRODUCT_ID, UNIT, QUANTITY, ACTUAL_QUANTITY, COST)"
+			+ " values (?, ?, ?, ?, ?, ?)";
 	
 	private void insert(final PurchaseOrderItem item) {
 		KeyHolder holder = new GeneratedKeyHolder();
@@ -83,7 +84,12 @@ public class PurchaseOrderItemDaoImpl extends MagicDao implements PurchaseOrderI
 				ps.setLong(2, item.getProduct().getId());
 				ps.setString(3, item.getUnit());
 				ps.setInt(4, item.getQuantity());
-				ps.setBigDecimal(5, item.getCost());
+				if (item.getActualQuantity() != null) {
+					ps.setInt(5, item.getActualQuantity());
+				} else {
+					ps.setNull(5, Types.INTEGER);
+				}
+				ps.setBigDecimal(6, item.getCost());
 				return ps;
 			}
 		}, holder);

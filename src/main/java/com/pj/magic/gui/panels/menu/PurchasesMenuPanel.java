@@ -114,7 +114,7 @@ public class PurchasesMenuPanel extends MenuPanel {
 			getMagicFrame().switchToPurchaseOrderBySpecialCodesListPanel();
 			break;
 		case RECEIVE_DELIVERY:
-			getMagicFrame().switchToReceiveDeliveryPanel();
+			getMagicFrame().switchToReceiveDeliveryListPanel();
 			break;
 		}
 	}

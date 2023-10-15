@@ -65,6 +65,7 @@ import com.pj.magic.model.PurchasePaymentAdjustment;
 import com.pj.magic.model.PurchasePaymentAdjustmentType;
 import com.pj.magic.model.PurchaseReturn;
 import com.pj.magic.model.PurchaseReturnBadStock;
+import com.pj.magic.model.ReceiveDelivery;
 import com.pj.magic.model.ReceivingReceipt;
 import com.pj.magic.model.SalesInvoice;
 import com.pj.magic.model.SalesRequisition;
@@ -225,6 +226,7 @@ public class MagicFrame extends JFrame {
 	public static final String PURCHASE_ORDER_BY_SPECIAL_CODES_LIST_PANEL = "PURCHASE_ORDER_BY_SPECIAL_CODES_LIST_PANEL";
 	public static final String PURCHASE_ORDER_BY_SPECIAL_CODES_PANEL = "PURCHASE_ORDER_BY_SPECIAL_CODES_PANEL";
 	public static final String RECEIVE_DELIVERY_PANEL = "RECEIVE_DELIVERY_PANEL";
+	public static final String RECEIVE_DELIVERY_LIST_PANEL = "RECEIVE_DELIVERY_LIST_PANEL";
 	
 	@Value("${application.title}")
 	private String baseTitle;
@@ -349,6 +351,7 @@ public class MagicFrame extends JFrame {
     @Autowired private PurchaseOrderBySpecialCodesListPanel purchaseOrderBySpecialCodesListPanel;
     @Autowired private PurchaseOrderBySpecialCodesPanel purchaseOrderBySpecialCodesPanel;
     @Autowired private ReceiveDeliveryPanel receiveDeliveryPanel;
+    @Autowired private ReceiveDeliveryListPanel receiveDeliveryListPanel;
 	
 	@Autowired private SystemService systemParameterService;
 	@Autowired private DataSource dataSource;
@@ -532,6 +535,7 @@ public class MagicFrame extends JFrame {
 		panelHolder.add(purchaseOrderBySpecialCodesListPanel, PURCHASE_ORDER_BY_SPECIAL_CODES_LIST_PANEL);
 		panelHolder.add(purchaseOrderBySpecialCodesPanel, PURCHASE_ORDER_BY_SPECIAL_CODES_PANEL);
 		panelHolder.add(receiveDeliveryPanel, RECEIVE_DELIVERY_PANEL);
+		panelHolder.add(receiveDeliveryListPanel, RECEIVE_DELIVERY_LIST_PANEL);
         getContentPane().add(panelHolder);
 
         switchToLoginPanel();
@@ -1422,9 +1426,19 @@ public class MagicFrame extends JFrame {
 		((CardLayout)panelHolder.getLayout()).show(panelHolder, PURCHASE_ORDER_BY_SPECIAL_CODES_PANEL);
 	}
 
+	public void switchToReceiveDeliveryListPanel() {
+        addPanelNameToTitle(receiveDeliveryListPanel.getTitle());
+        receiveDeliveryListPanel.updateDisplay();
+		((CardLayout)panelHolder.getLayout()).show(panelHolder, RECEIVE_DELIVERY_LIST_PANEL);
+	}
+
 	public void switchToReceiveDeliveryPanel() {
+		switchToReceiveDeliveryPanel(new ReceiveDelivery());
+	}
+
+	public void switchToReceiveDeliveryPanel(ReceiveDelivery receiveDelivery) {
         addPanelNameToTitle(receiveDeliveryPanel.getTitle());
-        receiveDeliveryPanel.updateDisplay();
+        receiveDeliveryPanel.updateDisplay(receiveDelivery);
 		((CardLayout)panelHolder.getLayout()).show(panelHolder, RECEIVE_DELIVERY_PANEL);
 	}
 
