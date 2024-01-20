@@ -28,7 +28,6 @@ import com.pj.magic.util.ListUtil;
 @Component
 public class RecordsMaintenanceMenuPanel extends MenuPanel {
 
-    private static final long serialVersionUID = 6070286737713137704L;
     private static final String AREA_LIST = "Area List";
 	private static final String ADJUSTMENT_TYPE_LIST = "Adjustment Type List";
 	private static final String PRODUCT_CATEGORY_LIST = "Product Category List";
@@ -38,6 +37,7 @@ public class RecordsMaintenanceMenuPanel extends MenuPanel {
 	private static final String CUSTOMER_LIST = "Customer List";
 	private static final String CREDIT_CARD_LIST = "Credit Card List";
 	private static final String PURCHASE_PAYMENT_ADJUSTMENT_TYPE_LIST = "Purchase Payment Adjustment Type List";
+	private static final String ECASH_RECEIVER_LIST = "E-Cash Receiver List";
 	
 	@Autowired private LoginService loginService;
 	
@@ -127,6 +127,9 @@ public class RecordsMaintenanceMenuPanel extends MenuPanel {
 		case AREA_LIST:
 			getMagicFrame().switchToAreaListPanel();
 			break;
+		case ECASH_RECEIVER_LIST:
+			getMagicFrame().switchToEcashReceiverListPanel();
+			break;
 		}
 	}
 
@@ -148,7 +151,8 @@ public class RecordsMaintenanceMenuPanel extends MenuPanel {
 //				ADJUSTMENT_TYPE_LIST,
 				AREA_LIST,
 				CREDIT_CARD_LIST,
-				PURCHASE_PAYMENT_ADJUSTMENT_TYPE_LIST
+				PURCHASE_PAYMENT_ADJUSTMENT_TYPE_LIST,
+				ECASH_RECEIVER_LIST
 		));
 		
 		private List<String> menuItems = new ArrayList<>();

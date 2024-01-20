@@ -32,6 +32,7 @@ import com.pj.magic.model.PurchasePaymentBankTransfer;
 import com.pj.magic.model.PurchasePaymentCashPayment;
 import com.pj.magic.model.PurchasePaymentCheckPayment;
 import com.pj.magic.model.PurchasePaymentCreditCardPayment;
+import com.pj.magic.model.PurchasePaymentEcashPayment;
 import com.pj.magic.model.PurchasePaymentPaymentAdjustment;
 import com.pj.magic.model.PurchasePaymentReceivingReceipt;
 import com.pj.magic.model.PurchaseReturn;
@@ -40,7 +41,9 @@ import com.pj.magic.model.search.PurchasePaymentBankTransferSearchCriteria;
 import com.pj.magic.model.search.PurchasePaymentCashPaymentSearchCriteria;
 import com.pj.magic.model.search.PurchasePaymentCheckPaymentSearchCriteria;
 import com.pj.magic.model.search.PurchasePaymentCreditCardPaymentSearchCriteria;
+import com.pj.magic.model.search.PurchasePaymentEcashPaymentSearchCriteria;
 import com.pj.magic.model.search.PurchasePaymentSearchCriteria;
+import com.pj.magic.repository.PurchasePaymentEcashPaymentRepository;
 import com.pj.magic.service.LoginService;
 import com.pj.magic.service.PurchasePaymentAdjustmentService;
 import com.pj.magic.service.PurchasePaymentService;
@@ -67,6 +70,7 @@ public class PurchasePaymentServiceImpl implements PurchasePaymentService {
 	@Autowired private PurchaseReturnBadStockDao purchaseReturnBadStockDao;
 	@Autowired private SystemDao systemDao;
 	@Autowired private PurchasePaymentAdjustmentTypeDao purchasePaymentAdjustmentTypeDao;
+	@Autowired private PurchasePaymentEcashPaymentRepository purchasePaymentEcashPaymentRepository;
 	
 	@Transactional
 	@Override
@@ -102,6 +106,8 @@ public class PurchasePaymentServiceImpl implements PurchasePaymentService {
 		purchasePayment.setCheckPayments(purchasePaymentCheckPaymentDao.findAllByPurchasePayment(purchasePayment));
 		purchasePayment.setBankTransfers(
 				purchasePaymentBankTransferDao.findAllByPurchasePayment(purchasePayment));
+		purchasePayment.setEcashPayments(
+				purchasePaymentEcashPaymentRepository.findAllByPurchasePayment(purchasePayment));
 		purchasePayment.setPaymentAdjustments(
 				purchasePaymentPaymentAdjustmentDao.findAllByPurchasePayment(purchasePayment));
 	}
@@ -324,4 +330,21 @@ public class PurchasePaymentServiceImpl implements PurchasePaymentService {
         return map;
     }
 
+	@Override
+	public void save(PurchasePaymentEcashPayment ecashPayment) {
+		purchasePaymentEcashPaymentRepository.save(ecashPayment);
+	}
+
+	@Transactional
+	@Override
+	public void delete(PurchasePaymentEcashPayment ecashPayment) {
+		purchasePaymentEcashPaymentRepository.delete(ecashPayment);
+	}
+
+	@Override
+	public List<PurchasePaymentEcashPayment> searchPurchasePaymentEcashPayments(
+			PurchasePaymentEcashPaymentSearchCriteria criteria) {
+		return purchasePaymentEcashPaymentRepository.search(criteria);
+	}
+    
 }

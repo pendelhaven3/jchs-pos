@@ -44,6 +44,7 @@ import com.pj.magic.model.BirForm2307Report;
 import com.pj.magic.model.CreditCard;
 import com.pj.magic.model.CreditCardStatement;
 import com.pj.magic.model.Customer;
+import com.pj.magic.model.EcashReceiver;
 import com.pj.magic.model.InventoryCheck;
 import com.pj.magic.model.InventoryCorrection;
 import com.pj.magic.model.Manufacturer;
@@ -227,6 +228,9 @@ public class MagicFrame extends JFrame {
 	public static final String PURCHASE_ORDER_BY_SPECIAL_CODES_PANEL = "PURCHASE_ORDER_BY_SPECIAL_CODES_PANEL";
 	public static final String RECEIVE_DELIVERY_PANEL = "RECEIVE_DELIVERY_PANEL";
 	public static final String RECEIVE_DELIVERY_LIST_PANEL = "RECEIVE_DELIVERY_LIST_PANEL";
+	public static final String ECASH_RECEIVER_LIST_PANEL = "ECASH_RECEIVER_LIST_PANEL";
+	public static final String MAINTAIN_ECASH_RECEIVER_PANEL = "MAINTAIN_ECASH_RECEIVER_PANEL";
+	public static final String ECASH_PURCHASE_PAYMENTS_REPORT_PANEL = "ECASH_PURCHASE_PAYMENTS_REPORT_PANEL";
 	
 	@Value("${application.title}")
 	private String baseTitle;
@@ -352,6 +356,9 @@ public class MagicFrame extends JFrame {
     @Autowired private PurchaseOrderBySpecialCodesPanel purchaseOrderBySpecialCodesPanel;
     @Autowired private ReceiveDeliveryPanel receiveDeliveryPanel;
     @Autowired private ReceiveDeliveryListPanel receiveDeliveryListPanel;
+	@Autowired private EcashReceiverListPanel ecashReceiverListPanel;
+	@Autowired private MaintainEcashReceiverPanel maintainEcashReceiverPanel;
+	@Autowired private EcashPurchasePaymentsReportPanel ecashPurchasePaymentsReportPanel;
 	
 	@Autowired private SystemService systemParameterService;
 	@Autowired private DataSource dataSource;
@@ -536,6 +543,9 @@ public class MagicFrame extends JFrame {
 		panelHolder.add(purchaseOrderBySpecialCodesPanel, PURCHASE_ORDER_BY_SPECIAL_CODES_PANEL);
 		panelHolder.add(receiveDeliveryPanel, RECEIVE_DELIVERY_PANEL);
 		panelHolder.add(receiveDeliveryListPanel, RECEIVE_DELIVERY_LIST_PANEL);
+		panelHolder.add(ecashReceiverListPanel, ECASH_RECEIVER_LIST_PANEL);
+		panelHolder.add(maintainEcashReceiverPanel, MAINTAIN_ECASH_RECEIVER_PANEL);
+		panelHolder.add(ecashPurchasePaymentsReportPanel, ECASH_PURCHASE_PAYMENTS_REPORT_PANEL);
         getContentPane().add(panelHolder);
 
         switchToLoginPanel();
@@ -1440,6 +1450,27 @@ public class MagicFrame extends JFrame {
         addPanelNameToTitle(receiveDeliveryPanel.getTitle());
         receiveDeliveryPanel.updateDisplay(receiveDelivery);
 		((CardLayout)panelHolder.getLayout()).show(panelHolder, RECEIVE_DELIVERY_PANEL);
+	}
+
+	public void switchToEcashReceiverListPanel() {
+		addPanelNameToTitle("E-Cash Receiver List");
+		ecashReceiverListPanel.updateDisplay();
+		((CardLayout)panelHolder.getLayout()).show(panelHolder, ECASH_RECEIVER_LIST_PANEL);
+	}
+
+	public void switchToAddEcashReceiverPanel() {
+		addPanelNameToTitle("Add New E-Cash Receiver");
+		switchToMaintainEcashReceiverPanel(new EcashReceiver());
+	}
+	
+	public void switchToEditEcashReceiverPanel(EcashReceiver ecashReceiver) {
+		addPanelNameToTitle("Edit E-Cash Receiver");
+		switchToMaintainEcashReceiverPanel(ecashReceiver);
+	}
+	
+	public void switchToMaintainEcashReceiverPanel(EcashReceiver ecashReceiver) {
+		maintainEcashReceiverPanel.updateDisplay(ecashReceiver);
+		((CardLayout)panelHolder.getLayout()).show(panelHolder, MAINTAIN_ECASH_RECEIVER_PANEL);
 	}
 
 }

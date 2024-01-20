@@ -7,12 +7,14 @@ import com.pj.magic.model.PurchasePaymentBankTransfer;
 import com.pj.magic.model.PurchasePaymentCashPayment;
 import com.pj.magic.model.PurchasePaymentCheckPayment;
 import com.pj.magic.model.PurchasePaymentCreditCardPayment;
+import com.pj.magic.model.PurchasePaymentEcashPayment;
 import com.pj.magic.model.PurchasePaymentPaymentAdjustment;
 import com.pj.magic.model.PurchasePaymentReceivingReceipt;
 import com.pj.magic.model.search.PurchasePaymentBankTransferSearchCriteria;
 import com.pj.magic.model.search.PurchasePaymentCashPaymentSearchCriteria;
 import com.pj.magic.model.search.PurchasePaymentCheckPaymentSearchCriteria;
 import com.pj.magic.model.search.PurchasePaymentCreditCardPaymentSearchCriteria;
+import com.pj.magic.model.search.PurchasePaymentEcashPaymentSearchCriteria;
 import com.pj.magic.model.search.PurchasePaymentSearchCriteria;
 
 public interface PurchasePaymentService {
@@ -66,5 +68,11 @@ public interface PurchasePaymentService {
 	void unpost(PurchasePayment purchasePayment);
 
     void generateEwtAdjustment(PurchasePayment purchasePayment);
-	
+
+	void save(PurchasePaymentEcashPayment ecashPayment);
+
+	void delete(PurchasePaymentEcashPayment ecashPayment);
+
+	List<PurchasePaymentEcashPayment> searchPurchasePaymentEcashPayments(PurchasePaymentEcashPaymentSearchCriteria criteria);
+
 }

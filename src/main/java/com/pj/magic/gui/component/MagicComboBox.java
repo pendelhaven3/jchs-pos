@@ -2,8 +2,13 @@ package com.pj.magic.gui.component;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 
+import javax.swing.AbstractAction;
 import javax.swing.JComboBox;
+import javax.swing.KeyStroke;
+
+import com.pj.magic.Constants;
 
 public class MagicComboBox<E> extends JComboBox<E> {
 
@@ -50,5 +55,16 @@ public class MagicComboBox<E> extends JComboBox<E> {
 		setSelectedIndex(1);
 		setSelectedIndex(-1);
 	}
+	
+    public void onEnterKey(CustomAction action) {
+        getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), Constants.ENTER_KEY_ACTION_NAME);
+        getActionMap().put(Constants.ENTER_KEY_ACTION_NAME, new AbstractAction() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                action.doAction();
+            }
+        });
+    }
 	
 }

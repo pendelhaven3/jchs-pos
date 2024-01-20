@@ -62,6 +62,16 @@ public class MagicTextField extends JTextField {
 		getActionMap().put(Constants.ENTER_KEY_ACTION_NAME, action);
 	}
 
+    public void onEnterKey(CustomAction action) {
+        onEnterKey(new AbstractAction() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                action.doAction();
+            }
+        });
+    }
+	
 	public void onF5Key(Action action) {
 		getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0), Constants.F5_KEY_ACTION_NAME);
 		getActionMap().put(Constants.F5_KEY_ACTION_NAME, action);
