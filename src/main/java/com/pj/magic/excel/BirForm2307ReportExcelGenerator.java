@@ -50,7 +50,7 @@ public class BirForm2307ReportExcelGenerator {
     private final int SHAPE_INDEX_PAYOR_ADDRESS = 23;
     private final int SHAPE_INDEX_PAYOR_ZIP_CODE = 45;
     
-    private final Pattern TIN_PATTERN = Pattern.compile("^(\\d{3}-\\d{3}-\\d{3}-\\d{3})|\\d{12}$");
+    private final Pattern TIN_PATTERN = Pattern.compile("^(\\d{3}-\\d{3}-\\d{3}-(\\d{3}|\\d{5}))$");
     
     private List<XSSFShape> shapes;
     
@@ -73,7 +73,7 @@ public class BirForm2307ReportExcelGenerator {
         setText(SHAPE_INDEX_PERIOD_TO_YEAR, String.valueOf(toDate.get(Calendar.YEAR)), 14.4);
         
         if (isValidTin(report.getSupplier().getTin())) {
-            String[] tinParts = getTinParts(report.getSupplier().getTin());
+            String[] tinParts = report.getSupplier().getTin().split("-");
             
             setText(SHAPE_INDEX_PAYEE_TIN_1, tinParts[0], 10.8);
             setText(SHAPE_INDEX_PAYEE_TIN_2, tinParts[1], 10.8);
@@ -162,11 +162,6 @@ public class BirForm2307ReportExcelGenerator {
             return TIN_PATTERN.matcher(tin).matches();
         }
         return false;
-    }
-    
-    private String[] getTinParts(String tin) {
-        String regex = tin.length() == 12 ? "(?<=\\\\G.{4})" : "-";
-        return tin.split(regex);
     }
     
 }
