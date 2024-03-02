@@ -50,7 +50,7 @@ public class BirForm2307ReportExcelGenerator {
     private final int SHAPE_INDEX_PAYOR_ADDRESS = 23;
     private final int SHAPE_INDEX_PAYOR_ZIP_CODE = 45;
     
-    private final Pattern TIN_PATTERN = Pattern.compile("^(\\d{3}-\\d{3}-\\d{3}-(\\d{3}|\\d{5}))$");
+    private final Pattern TIN_PATTERN = Pattern.compile("^(\\d{3}-\\d{3}-\\d{3}-(\\d{3}|\\d{4}|\\d{5}))$");
     
     private List<XSSFShape> shapes;
     
