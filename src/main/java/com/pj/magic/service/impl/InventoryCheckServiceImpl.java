@@ -13,6 +13,7 @@ import com.pj.magic.dao.SystemDao;
 import com.pj.magic.model.AreaInventoryReportItem;
 import com.pj.magic.model.InventoryCheck;
 import com.pj.magic.model.InventoryCheckSummaryItem;
+import com.pj.magic.model.Product2;
 import com.pj.magic.model.search.AreaInventoryReportItemSearchCriteria;
 import com.pj.magic.repository.Product2Repository;
 import com.pj.magic.service.InventoryCheckService;
@@ -70,7 +71,10 @@ public class InventoryCheckServiceImpl implements InventoryCheckService {
 	public void post(InventoryCheck inventoryCheck) {
 		InventoryCheck updated = getInventoryCheck(inventoryCheck.getId());
 		for (InventoryCheckSummaryItem item : updated.getSummaryItems()) {
-			product2Repository.addAvailableQuantity(item.getProduct().getId(), item.getUnit(), item.getQuantity());
+			Product2 product = product2Repository.get(item.getProduct().getId());
+			product.addUnitQuantity(item.getUnit(), item.getQuantityDifference());
+			product2Repository.addAvailableQuantity(item.getProduct().getId(), item.getUnit(), item.getQuantityDifference());
+			
 			item.setParent(inventoryCheck);
 			inventoryCheckSummaryItemDao.save(item);
 		}
