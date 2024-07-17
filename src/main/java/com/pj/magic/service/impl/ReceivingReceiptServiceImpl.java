@@ -14,6 +14,7 @@ import com.pj.magic.dao.ReceivingReceiptItemDao;
 import com.pj.magic.dao.SystemDao;
 import com.pj.magic.exception.AlreadyCancelledException;
 import com.pj.magic.exception.AlreadyPostedException;
+import com.pj.magic.exception.PostReceivingReceiptException;
 import com.pj.magic.model.Product2;
 import com.pj.magic.model.ProductCanvassItem;
 import com.pj.magic.model.ReceivingReceipt;
@@ -107,7 +108,7 @@ public class ReceivingReceiptServiceImpl implements ReceivingReceiptService {
 					product.autoCalculateCostsOfSmallerUnits(item.getUnit());
 				}
 			} catch (Exception e) {
-				throw e;
+				throw new PostReceivingReceiptException(item.getCode(), e);
 			}
 			product2Repository.updateCosts(product);
 			

@@ -37,6 +37,7 @@ import org.springframework.stereotype.Component;
 
 import com.pj.magic.exception.AlreadyCancelledException;
 import com.pj.magic.exception.AlreadyPostedException;
+import com.pj.magic.exception.PostReceivingReceiptException;
 import com.pj.magic.gui.MagicFrame;
 import com.pj.magic.gui.component.DatePickerFormatter;
 import com.pj.magic.gui.component.MagicFileChooser;
@@ -502,18 +503,19 @@ public class ReceivingReceiptPanel extends StandardMagicPanel {
 			try {
 				receivingReceiptService.post(receivingReceipt);
 				showMessage("Post successful!");
-				updateDisplay(receivingReceipt);
 			} catch (AlreadyPostedException e) {
 				showErrorMessage("Receiving Receipt already posted");
-				updateDisplay(receivingReceipt);
 			} catch (AlreadyCancelledException e) {
 				showErrorMessage("Receiving Receipt already cancelled");
-				updateDisplay(receivingReceipt);
+			} catch (PostReceivingReceiptException e) {
+				log.error(e.getMessage(), e);
+				showErrorMessage("Unexpected error occurred during posting!\nLast product code being processed: " + e.getProductCode());
 			} catch (Exception e) {
 				log.error(e.getMessage(), e);
 				showErrorMessage("Unexpected error occurred during posting!");
-				updateDisplay(receivingReceipt);
 			}
+			
+			updateDisplay(receivingReceipt);
 		}
 	}
 

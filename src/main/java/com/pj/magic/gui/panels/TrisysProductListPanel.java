@@ -261,8 +261,6 @@ public class TrisysProductListPanel extends StandardMagicPanel {
             		continue;
             	}
             	
-            	System.out.println("updating product code " + code);
-            	
                 String unit1 = nextLine[8];
                 String unit2 = nextLine[9];
                 if ("null".equals(unit2)) {
@@ -295,6 +293,10 @@ public class TrisysProductListPanel extends StandardMagicPanel {
                 product.getUnitConversions().add(new UnitConversion(unit1, unitConversion1));
                 if (!StringUtils.isEmpty(nextLine[9]) && !"null".equals(nextLine[9])) {
                     product.getUnitConversions().add(new UnitConversion(unit2, unitConversion2));
+                }
+                
+                if ("00000000044501".equals(code) && ("PACK".equals(unit1) || "PACK".equals(unit2))) {
+                	continue;
                 }
                 
                 productService.updateProduct(product);
