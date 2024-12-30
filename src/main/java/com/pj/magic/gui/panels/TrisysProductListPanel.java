@@ -295,6 +295,10 @@ public class TrisysProductListPanel extends StandardMagicPanel {
                     product.getUnitConversions().add(new UnitConversion(unit2, unitConversion2));
                 }
                 
+                if ("000000000445".equals(code) && ("PACK".equals(unit1) || "PACK".equals(unit2))) {
+                	continue;
+                }
+                
                 if ("00000000044501".equals(code) && ("PACK".equals(unit1) || "PACK".equals(unit2))) {
                 	continue;
                 }
